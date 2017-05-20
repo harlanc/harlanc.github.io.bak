@@ -1,0 +1,917 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 普通作用域中的隐藏名字实际上和继承没有关系。有关系的是作用域。我们都知道像下面的代码： 1234567891011 int x;                 // global variable void someFunc&amp;lt;!--more--&amp;gt;) &amp;#123; double x;          // local variable std::cin &amp;gt;&amp;gt; x;">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective C++ Item 33 避免隐藏继承而来的名字">
+<meta property="og:url" content="http://yoursite.com/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 普通作用域中的隐藏名字实际上和继承没有关系。有关系的是作用域。我们都知道像下面的代码： 1234567891011 int x;                 // global variable void someFunc&amp;lt;!--more--&amp;gt;) &amp;#123; double x;          // local variable std::cin &amp;gt;&amp;gt; x;">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205232604-2077757503.png">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205309620-2055878691.png">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205340135-333941176.png">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205353510-1969970357.png">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.892Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective C++ Item 33 避免隐藏继承而来的名字">
+<meta name="twitter:description" content="1. 普通作用域中的隐藏名字实际上和继承没有关系。有关系的是作用域。我们都知道像下面的代码： 1234567891011 int x;                 // global variable void someFunc&amp;lt;!--more--&amp;gt;) &amp;#123; double x;          // local variable std::cin &amp;gt;&amp;gt; x;">
+<meta name="twitter:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205232604-2077757503.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/"/>
+
+
+
+
+
+  <title>读书笔记 effective C++ Item 33 避免隐藏继承而来的名字 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective C++ Item 33 避免隐藏继承而来的名字</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-15T20:56:00+08:00">
+                2017-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/" class="leancloud_visitors" data-flag-title="读书笔记 effective C++ Item 33 避免隐藏继承而来的名字">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><h2 id="1-普通作用域中的隐藏"><a href="#1-普通作用域中的隐藏" class="headerlink" title="1. 普通作用域中的隐藏"></a>1. 普通作用域中的隐藏</h2><p>名字实际上和继承没有关系。有关系的是作用域。我们都知道像下面的代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"> int x;                 // global variable</div><div class="line"></div><div class="line"> void someFunc</div><div class="line">&lt;!--more--&gt;</div><div class="line">)</div><div class="line"> &#123;</div><div class="line"> double x;          // local variable</div><div class="line"></div><div class="line"> std::cin &gt;&gt; x;     // read a new value for local x</div><div class="line"></div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>读入x的声明指向的是本地的x而不是全局的x，因为内部作用域的名字将外部作用域的变量隐藏掉了。我们将作用域的这种情况用以下方式进行可视化：</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205232604-2077757503.png" alt=""></p>
+<p>当编译器在someFunc的作用域中时，遇到了名字x,它们先在本地作用域中查询是否有以这个名字命名的一些东西。因为存在，它们就不再检查别的作用域了。在这种情况中，someFunc的x是double类型，而global的x是int类型，这没有关系。C++的名字隐藏规则会对其进行处理：隐藏名字。不管与名字对应的是相同还是不同的类型都没有关系。在这种情况中，被命名为x的double隐藏了命名为x的int。</p>
+<h2 id="2-编译器是如何在继承体系中寻找名字的"><a href="#2-编译器是如何在继承体系中寻找名字的" class="headerlink" title="2. 编译器是如何在继承体系中寻找名字的"></a>2. 编译器是如何在继承体系中寻找名字的</h2><p>现在进入继承。我们知道当我们处在一个派生类成员函数内部时，并且引用了一些基类的东西（例如，一个成员函数，一个typedef或者一个数据成员），编译器能够找到我们所引用的东西，因为派生类继承了声明在基类中的这些东西。实际的工作方式是派生类的作用域被镶嵌在基类作用域内部。举个例子：</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205309620-2055878691.png" alt=""></p>
+<p>这个类中既有public的名字也有private的名字，既有数据成员也有成员函数。成员函数包括纯虚函数，普通虚函数（非纯虚函数）以及非虚函数。这是为了强调我们要讨论的是名字而不是别的。例子中也能包含类型名称，例如，枚举，嵌套类和typedefs。在这次的讨论中我们唯一关心的是他们是名字。他们是什么样的类型无关紧要。这个例子使用的是单继承，但是一旦你明白了在单继承下会发生什么，多继承下的C++行为很容易就能够预推测出来。</p>
+<p>假设派生类中的mf4定义如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">void Derived::mf4()</div><div class="line">&#123;</div><div class="line">...</div><div class="line">mf2();</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当编译器看到这里使用了名字mf2，它们必须理解mf2指向的是什么。它们会在作用域中寻找名字为mf2的一个声明。首先他们在local作用域中寻找，但是发现没有任何名字为mf4的声明。接下来寻找包含（containing）作用域，也就是类Derived。它们仍然没有发现mf2，所以它们进入了下一个包含作用域，也就是基类。在这里找到了名字为mf2的声明，搜索结束了。如果在基类中没有mf2,搜索会继续进行，首先在包含Derived的namespace(s)中寻找，最后在全局作用域内寻找。</p>
+<p>我们刚刚描述的流程是准确的，但是对于名字如何在C++中被发现来说是不全面的。我们的目标不是为了了解足够的名字寻找规则然后实现一个编译器，然而，我们应该了解足够的规则来避免碰到一些让人感到意外的事情，对这个工作，我们已经了解了大量的信息了。</p>
+<h2 id="3-继承体系中的名字是如何被隐藏的"><a href="#3-继承体系中的名字是如何被隐藏的" class="headerlink" title="3. 继承体系中的名字是如何被隐藏的"></a>3. 继承体系中的名字是如何被隐藏的</h2><p>考虑前面的例子，这次我们除了要重载mf1和mf3之外，也在Derived中添加一个mf3版本。（正如Item36中解释的，Derived中mf3的声明——一个继承而来的非virtual函数——会让这个设计看起来很可疑，但是为了理解继承下的名字可见性，我们忽略这个问题。）</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Base</span> &#123;</div><div class="line"><span class="keyword">private</span>:</div><div class="line"><span class="keyword">int</span> x;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span>(<span class="params"></span>) </span>= <span class="number">0</span>;</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span>(<span class="params"><span class="keyword">int</span></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf2</span>(<span class="params"></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mf3</span>(<span class="params"></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mf3</span>(<span class="params"><span class="keyword">double</span></span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Derived</span>: <span class="title">public</span> <span class="title">Base</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span>(<span class="params"></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mf3</span>(<span class="params"></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mf4</span>(<span class="params"></span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205340135-333941176.png" alt=""></p>
+<p>这段代码产生的行为会让每个首次碰到这种情况的C++程序员都感到吃惊。基于作用域的名字隐藏规则并没有变化，所以基类中的名字为mf1和mf3的所有函数被派生类中相同名字的函数隐藏掉了。从名字搜寻的角度来看，Base::mf1和Base::mf3不再被Derived继承了！</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Derived d;</div><div class="line"><span class="keyword">int</span> x;</div><div class="line">...</div><div class="line">d.mf1(); <span class="comment">// fine, calls Derived::mf1</span></div><div class="line">d.mf1(x); <span class="comment">// error! Derived::mf1 hides Base::mf1</span></div><div class="line"></div><div class="line">d.mf2();         <span class="comment">// fine, calls Base::mf2</span></div><div class="line"></div><div class="line">d.mf3();         <span class="comment">// fine, calls Derived::mf3</span></div><div class="line"></div><div class="line">d.mf3(x);                     <span class="comment">// error! Derived::mf3 hides Base::mf3</span></div></pre></td></tr></table></figure>
+<p>正如你所看到的，对于有相同名字的基类和派生类中的函数有，即使参数类型不同，上面的隐藏规则也同样适用，并且它和函数的虚与非虚没有关系。在这个条款开始也是同样的方式，函数someFunc中的double x隐藏了全局作用域的int x，在这里Derived中的函数mf3隐藏了基类中名字为mf3的函数，即使参数类型不一样。</p>
+<h2 id="4-如何将隐藏行为覆盖掉"><a href="#4-如何将隐藏行为覆盖掉" class="headerlink" title="4. 如何将隐藏行为覆盖掉"></a>4. 如何将隐藏行为覆盖掉</h2><p>这种行为背后的基本原理在于当你在一个库或者应用框架中创建一个新的派生类时，它能够阻止你突然从遥远的基类中继承重载函数。不幸的是，你总是想继承重载函数。事实上，如果你正在使用public继承并且没有继承重载函数，你就违反了基类和派生类之间的”is-a”关系，这是<a href="http://www.cnblogs.com/harlanc/p/6551155.html" title="Item 32" target="_blank" rel="external">Item 32</a>中介绍的public继承的基本原则。这就是基本情况，你总是想对继承来的名字的默认隐藏行为进行覆盖。</p>
+<h3 id="4-1-方法一-使用using-声明"><a href="#4-1-方法一-使用using-声明" class="headerlink" title="4.1 方法一 使用using 声明"></a>4.1 方法一 使用using 声明</h3><p>使用using声明来达到这个目的：</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205353510-1969970357.png" alt=""></p>
+<p>现在的继承就按照你所期望的进行工作了：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Derived d;</div><div class="line"><span class="keyword">int</span> x;</div><div class="line">...</div><div class="line">d.mf1(); <span class="comment">// still fine, still calls Derived::mf1</span></div><div class="line">d.mf1(x); <span class="comment">// now okay, calls Base::mf1</span></div><div class="line"></div><div class="line">d.mf2();         <span class="comment">// still fine, still calls Base::mf2</span></div><div class="line"></div><div class="line">d.mf3();         <span class="comment">// fine, calls Derived::mf3</span></div><div class="line"></div><div class="line">d.mf3(x);    <span class="comment">// now okay, calls Base::mf3 (The int x is</span></div><div class="line"><span class="comment">// implicitly converted to a double so that</span></div><div class="line"><span class="comment">// the call to Base::mf3 is valid.)</span></div></pre></td></tr></table></figure>
+<p>这意味着如果你的类继承自包含重载函数的基类，你想对其中的一些函数进行重新定义或者覆盖，你需要为每个即将被隐藏掉的名字包含一个using声明，如果你不这样做，你想继承的一些名字就会被隐藏。</p>
+<h3 id="4-2-方法二-使用forwarding函数"><a href="#4-2-方法二-使用forwarding函数" class="headerlink" title="4.2 方法二 使用forwarding函数"></a>4.2 方法二 使用forwarding函数</h3><p>有时候你并不想继承基类的所有函数，这是可能的。在public继承下，你应该永远拒绝这种行为，因为，它违反了基类和派生类之间public继承的”is-a”关系。（这也是为什么上面的using声明放在派生类的public部分：基类中的public名字在public继承的派生类中应该也是public的）。然而在private继承中(见Item 39)，它也是有意义的。举个例子，假设Derived私有继承自基类Base,Derived类想继承基类函数mf1的唯一版本是不带参数的版本。Using声明在这里就不工作了，因为一个using声明会使得所有继承而来的函数的名字在派生类中是可见的。这里可以使用不同的技术，也就是简单的forwarding函数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Base &#123;</div><div class="line">public:</div><div class="line">virtual void mf1() = 0;</div><div class="line">virtual void mf1(int);</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">// as before</div><div class="line"></div><div class="line">&#125;;</div><div class="line">class Derived: private Base &#123;</div><div class="line">public:</div><div class="line">virtual void mf1() // forwarding function; implicitly</div><div class="line">&#123; Base::mf1(); &#125; // inline — see [Item 30](http://www.cnblogs.com/harlanc/p/6523201.html "Item 30"). (For info</div><div class="line">... // on calling a pure virtual</div><div class="line">&#125;; // function, see Item 34.)</div><div class="line">...</div><div class="line">Derived d;</div><div class="line">int x;</div><div class="line">d.mf1(); // fine, calls Derived::mf1</div><div class="line">d.mf1(x); // error! Base::mf1() is hidden</div></pre></td></tr></table></figure>
+<p>另外一种使用inline forwarding函数的地方是在使用比较老的编译器的时候，它们不支持通过using 声明来将继承而来的名字导入到派生类作用域中。</p>
+<p>这就是关于继承和名字隐藏的全部故事，但是当继承同模板结合起来的时候，一个完全不同的“继承而来的名字被隐藏”问题就会出现，详情见 Item 43。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><ul>
+<li><ul>
+<li>派生类中的名字会将基类中的名字隐藏掉。在公共继承中，这绝不是令人满意的。</li>
+<li>为了让隐藏起来的名字重见天日，使用using声明或者forwarding函数来达到目的。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/14/2017-03-14_22_28_读书笔记_effective_c++__Item_32_确保public继承建立“is-a”模型/" rel="next" title="读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/" rel="prev" title="读书笔记 effective c++ Item 34 区分接口继承和实现继承">
+                读书笔记 effective c++ Item 34 区分接口继承和实现继承 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-普通作用域中的隐藏"><span class="nav-number">1.1.</span> <span class="nav-text">1. 普通作用域中的隐藏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-编译器是如何在继承体系中寻找名字的"><span class="nav-number">1.2.</span> <span class="nav-text">2. 编译器是如何在继承体系中寻找名字的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-继承体系中的名字是如何被隐藏的"><span class="nav-number">1.3.</span> <span class="nav-text">3. 继承体系中的名字是如何被隐藏的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-如何将隐藏行为覆盖掉"><span class="nav-number">1.4.</span> <span class="nav-text">4. 如何将隐藏行为覆盖掉</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-方法一-使用using-声明"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 方法一 使用using 声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-方法二-使用forwarding函数"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 方法二 使用forwarding函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-number">1.5.</span> <span class="nav-text">5. 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

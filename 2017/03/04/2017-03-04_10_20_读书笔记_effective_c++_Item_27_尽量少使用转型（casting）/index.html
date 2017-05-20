@@ -1,0 +1,932 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="C++设计的规则是用来保证使类型相关的错误不再可能出现。理论上来说，如果你的程序能够很干净的通过编译，它就不会尝试在任何对象上执行任何不安全或无意义的操作。这个保证很有价值，不要轻易放弃它。 不幸的是，casts颠覆了类型系统。它导致了各种麻烦的出现，一些很容易识别，一些却">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 27 尽量少使用转型（casting）">
+<meta property="og:url" content="http://yoursite.com/2017/03/04/2017-03-04_10_20_读书笔记_effective_c++_Item_27_尽量少使用转型（casting）/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="C++设计的规则是用来保证使类型相关的错误不再可能出现。理论上来说，如果你的程序能够很干净的通过编译，它就不会尝试在任何对象上执行任何不安全或无意义的操作。这个保证很有价值，不要轻易放弃它。 不幸的是，casts颠覆了类型系统。它导致了各种麻烦的出现，一些很容易识别，一些却">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.712Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 27 尽量少使用转型（casting）">
+<meta name="twitter:description" content="C++设计的规则是用来保证使类型相关的错误不再可能出现。理论上来说，如果你的程序能够很干净的通过编译，它就不会尝试在任何对象上执行任何不安全或无意义的操作。这个保证很有价值，不要轻易放弃它。 不幸的是，casts颠覆了类型系统。它导致了各种麻烦的出现，一些很容易识别，一些却">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/04/2017-03-04_10_20_读书笔记_effective_c++_Item_27_尽量少使用转型（casting）/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 27 尽量少使用转型（casting） | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/04/2017-03-04_10_20_读书笔记_effective_c++_Item_27_尽量少使用转型（casting）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 27 尽量少使用转型（casting）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-04T10:20:00+08:00">
+                2017-03-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/04/2017-03-04_10_20_读书笔记_effective_c++_Item_27_尽量少使用转型（casting）/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/04/2017-03-04_10_20_读书笔记_effective_c++_Item_27_尽量少使用转型（casting）/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 27 尽量少使用转型（casting）">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><p>C++设计的规则是用来保证使类型相关的错误不再可能出现。理论上来说，如果你的程序能够很干净的通过编译，它就不会尝试在任何对象上执行任何不安全或无意义的操作。这个保证很有价值，不要轻易放弃它。</p>
+<p>不幸的是，casts颠覆了类型系统。它导致了各种麻烦的出现，一些很容易识别，一些却<br><a id="more"></a><br>狡猾（不容易被识别）。如果你以前使用过C,java或者C#，你就需要注意了，因为在这些语言中casting是更加必不可少的，但却比C++更安全。C++不是C，不是java也不是C#，在C++中，你需要怀着极大的敬意来使用casting。</p>
+<h2 id="1-新旧风格cast回顾"><a href="#1-新旧风格cast回顾" class="headerlink" title="1. 新旧风格cast回顾"></a>1. 新旧风格cast回顾</h2><h3 id="1-1-旧风格cast"><a href="#1-1-旧风格cast" class="headerlink" title="1.1 旧风格cast"></a>1.1 旧风格cast</h3><p>先让我们回顾一下casting的语法，通常有三种不同的方法来实现同一个cast。C风格的casts如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(T) expression <span class="comment">// cast expression to be of type T</span></div></pre></td></tr></table></figure>
+<p>函数风格的casts使用下面的语法：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">T(expression) <span class="comment">// cast expression to be of type T</span></div></pre></td></tr></table></figure>
+<p>上面的两种形式在意义上没有区别，只是放括号的地方不一样。我们将这两种形式的casts叫做旧式风格的casts。</p>
+<h3 id="1-2-C-风格的cast"><a href="#1-2-C-风格的cast" class="headerlink" title="1.2 C++风格的cast"></a>1.2 C++风格的cast</h3><p>C++同样提供四种新的casts形式（C++风格的casts）:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">const_cast&lt;T&gt;(expression)</div><div class="line">dynamic_cast&lt;T&gt;(expression)</div><div class="line">reinterpret_cast&lt;T&gt;(expression)</div><div class="line">static_cast&lt;T&gt;(expression)</div></pre></td></tr></table></figure>
+<p>每种方法都有独特的用途：</p>
+<ul>
+<li>Const_cast是用来去除对象的常量性的（constness）。在四个C++风格的cast中，const_cast是唯一能做到这一点的。</li>
+<li>Dynamic_cast主要用来执行“安全的向下转型”，也就是决定一个特定类型的对象是否在一个继承体系中。<strong>这也是唯一一个不能用旧式风格语法来实现的**</strong>cast<strong>。</strong>它也是唯一一个可能会出现巨大的运行时开销的<strong>**cast</strong>。（稍后会详细讲解）</li>
+<li>Reinterpret_cast被用来做低级的casts，结果可能依赖于编译器，也就是代码不能被移植，例如，将一个指针转换成int。这种casts除了用在低级代码中，其他地方很少见。本书中只出现过一次，就是在讨论如何为原生内存（raw memory）实现一个调试分配器(Item 50)。</li>
+<li>Static_cast能被用来做强制的显示类型转换（比如，non-const对象转换成const对象(<a href="http://www.cnblogs.com/harlanc/p/6384546.html" title="Item 3" target="_blank" rel="external">Item 3</a>)，int转换成double等等。）它同样能够用来对这些转换进行反转（比如，void*转换成具体类型指针，指向base的指针转换成指向派生类的指针），但是不能从const转换成非const对象（只有const_cast能这么做）。</li>
+</ul>
+<h3 id="1-3-旧风格PK新风格"><a href="#1-3-旧风格PK新风格" class="headerlink" title="1.3 旧风格PK新风格"></a>1.3 旧风格PK新风格</h3><p>旧式风格的casts仍然合法，但是新风格的更好。第一，在代码中它们更加容易被辨别（对于人或者工具来说），因此简化了在代码中寻找转型动作的过程。第二，每个cast更加特别的使用用途使得编译器能够诊断出使用错误成为可能。譬如，如果你使用其它3个cast而不是const_cast来去除常量的常量性，你的代码无法通过编译。</p>
+<p>我使用旧式风格cast的唯一地方是当我想通过调用一个explici构造函数来为一个函数传递一个对象的时候。比如：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">Widget</span>(<span class="params"><span class="keyword">int</span> size</span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomeWork</span>(<span class="params"><span class="keyword">const</span> Widget&amp; w</span>)</span>;</div><div class="line">doSomeWork(Widget(<span class="number">15</span>));                     <span class="comment">// create Widget from int</span></div><div class="line"><span class="comment">// with function-style cast</span></div><div class="line"></div><div class="line">doSomeWork(static_cast&lt;Widget&gt;(<span class="number">15</span>));      <span class="comment">// create Widget from int</span></div><div class="line"><span class="comment">// with C++-style cast</span></div></pre></td></tr></table></figure>
+<p>从某种意义上来说，这种对象的创建不像是一个cast,所以使用了函数风格的cast而不是static_cast。（这两种方法做了相同的事情：创建一个临时Widget对象然后传递给doSomeWork。）需要再说一遍，使用旧式转型实现的代码往往当时感觉很合理，但日后可能出现core dump，所以最好忽略这种感觉，总是使用新风格的casts。</p>
+<h2 id="2-使用cast会产生运行时代码——不要认为你以为的就是你以为的"><a href="#2-使用cast会产生运行时代码——不要认为你以为的就是你以为的" class="headerlink" title="2. 使用cast会产生运行时代码——不要认为你以为的就是你以为的"></a>2. 使用cast会产生运行时代码——不要认为你以为的就是你以为的</h2><p>许多程序员认为cast除了告诉编译器需要将一个类型当作另外一个类型之外，没有做任何事情，但这个一个误区。任何种类的类型转换（不管显示cast还是隐式转换）都会产生运行时代码。举个例子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> x, y;</div><div class="line">...</div><div class="line"><span class="keyword">double</span> d = static_cast&lt;<span class="keyword">double</span>&gt;(x)/y; <span class="comment">// divide x by y, but use</span></div><div class="line"><span class="comment">// floating point division</span></div></pre></td></tr></table></figure>
+<p>将int x转换成double肯定会产生代码，因为在大多数系统架构中，int的底层表示同double是不一样的。这也许不会让你吃惊，但下面的例子可能亮瞎你的双眼：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Base</span> &#123; ... &#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Derived</span>: <span class="title">public</span> <span class="title">Base</span> &#123; ... &#125;;</div><div class="line">Derived d;</div><div class="line"></div><div class="line">Base *pb = &amp;d;                                    <span class="comment">// implicitly convert Derived* ⇒ Base*</span></div></pre></td></tr></table></figure>
+<p>这里我们只是创建了一个指向派生类对象的基类指针，但<strong>有时候</strong>，这两个指针（Derived<em>和Base</em>）值将会不一样。在上面的情况中，运行时会在Derived<em>指针上应用一个偏移量来产生正确的Base</em>指针值。</p>
+<p>最后这个例子表明一个对象（比如Derived类型的对象）可能有多于一个的地址（比如，当Base<em>指针指向这个对象和Derived</em>指向这个对象时有两个地址）。这在C，java和C#中不可能发生。事实上，当使用多继承时，这种情况总会发生，但在单继承中也能发生。这意味着在C++中你应该避免对一些东西是如何布局的做出假设。例如，<strong>将对象地址转换成**</strong>char<em>指针然后在此指针上面进行指针算术运算几乎总是会产生未定义行为*</em>。</p>
+<p>但是注意我说过偏移量“有时候“是需要的。对象的布局方式和地址被计算的方式会随编译器的不同而不同。这意味着仅仅因为你了解一种平台上的布局和转型并不意味着在别的平台上也能如此工作。世界上充满了从中吸取教训的悲哀的程序员。</p>
+<h2 id="3-Cast很容易被误用——无效状态是如何产生的"><a href="#3-Cast很容易被误用——无效状态是如何产生的" class="headerlink" title="3. Cast很容易被误用——无效状态是如何产生的"></a>3. Cast很容易被误用——无效状态是如何产生的</h2><p>关于cast的一件有趣的事情是容易写出看上去正确但实际错误的代码。比如，许多应用框架需要派生类中的虚函数实现首先要调用基类部分。假设我们有一个Window基类和一个SpecialWindow派生类，两个类中都定义了onResize虚函数。进一步假设SpecialWindow的onResize函数首先要调用Window的onResize函数。下面的实现方式看上去正确，实际上并非如此：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Window</span> &#123;                       <span class="comment">// base class</span></div><div class="line"></div><div class="line"><span class="keyword">public</span>:                                   </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span>(<span class="params"></span>) </span>&#123; ... &#125;           <span class="comment">// base onResize impl</span></div><div class="line"></div><div class="line">...                                                   </div><div class="line"></div><div class="line">&#125;;                                                   </div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">SpecialWindow</span>: <span class="title">public</span> <span class="title">Window</span> &#123;       <span class="comment">// derived class</span></div><div class="line"></div><div class="line"><span class="keyword">public</span>:                                                       </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onResize</span>(<span class="params"></span>) </span>&#123;                             <span class="comment">// derived onResize impl;</span></div><div class="line"></div><div class="line">static_cast&lt;Window&gt;(*<span class="keyword">this</span>).onResize();     <span class="comment">// cast *this to Window,</span></div><div class="line"></div><div class="line"><span class="comment">// then call its onResize;</span></div><div class="line"><span class="comment">// this doesn’t work!</span></div><div class="line">... <span class="comment">// do SpecialWindow-</span></div><div class="line">&#125; <span class="comment">// specific stuff</span></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>我已经对代码中的cast标注了红色。（它是新风格的cast，使用旧风格的转换也不会改变如下事实）。正如你所期望的，代码将<em>this转换成一个window对象。因此调用onResize时会触发Window:: onResize。你可能想不到的是它并没有在当前的对象上触发相应的函数。相反，<strong>转型动作为**</strong></em>this<strong><strong>的基类部分创建了一份新的临时拷贝，</strong></strong>onResize<strong>**是在这份拷贝上被触发的</strong>！上面的代码没有在当前对象上调用Window::onResize然后在此对象上执行SpecialWindow的指定动作——它在执行特定动作之前，在当前对象基类部分的拷贝之上调用了Window::onResize。如果Window::onResize修改了当前对象（很有可能，既然onResize是non-const成员函数），当前的对象（Window对象）是不会被修改的。修改的是对象的拷贝。然而如果SpecialWIndow::onResize修改当前对象，当前对象将会被修改，导致上面代码会为当前对象留下一个无效状态：<strong>基类部分没有被修改，派生类部分却被修改了</strong>。</p>
+<p>解决方法是消除cast的使用，你不想欺骗编译器让其把*this当作一个基类对象。你想的是在当前对象上调用onResize的基类版本。所以按照下面的方法做：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class SpecialWindow: public Window &#123;</div><div class="line">public:</div><div class="line">virtual void onResize() &#123;</div><div class="line">Window::onResize(); // call Window::onResize</div><div class="line">... // on *this</div><div class="line">&#125;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这个例子同样表明如果你发现你自己想使用cast了，它就标志着你可能会使用错误的方式来应用它。使用dynamic_cast的时候也是如此。</p>
+<h2 id="4-Dynamic-cast-分析"><a href="#4-Dynamic-cast-分析" class="headerlink" title="4. Dynamic_cast 分析"></a>4. Dynamic_cast 分析</h2><h3 id="4-1-Dynamic-cast速度很慢"><a href="#4-1-Dynamic-cast速度很慢" class="headerlink" title="4.1 Dynamic_cast速度很慢"></a>4.1 Dynamic_cast速度很慢</h3><p>在深入研究dynamic_cast的设计含义之前，我们能观察到dynamic_cast的很多实现其速度是非常慢的。举个例子，至少有一种普通的实现在某种程度上是基于类名称的字符串比较。如果你正在一个4层深的单继承体系的对象上执行dynamic_cast，在这样一种实现（也就是上面说的普通实现）下每个dynamic_cast至多可能调用四次strcmp来比较类名称。一个层次更深的继承或者一个多继承可能开销会更大。这样实现是有原因的（它们必须支持动态链接（dynamic linking））。因此，<strong>除了要对使用**</strong>cast<strong><strong>时的一般问题保持机敏，在对性能敏感的代码中更要对</strong></strong>dynamic_cast<strong>**的使用保持机敏</strong>。</p>
+<h3 id="4-2-Dynamic-cast的两种替代方案"><a href="#4-2-Dynamic-cast的两种替代方案" class="headerlink" title="4.2 Dynamic_cast的两种替代方案"></a>4.2 Dynamic_cast的两种替代方案</h3><p>你需要dynamic_cast是因为你想在你坚信其是派生类对象之上执行派生类操作，但你只能通过基类指针或基类引用来操作此对象。有两种普通的方法避免使用dynamic_cast</p>
+<p>第一，  使用容器直接存储派生类对象指针（通常情况下使用智能指针，见<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>），这样就消除了通过基类接口来操纵这些对象的可能。举个例子，在我们的window/SpecialWindow继承体系中，只有SpecialWindows支持blink，不要像下面这样做：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">class Window &#123; ... &#125;;</div><div class="line">class SpecialWindow: public Window &#123;</div><div class="line">public:</div><div class="line">void blink();</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"></div><div class="line">typedef                                                                                              // see [Item 13](http://www.cnblogs.com/harlanc/p/6412222.html "Item 13") for info</div><div class="line"></div><div class="line">std::vector&lt;std::tr1::shared_ptr&lt;Window&gt; &gt; VPW; // on tr1::shared_ptr     </div><div class="line"></div><div class="line">VPW winPtrs;                                                                                   </div><div class="line"></div><div class="line">...                                                                                                       </div><div class="line"></div><div class="line">for (VPW::iterator iter = winPtrs.begin();                                          // undesirable code:</div><div class="line"></div><div class="line">iter != winPtrs.end();                                                                         // uses dynamic_cast</div><div class="line"></div><div class="line">++iter) &#123;                                                                                            </div><div class="line"></div><div class="line">if (SpecialWindow *psw = dynamic_cast&lt;SpecialWindow*&gt;(iter-&gt;get()))    </div><div class="line"></div><div class="line">psw-&gt;blink();                                                                                   </div><div class="line"></div><div class="line">&#125;   </div></pre></td></tr></table></figure>
+<p> 而是用下面的做法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">typedef std::vector&lt;std::tr1::shared_ptr&lt;SpecialWindow&gt; &gt; VPSW;</div><div class="line"></div><div class="line">VPSW winPtrs;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">for (VPSW::iterator iter = winPtrs.begin(); // better code: uses</div><div class="line">iter != winPtrs.end(); // no dynamic_cast</div><div class="line">++iter)</div><div class="line">(*iter)-&gt;blink();</div></pre></td></tr></table></figure>
+<p>当然这种方法不允许你在同一个容器中存储所有可能的Window派生物。要达到这个目的，你可能需要多个类型安全的容器。</p>
+<p>第二，  在基类中提供虚函数。举个例子，虽然只有SecialWindos支持blink，你同样可以在基类中声明一个blink,但默认实现是什么都不做：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">class Window &#123;</div><div class="line">public:</div><div class="line">virtual void blink() &#123;&#125; // default impl is no-op;</div><div class="line">... // see Item 34 for why</div><div class="line">&#125;; // a default impl may be</div><div class="line">// a bad idea</div><div class="line">class SpecialWindow: public Window &#123;</div><div class="line">public:</div><div class="line">virtual void blink() &#123; ... &#125; // in this class, blink</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">// does something</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">typedef std::vector&lt;std::tr1::shared_ptr&lt;Window&gt; &gt; VPW;</div><div class="line"></div><div class="line">VPW winPtrs; // container holds</div><div class="line">// (ptrs to) all possible</div><div class="line">... // Window types</div><div class="line">for (VPW::iterator iter = winPtrs.begin();</div><div class="line">iter != winPtrs.end();</div><div class="line">++iter) // note lack of</div><div class="line">(*iter)-&gt;blink(); // dynamic_cast</div></pre></td></tr></table></figure>
+<p>上面的两种方法不是在任何情况下都能使用，但是在许多情况下，它们为dynamic_cast提供了一种可行的替代方案。当他们确实能做到你想要的，你应该拥抱它们。</p>
+<h3 id="4-3-不要在级联设计中使用dynamic-cast"><a href="#4-3-不要在级联设计中使用dynamic-cast" class="headerlink" title="4.3 不要在级联设计中使用dynamic_cast"></a>4.3 不要在级联设计中使用dynamic_cast</h3><p>你绝对想避免的一件事是不要做包含级联dynamic_cast的设计，也就是像下面这个样子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">class Window &#123; ... &#125;;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">// derived classes are defined here</div><div class="line"></div><div class="line">typedef std::vector&lt;std::tr1::shared_ptr&lt;Window&gt; &gt; VPW;</div><div class="line"></div><div class="line">VPW winPtrs;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">for (VPW::iterator iter = winPtrs.begin(); iter != winPtrs.end(); ++iter)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">if (SpecialWindow1 *psw1 =</div><div class="line"></div><div class="line">dynamic_cast&lt;SpecialWindow1*&gt;(iter-&gt;get())) &#123; ... &#125;</div><div class="line"></div><div class="line">else if (SpecialWindow2 *psw2 =</div><div class="line"></div><div class="line">dynamic_cast&lt;SpecialWindow2*&gt;(iter-&gt;get())) &#123; ... &#125;</div><div class="line"></div><div class="line">else if (SpecialWindow3 *psw3 =</div><div class="line"></div><div class="line">dynamic_cast&lt;SpecialWindow3*&gt;(iter-&gt;get())) &#123; ... &#125;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这种实现产生的代码既大又慢，也很脆弱，因为每次Windos类体系发生变化，你都需要为上面的代码做一次检查是否需要更新。（例如，如果添加了一个新的派生类，上面的代码可能需要添加一个新的条件分支）。这样的代码应该被基于虚函数的设计替换掉。</p>
+<h2 id="5-把对cast的使用隐藏在函数接口中"><a href="#5-把对cast的使用隐藏在函数接口中" class="headerlink" title="5. 把对cast的使用隐藏在函数接口中"></a>5. 把对cast的使用隐藏在函数接口中</h2><p>好的C++ 代码很少使用casts，但完全去除它们也是不切实际的。Int 转换成double这样的cast是合理的应用，虽然有可能不是必须的。（可以重新声明一个新的double变量，用x的值来对其进行初始化）。像许多可能令人起疑的设计一样，要尽可能的对cast的使用进行隔离，可以将其隐藏在调用者看不见的接口中。</p>
+<h2 id="6-总结："><a href="#6-总结：" class="headerlink" title="6. 总结："></a>6. 总结：</h2><ul>
+<li><ul>
+<li>能避免就避免使用cast，尤其在对性能敏感的代码中对使用dynamic_cast要谨慎。如果一个设计需要cast，首先尝试是否能设计出一个不需要cast的替代方案。</li>
+<li>当必须使用casting的时候，尽量将其隐藏在函数中。客户可以调用这个函数从而避免在他们自己的代码中使用casts</li>
+<li>优先使用C++风格的cast而不是旧式风格的casts。因为它们很容易被看到，它们做的事情也更加明确。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/03/2017-03-03_19_17_读书笔记_effective_c++_Item_26_尽量推迟变量的定义/" rel="next" title="读书笔记 effective c++ Item 26 尽量推迟变量的定义">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 26 尽量推迟变量的定义
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/05/2017-03-05_10_16_C++_11和C++98相比有哪些新特性/" rel="prev" title="C++ 11和C++98相比有哪些新特性">
+                C++ 11和C++98相比有哪些新特性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-新旧风格cast回顾"><span class="nav-number">1.1.</span> <span class="nav-text">1. 新旧风格cast回顾</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-旧风格cast"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 旧风格cast</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-C-风格的cast"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 C++风格的cast</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-旧风格PK新风格"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 旧风格PK新风格</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-使用cast会产生运行时代码——不要认为你以为的就是你以为的"><span class="nav-number">1.2.</span> <span class="nav-text">2. 使用cast会产生运行时代码——不要认为你以为的就是你以为的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Cast很容易被误用——无效状态是如何产生的"><span class="nav-number">1.3.</span> <span class="nav-text">3. Cast很容易被误用——无效状态是如何产生的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Dynamic-cast-分析"><span class="nav-number">1.4.</span> <span class="nav-text">4. Dynamic_cast 分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Dynamic-cast速度很慢"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 Dynamic_cast速度很慢</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Dynamic-cast的两种替代方案"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 Dynamic_cast的两种替代方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-不要在级联设计中使用dynamic-cast"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 不要在级联设计中使用dynamic_cast</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-把对cast的使用隐藏在函数接口中"><span class="nav-number">1.5.</span> <span class="nav-text">5. 把对cast的使用隐藏在函数接口中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-总结："><span class="nav-number">1.6.</span> <span class="nav-text">6. 总结：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,907 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++ 11," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="此文是如下博文的翻译： https://herbsutter.com/elements-of-modern-c-style/ C++11标准提供了许多有用的新特性。这篇文章特别针对使C++11和C++98相比看上去像一门新语言的特性，因为：  C++11的这些特性改变了书写C++代码的风格和习惯，也改变了设计C++库的方式。例如，你会看到更多的被当作参数和返回值的智能指针，还有按值(b">
+<meta name="keywords" content="C++ 11">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 11和C++98相比有哪些新特性">
+<meta property="og:url" content="http://yoursite.com/2017/03/05/2017-03-05_10_16_C++_11和C++98相比有哪些新特性/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="此文是如下博文的翻译： https://herbsutter.com/elements-of-modern-c-style/ C++11标准提供了许多有用的新特性。这篇文章特别针对使C++11和C++98相比看上去像一门新语言的特性，因为：  C++11的这些特性改变了书写C++代码的风格和习惯，也改变了设计C++库的方式。例如，你会看到更多的被当作参数和返回值的智能指针，还有按值(b">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.731Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++ 11和C++98相比有哪些新特性">
+<meta name="twitter:description" content="此文是如下博文的翻译： https://herbsutter.com/elements-of-modern-c-style/ C++11标准提供了许多有用的新特性。这篇文章特别针对使C++11和C++98相比看上去像一门新语言的特性，因为：  C++11的这些特性改变了书写C++代码的风格和习惯，也改变了设计C++库的方式。例如，你会看到更多的被当作参数和返回值的智能指针，还有按值(b">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/05/2017-03-05_10_16_C++_11和C++98相比有哪些新特性/"/>
+
+
+
+
+
+  <title>C++ 11和C++98相比有哪些新特性 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/05/2017-03-05_10_16_C++_11和C++98相比有哪些新特性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C++ 11和C++98相比有哪些新特性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-05T10:16:00+08:00">
+                2017-03-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/05/2017-03-05_10_16_C++_11和C++98相比有哪些新特性/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/05/2017-03-05_10_16_C++_11和C++98相比有哪些新特性/" class="leancloud_visitors" data-flag-title="C++ 11和C++98相比有哪些新特性">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p> 此文是如下博文的翻译：</p>
+<p><a href="https://herbsutter.com/elements-of-modern-c-style/" target="_blank" rel="external">https://herbsutter.com/elements-of-modern-c-style/</a></p>
+<p>C++11标准提供了许多有用的新特性。这篇文章特别针对使C++11和C++98相比看上去像一门新语言的特性，因为：</p>
+<ul>
+<li>C++11的这些特性改变了书写C++代码的风格和习惯，也改变了设计C++库的方式。例如，你会看到更多的被当作参数和返回值的智能指针，还有按值(b<a id="more"></a>
+value)返回巨大对象的函数。</li>
+<li>它们被使用的非常广泛，在大多数代码中你都能看到它们。举个例子，在现代C++中几乎每5行C++代码你就能看到auto关键字。</li>
+</ul>
+<p>还有一些其它的非常好的C++11新特性，但先把这篇文章所描述的新特性熟悉起来把，因为这些被广泛使用的特性展示了为什么C++11代码是简洁的，安全的和快速的，就像其它现代主流开发语言一样，并且性能和传统C++一样强大。</p>
+<h2 id="1-Auto"><a href="#1-Auto" class="headerlink" title="1. Auto"></a>1. Auto</h2><p>在任何可能的时候使用auto。因为有两个原因。第一，非常明显，能够避免重复输入我们已经声明的并且编译器已经认识的类型名称，这是非常方便的。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">// C++98</div><div class="line"></div><div class="line">map&lt;int,string&gt;::iterator i = m.begin();</div><div class="line"></div><div class="line">double const xlimit = config["xlimit"];</div><div class="line"></div><div class="line">singleton&amp; s = singleton::instance(); </div><div class="line"></div><div class="line">// C++11</div><div class="line"></div><div class="line">auto i = begin(m);</div><div class="line"></div><div class="line">auto const xlimit = config["xlimit"];</div><div class="line"></div><div class="line">auto&amp; s = singleton::instance();</div></pre></td></tr></table></figure>
+<p>第二，当有遇到一个你不知道或者无法用语言表达的类型时，auto就不仅仅是使用方便这么简单了，比如，大多数lambda函数的类型，你不能够容易的将其类型拼写出来甚至根本就不能够写出来。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// C++98</span></div><div class="line"></div><div class="line">binder2nd&lt; greater &gt; x = bind2nd( greater(), <span class="number">42</span> ); </div><div class="line"></div><div class="line"><span class="comment">// C++11</span></div><div class="line"></div><div class="line">auto x = [](<span class="keyword">int</span> i) &#123; <span class="keyword">return</span> i &gt; <span class="number">42</span>; &#125;;</div></pre></td></tr></table></figure>
+<p>注意，使用auto并没有修改代码的语义。代码仍然是静态输入(statically typed)的,并且每个表达式都干净利落；只是不再强制我们多余的重新声明类型的名称。</p>
+<p>一些人开始的时候害怕使用auto，因为给人的感觉像是并没有声明（重新声明）我们想要的类型，这意味着我们可能会突然得到一个不同的类型。如果你想显示的做强制类型转换，这没有问题；声明目标类型就可以了。但是在大部分情况下，使用auto就足够了，由于出现错误而得到另外一个类型的情况很少见，在使用强静态类型（strong static typing）情况下，如果类型出现错误编译器就会告诉你。</p>
+<h2 id="2-智能指针，no-delete"><a href="#2-智能指针，no-delete" class="headerlink" title="2. 智能指针，no delete"></a>2. 智能指针，no delete</h2><p> 总是使用智能指针，不要用原生指针和delete。除非需要实现你自己的底层数据结构（把原生指针很好的封装在类(class boundary)中  </p>
+<p>如果你知道你是另外一个对象的唯一拥有着，使用unique_ptr来表示唯一的拥有权。一个”new T”表达式能很快的初始化一个拥有 这个智能指针的对象，特别是unique_ptr。典型的例子是指向实现的指针（Pimpl Idiom）：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">// C++11 Pimpl idiom: header file</div><div class="line">class widget &#123;</div><div class="line">public:</div><div class="line">    widget();</div><div class="line">    // ... (see GotW #100) ...</div><div class="line">private:</div><div class="line">    class impl;</div><div class="line">    unique_ptr&lt;impl&gt; pimpl;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">// implementation file</div><div class="line">class widget::impl &#123; /*...*/ &#125;;</div><div class="line"></div><div class="line">widget::widget() : pimpl&#123; new impl&#123; /*...*/ &#125; &#125; &#123; &#125;</div><div class="line">// ...</div></pre></td></tr></table></figure>
+<p>使用shared_ptr来表示共享所有权（shared ownership）。使用make_shared来创建共享对象更好。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">// C++98</div><div class="line">widget* pw = new widget();</div><div class="line">:::</div><div class="line">delete pw;</div><div class="line"></div><div class="line">// C++11</div><div class="line">auto pw = make_shared&lt;widget&gt;();</div></pre></td></tr></table></figure>
+<p>使用weak_ptr来打破循环和表示可选性（比如实现一个对象缓存）</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// C++11</span></div><div class="line"><span class="keyword">class</span> <span class="title">gadget</span>;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">widget</span> &#123;</div><div class="line"><span class="keyword">private</span>:</div><div class="line">    shared_ptr&lt;gadget&gt; g; <span class="comment">// if shared ownership</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">gadget</span> &#123;</div><div class="line"><span class="keyword">private</span>:</div><div class="line">    weak_ptr&lt;widget&gt; w;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>如果你了解到另外一个对象比你的生存周期要长，并且你想观察这个对象，那么使用原生指针（raw pointer）。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">// C++11</div><div class="line">class node &#123;</div><div class="line"> vector&lt;unique_ptr&lt;node&gt;&gt; children;</div><div class="line"> node* parent;</div><div class="line">public:</div><div class="line"> :::</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h2 id="3-Nullptr"><a href="#3-Nullptr" class="headerlink" title="3. Nullptr"></a>3. Nullptr</h2><p>用nullptr来表示一个空指针，不要再使用数字0或者宏NULL来表示空指针了，因为这些是模棱两可的，既能表示整形也可表示指针。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// C++98</span></div><div class="line"><span class="keyword">int</span>* p = <span class="number">0</span>;</div><div class="line"></div><div class="line"><span class="comment">// C++11</span></div><div class="line"><span class="keyword">int</span>* p = nullptr;</div></pre></td></tr></table></figure>
+<h2 id="4-Range-for"><a href="#4-Range-for" class="headerlink" title="4. Range for"></a>4. Range for</h2><p>对一个范围内的元素进行有序访问，基于range的for循环会是更方便的用法。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// C++98</div><div class="line">for( vector&lt;int&gt;::iterator i = v.begin(); i != v.end(); ++i ) &#123;</div><div class="line">    total += *i;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// C++11</div><div class="line">for( auto d : v ) &#123;</div><div class="line">    total += d;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="5-非成员begin和end"><a href="#5-非成员begin和end" class="headerlink" title="5. 非成员begin和end"></a>5. 非成员begin和end</h2><p>使用非成员函数begin(x)和end(x)(不是x.begin()和x.end())，因为begin(x)和end(x)是可扩展的，能同所有容器类型一块工作——甚至数组也可以——并不是只针对提供了STL风格的x.begin()和x.end()成员函数的容器。  </p>
+<p>如果你正在使用一个非STL集合类型，这个类型提供迭代器但不是STL风格的x.begin()和x.end()，你可以对他的非成员函数begin()和end()进行重载，这样你就可以使用同STL容器同样的风格进行编码。标准中举了一个例子：数组，并且提供了对象的begin和end函数：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">vector&lt;<span class="keyword">int</span>&gt; v;</div><div class="line"><span class="keyword">int</span> a[<span class="number">100</span>];</div><div class="line"></div><div class="line"><span class="comment">// C++98</span></div><div class="line">sort( v.begin(), v.end() );</div><div class="line">sort( &amp;a[<span class="number">0</span>], &amp;a[<span class="number">0</span>] + <span class="keyword">sizeof</span>(a)/<span class="keyword">sizeof</span>(a[<span class="number">0</span>]) );</div><div class="line"></div><div class="line"><span class="comment">// C++11</span></div><div class="line">sort( begin(v), end(v) );</div><div class="line">sort( begin(a), end(a) );</div></pre></td></tr></table></figure>
+<h2 id="6-Lambda函数和算法"><a href="#6-Lambda函数和算法" class="headerlink" title="6. Lambda函数和算法"></a>6. Lambda函数和算法</h2><p> Lambda表达式改变了游戏规则，它会时不时的改变你的编码方式，这种方式优雅并且快速。Lambda使现存STL算法实用性提高了百倍。  </p>
+<p>新增加的C++库的设计都以支持lambad表达式为前提(例如：PPL)，甚至有一些库需要通过你编写lambda表达式来使用库（例如：c++ AMP）。  </p>
+<p>这里有个例子，找到v中的&gt;X并且&lt;Y的第一个元素。在C++11中，最简单并且干净的代码是使用标准算法。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// C++98: write a naked loop (using std::find_if is impractically difficult)</div><div class="line">vector&lt;int&gt;::iterator i = v.begin(); // because we need to use i later</div><div class="line">for( ; i != v.end(); ++i ) &#123;</div><div class="line">    if( *i &gt; x &amp;&amp; *i &lt; y ) break;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// C++11: use std::find_if</div><div class="line">auto i = find_if( begin(v), end(v), [=](int i) &#123; return i &gt; x &amp;&amp; i &lt; y; &#125; );</div></pre></td></tr></table></figure>
+<p>想使用一个循环或者类似的语言特性（language feature）但实际上在该语言中并不存在，怎么办？将其实现成模板函数（库算法）就可以了，多亏了lambda，使用它就像是用一个语言特性一样的方便，但是更灵活，因为它确实是一个库而不是一个固定的语言特性。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// C#</span></div><div class="line"><span class="keyword">lock</span>( mut_x ) &#123;</div><div class="line">    ... use x ...</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// C++11 without lambdas: already nice, and more flexible (e.g., can use timeouts, other options)</span></div><div class="line">&#123;</div><div class="line">    lock_guard&lt;mutex&gt; hold &#123; mut_x &#125;;</div><div class="line">    ... use x ...</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// C++11 with lambdas, and a helper algorithm: C# syntax in C++</span></div><div class="line"><span class="comment">// Algorithm: template&lt;typename T&gt; void lock( T&amp; t, F f ) &#123; lock_guard hold(t); f(); &#125;</span></div><div class="line"><span class="keyword">lock</span>( mut_x, [&amp;]&#123;</div><div class="line">    ... use x ...</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p> 熟悉一下lambda吧，你会发现他们很有用，并不只是在c++中，它们已经在几个主流语言中得到支持并且流行开来。  </p>
+<h2 id="7-Move-amp-amp"><a href="#7-Move-amp-amp" class="headerlink" title="7. Move/&amp;&amp;"></a>7. Move/&amp;&amp;</h2><p>把move当作是对拷贝的优化最合适不过了，虽然它也包含其他方面的东西（像完美转发(perfect forwarding)）  </p>
+<p>move语义改变了我们设计API的方式。我们会越来越多的将函数设计成return by value。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">// C++98: alternatives to avoid copying</div><div class="line">vector&lt;int&gt;* make_big_vector(); // option 1: return by pointer: no copy, but don't forget to delete</div><div class="line">:::</div><div class="line">vector&lt;int&gt;* result = make_big_vector();</div><div class="line"></div><div class="line">void make_big_vector( vector&lt;int&gt;&amp; out ); // option 2: pass out by reference: no copy, but caller needs a named object</div><div class="line">:::</div><div class="line">vector&lt;int&gt; result;</div><div class="line">make_big_vector( result );</div><div class="line"></div><div class="line">// C++11: move</div><div class="line">vector&lt;int&gt; make_big_vector(); // usually sufficient for 'callee-allocated out' situations</div><div class="line">:::</div><div class="line">auto result = make_big_vector(); // guaranteed not to copy the vector</div></pre></td></tr></table></figure>
+<p> 如果你想获得比copy更高效的办法，对你的类型使用move语义吧。  </p>
+<h2 id="8-统一的初始化和初始化列表"><a href="#8-统一的初始化和初始化列表" class="headerlink" title="8. 统一的初始化和初始化列表"></a>8. 统一的初始化和初始化列表</h2><p>没有发生变化的：当初始化一个non-POD或者auto的本地变量时，继续使用熟悉的不带额外花括号{}的=语法。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// C++98 or C++11</span></div><div class="line"><span class="keyword">int</span> a = <span class="number">42</span>;        <span class="comment">// still fine, as always</span></div><div class="line"></div><div class="line"><span class="comment">// C++ 11</span></div><div class="line">auto x = begin(v); <span class="comment">// no narrowing or non-initialization is possible</span></div></pre></td></tr></table></figure>
+<p>在其他情况中（特别是随处可见的使用（）来构造对象），使用花括号{}会更好。使用花括号{}能避免一些潜在的问题：你不会突然得到一个收缩转换(narrowing conversions)后的值(比如，float转换成int),也不会有偶尔突发的未初始化POD成员变量或者数组的存在，也能避免在c++98中会碰到的奇怪事：你的代码编译没问题，你需要的是变量但实际上你声明了一个函数，这都源于C++声明语法的模糊不清，Scott Meyers的著名说法：“C++最令人苦恼的解析”。通过使用新风格的语法上面解析问题会不复存在。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// C++98</span></div><div class="line"><span class="function">rectangle       <span class="title">w</span>(<span class="params"> origin(</span>), <span class="title">extents</span>(<span class="params"></span>) )</span>;   <span class="comment">// oops, declares a function, if origin and extents are types</span></div><div class="line"><span class="function">complex&lt;<span class="keyword">double</span>&gt; <span class="title">c</span>(<span class="params"> <span class="number">2.71828</span>, <span class="number">3.14159</span> </span>)</span>;</div><div class="line"><span class="keyword">int</span>             a[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;;</div><div class="line">vector&lt;<span class="keyword">int</span>&gt;     v;</div><div class="line"><span class="keyword">for</span>( <span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">4</span>; ++i ) v.push_back(i);</div><div class="line"></div><div class="line"><span class="comment">// C++11</span></div><div class="line">rectangle       w   &#123; origin(), extents() &#125;;</div><div class="line">complex&lt;<span class="keyword">double</span>&gt; c   &#123; <span class="number">2.71828</span>, <span class="number">3.14159</span> &#125;;</div><div class="line"><span class="keyword">int</span>             a[] &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;;</div><div class="line">vector&lt;<span class="keyword">int</span>&gt;     v   &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;;</div></pre></td></tr></table></figure>
+<p>新的{}语法在几乎任何地方都能出色的工作。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">// C++98</div><div class="line">X::X( /*...*/ ) : mem1(init1), mem2(init2, init3) &#123; /*...*/ &#125;</div><div class="line"></div><div class="line">// C++11</div><div class="line">X::X( /*...*/ ) : mem1&#123;init1&#125;, mem2&#123;init2, init3&#125; &#123; /*...*/ &#125;</div></pre></td></tr></table></figure>
+<p> 最后，有时候传递不带(type-named temporary)的函数参数是很方便的：  </p>
+<p>void draw_rect( rectangle );  </p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// C++98</span></div><div class="line">draw_rect( rectangle( myobj.origin, selection.extents ) );</div><div class="line"></div><div class="line"><span class="comment">// C++11</span></div><div class="line">draw_rect( &#123; myobj.origin, selection.extents &#125; );</div></pre></td></tr></table></figure>
+<p> 我不喜欢使用花括号{}的唯一地方是在初始化一个非POD变量的时候，像 auto x= begin(v);使用花括号会使代码不必要的丑陋，因为我知道了它是一个类类型，所以我不必担心收缩转换，并且现代编译器已经对额外的拷贝（或者额外move，如果类型是move-enabled）进行了优化。  </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-11/" rel="tag"># C++ 11</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/04/2017-03-04_10_20_读书笔记_effective_c++_Item_27_尽量少使用转型（casting）/" rel="next" title="读书笔记 effective c++ Item 27 尽量少使用转型（casting）">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 27 尽量少使用转型（casting）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/06/2017-03-06_23_27_读书笔记_effective_c++_Item_28_不要返回指向对象内部数据(internals)的句柄（handles）/" rel="prev" title="读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles）">
+                读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Auto"><span class="nav-number">1.</span> <span class="nav-text">1. Auto</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-智能指针，no-delete"><span class="nav-number">2.</span> <span class="nav-text">2. 智能指针，no delete</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Nullptr"><span class="nav-number">3.</span> <span class="nav-text">3. Nullptr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Range-for"><span class="nav-number">4.</span> <span class="nav-text">4. Range for</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-非成员begin和end"><span class="nav-number">5.</span> <span class="nav-text">5. 非成员begin和end</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Lambda函数和算法"><span class="nav-number">6.</span> <span class="nav-text">6. Lambda函数和算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Move-amp-amp"><span class="nav-number">7.</span> <span class="nav-text">7. Move/&&</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-统一的初始化和初始化列表"><span class="nav-number">8.</span> <span class="nav-text">8. 统一的初始化和初始化列表</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

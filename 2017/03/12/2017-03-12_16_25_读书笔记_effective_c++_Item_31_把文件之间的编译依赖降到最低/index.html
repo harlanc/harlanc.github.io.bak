@@ -1,0 +1,943 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 牵一发而动全身现在开始进入你的C++程序，你对你的类实现做了一个很小的改动。注意，不是接口，只是实现，而且是private部分。然后你需要rebuild你的程序，计算着这个build应该几秒钟就足够了。毕竟，只修改了一个类。你点击了build 或者输入了make(">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 31 把文件之间的编译依赖降到最低">
+<meta property="og:url" content="http://yoursite.com/2017/03/12/2017-03-12_16_25_读书笔记_effective_c++_Item_31_把文件之间的编译依赖降到最低/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 牵一发而动全身现在开始进入你的C++程序，你对你的类实现做了一个很小的改动。注意，不是接口，只是实现，而且是private部分。然后你需要rebuild你的程序，计算着这个build应该几秒钟就足够了。毕竟，只修改了一个类。你点击了build 或者输入了make(">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.843Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 31 把文件之间的编译依赖降到最低">
+<meta name="twitter:description" content="1. 牵一发而动全身现在开始进入你的C++程序，你对你的类实现做了一个很小的改动。注意，不是接口，只是实现，而且是private部分。然后你需要rebuild你的程序，计算着这个build应该几秒钟就足够了。毕竟，只修改了一个类。你点击了build 或者输入了make(">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/12/2017-03-12_16_25_读书笔记_effective_c++_Item_31_把文件之间的编译依赖降到最低/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 31 把文件之间的编译依赖降到最低 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/12/2017-03-12_16_25_读书笔记_effective_c++_Item_31_把文件之间的编译依赖降到最低/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 31 把文件之间的编译依赖降到最低</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-12T16:25:00+08:00">
+                2017-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/12/2017-03-12_16_25_读书笔记_effective_c++_Item_31_把文件之间的编译依赖降到最低/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/12/2017-03-12_16_25_读书笔记_effective_c++_Item_31_把文件之间的编译依赖降到最低/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 31 把文件之间的编译依赖降到最低">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><h2 id="1-牵一发而动全身"><a href="#1-牵一发而动全身" class="headerlink" title="1. 牵一发而动全身"></a>1. 牵一发而动全身</h2><p>现在开始进入你的C++程序，你对你的类实现做了一个很小的改动。注意，不是接口，只是实现，而且是private部分。然后你需要rebuild你的程序，计算着这个build应该几秒钟就足够了。毕竟，只修改了一个类。你点击了build 或者输入了make(<br><a id="more"></a><br>或者其他方式)，你被惊到了，然后羞愧难当，因为你意识到整个世界都被重新编译和重新链接了！当这些发生时你不觉的感到愤恨么？</p>
+<h2 id="2-编译依赖是如何发生的"><a href="#2-编译依赖是如何发生的" class="headerlink" title="2. 编译依赖是如何发生的"></a>2. 编译依赖是如何发生的</h2><p>问题出在C++并不擅长将接口从实现中分离出来。类定义不仅指定了类的接口也同时指定了许多类的细节。举个例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class Person &#123;</div><div class="line">public:</div><div class="line">Person(const std::string&amp; name, const Date&amp; birthday,</div><div class="line">const Address&amp; addr);</div><div class="line">std::string name() const;</div><div class="line">std::string birthDate() const;</div><div class="line">std::string address() const;</div><div class="line">...</div><div class="line">private:</div><div class="line">std::string theName; // implementation detail</div><div class="line">Date theBirthDate; // implementation detail</div><div class="line"></div><div class="line">Address theAddress;              // implementation detail</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这里，类Person的实现需要使用一些类的定义，也就是string,Date,和Address,如果类Person对这些类的定义没有访问权，那么Person不会被编译通过。这些定义通过使用#include指令来提供，所以在定义Person类的文件中，你可能会发现像下面这样的代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#include &lt;string&gt;</span></div><div class="line"></div><div class="line"><span class="meta">#include "date.h"</span></div><div class="line"></div><div class="line"><span class="meta">#include "address.h"</span></div></pre></td></tr></table></figure>
+<p><span style="line-height: 1.5;"> </span></p>
+<p>不幸的是，定义Person类的文件和上面列出的头文件之间建立了编译依赖。任何一个头文件被修改，或者这些头文件依赖的文件被修改，包含Person类的文件就必须要重新编译，使用Person的任何文件也必须要重新编译。这样的级联编译依赖会对一个工程造成无尽的伤痛。</p>
+<h2 id="3-尝试将类的实现分离出来"><a href="#3-尝试将类的实现分离出来" class="headerlink" title="3. 尝试将类的实现分离出来"></a>3. 尝试将类的实现分离出来</h2><p>你可能想知道为什么C++坚持将类的实现细节放在类定义中。举个例子，你为什么不能这么定义Person类，将指定类的实现细节单独分离开来。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">namespace std &#123;</div><div class="line">class string; // forward declaration (an incorrect</div><div class="line">&#125; // one — see below)</div><div class="line">class Date; // forward declaration</div><div class="line">class Address; // forward declaration</div><div class="line">class Person &#123;</div><div class="line">public:</div><div class="line">Person(const std::string&amp; name, const Date&amp; birthday,</div><div class="line">const Address&amp; addr);</div><div class="line">std::string name() const;</div><div class="line">std::string birthDate() const;</div><div class="line">std::string address() const;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>如果这是可能的 ，Person的用户只有在类的接口被修改的时候才必须要重新编译。</p>
+<p>这个想法有两个问题。首先，string不是类，它是一个typedef(basic_string<char>的typedef)。因此，对string的前置声明是不正确的。合适的前置声明实质上更加复杂，因为它涉及到了额外的模板。然而这没关系，因为你不应该尝试对标准库的某些部分进行手动声明。相反，简单的使用合适的#include来达到目的。标准头文件看上去不像是编译的瓶颈，特别是你的编译环境允许你利用预编译头文件。如果标准头文件的解析真的是一个问题，你可能需要修改你的接口设计来避免使用标准库的某些部分（使用标准库的某些部分需要使用不受欢迎的#includes）。</char></p>
+<p>对每件事情进行前置声明的第二个难点（并且是更加明显的）是需要处理如下问题：在编译过程中编译器需要知道对象的大小。考虑：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span>(<span class="params"></span>)</span></div><div class="line">&#123;</div><div class="line"><span class="keyword">int</span> x;                      <span class="comment">// define an int</span></div><div class="line"></div><div class="line"><span class="function">Person <span class="title">p</span>(<span class="params"> <span class="keyword">params</span> </span>)</span>; <span class="comment">// define a Person</span></div><div class="line"></div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><span style="line-height: 1.5;"> </span></p>
+<p>当编译器看到x的定义时，它们知道必须要为一个int分配足够的空间。这没问题。编译器知道一个int有多大。当编译器看到p的定义时，它们知道必须要为一个Person分配足够的空间，但是他们如何知道一个Person对象有多大呢？唯一的方法就是通过查看类定义，但是对于一个类的定义来说，如果将其实现细节忽略掉是合法的，编译器如何知道需要分配多少空间呢？</p>
+<p>这种问题不会出现在像Smalltalk 和Java这样的语言中，因为当在这些语言中定义一个对象时，编译器只为指向对象的指针分配足够的空间。对于上面的代码，它们会像下面这样进行处理：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span>(<span class="params"></span>)</span></div><div class="line">&#123;</div><div class="line"><span class="keyword">int</span> x;         <span class="comment">// define an int</span></div><div class="line"></div><div class="line">Person *p; <span class="comment">// define a pointer to a Person</span></div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><span style="line-height: 1.5;"> </span></p>
+<p>这当然是合法的C++代码，所以你可以自己玩“将对象细节隐藏在指针后面”的游戏。对于Person来说，一种实现方式就是将其分成两个类，一个只提供接口，另一个实现接口。如果实现类的被命名为PersonImpl，Person将会被定义如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">#include &lt;string&gt; // standard library components</div><div class="line">// shouldn’t be forward-declared</div><div class="line"></div><div class="line">#include &lt;memory&gt; // for tr1::shared_ptr; see below</div><div class="line"></div><div class="line">class PersonImpl; // forward decl of Person impl. class</div><div class="line"></div><div class="line">class Date;             // forward decls of classes used in</div><div class="line"></div><div class="line">class Address;                                                                      // Person interface</div><div class="line"></div><div class="line">class Person &#123;                                                                      </div><div class="line"></div><div class="line">public:                                                                                </div><div class="line"></div><div class="line">Person(const std::string&amp; name, const Date&amp; birthday,       </div><div class="line"></div><div class="line">const Address&amp; addr);                                                        </div><div class="line"></div><div class="line">std::string name() const;                                                    </div><div class="line"></div><div class="line">std::string birthDate() const;                                              </div><div class="line"></div><div class="line">std::string address() const;                                                 </div><div class="line"></div><div class="line">...                                                                                        </div><div class="line"></div><div class="line">private:                                                                               // ptr to implementation;</div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;PersonImpl&gt; pImpl; // see [Item 13](http://www.cnblogs.com/harlanc/p/6412222.html "Item 13") for info on</div><div class="line">&#125;; // std::tr1::shared_ptr</div></pre></td></tr></table></figure>
+<p><span style="line-height: 1.5;">这里，主类(Person)没有包含任何数据成员，只包含了指向类实现的指针（PersonImpl），一个tr1::shared_ptr指针(<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>)。这样一个设计就是通常所说的“pimpl idiom”(指向实现的指针)。在这样的类中，指针的名字通常为pImpl，如上面所示。</span></p>
+<p>使用这个设计，Person的用户脱离了datas,address和persons的实现细节。这些类的实现可以随意修改，但Person用户不需要重新编译。此外，因为他们不能够看到Person的实现细节，用户应该不会写出依赖这些细节的代码。这就对实现和接口进行了真正的分离。</p>
+<h2 id="4-最小化编译依赖的设计策略"><a href="#4-最小化编译依赖的设计策略" class="headerlink" title="4. 最小化编译依赖的设计策略"></a>4. 最小化编译依赖的设计策略</h2><p>分离的关键在于把对定义的依赖替换为对声明的依赖。这是最小化编译依赖的本质：<strong>在切实可行的情况下让你的头文件能够自给自足，如果达不到这个要求，依赖其他文件中的声明而不是定义</strong>。其他的设计都来自于这个简单的设计策略。因此：</p>
+<ul>
+<li>当使用指向对象的引用和指针能够做到时就不要使用对象。你可以只用一个声明来定义指向一个类型的引用和指针。而定义一个类型的对象则需要使用类的定义。</li>
+<li>尽可能用类的声明替换类的定义。注意使用类来声明一个函数的时候你绝不会用到这个类的定义，甚至使用按值传递参数或者按值返回也不需要：</li>
+</ul>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Date</span>; <span class="comment">// class declaration</span></div><div class="line"></div><div class="line"><span class="function">Date <span class="title">today</span>(<span class="params"></span>)</span>;     <span class="comment">// fine — no definition</span></div><div class="line"></div><div class="line">   <span class="function">id <span class="title">clearAppointments</span>(<span class="params">Date d</span>)</span>; <span class="comment">// of Date is needed</span></div></pre></td></tr></table></figure>
+<p>当然，按值传递通常情况下是一个坏方法（<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 20" target="_blank" rel="external">Item 20</a>）,但是如果你发现自己因为某种原因需要使用它，引入不必要的编译依赖也是没有任何理由的。</p>
+<p>声明today和clearAppointments时不需要对Date进行定义可能会让你感到吃惊，但是它不像看上去那样让人好奇。如果任何人调用这些函数，Data的定义必须在函数调用之前被看到。你可能纳闷为什么声明无人调用的函数呢？很简单。不是没有人会调用它们，而是不是所有人都会调用它们。如果你有一个库包含很多函数声明，每个用户都调用每个函数是不太可能的。通过把在声明函数的头文件中提供类定义的责任转移到包含函数调用的客户文件中，你就消除了不必要的人为造成的对类型定义的用户依赖。</p>
+<ul>
+<li>为声明和定义分别提供头文件</li>
+</ul>
+<p>为了符合上述方针，头文件需要成对使用：一个用于声明，一个用于定义。当然这些文件应该保持一致。如果一个地方的声明被修改了，两个地方必须同时修改。最后，库的用户应该总是#include一个声明文件，而不是自己对其进行前向声明，。举个例子,Date类的客户想声明today和clearAppointments，这里就不用像上面那样对Date进行前向声明了。而是应该#include包含了声明的头文件：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#include "datefwd.h" // header file declaring (but not</span></div><div class="line"></div><div class="line"><span class="comment">// defining) class Date</span></div><div class="line"></div><div class="line"><span class="function">Date <span class="title">today</span>(<span class="params"></span>)</span>; <span class="comment">// as before</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">clearAppointments</span>(<span class="params">Date d</span>)</span>;</div></pre></td></tr></table></figure>
+<p><span style="line-height: 1.5;"> </span></p>
+<p>头文件“datefwd.h”只包含声明，它的命名是基于标准C++库的头<iosfwd>(Item 54)。<iosfwd>包含了iostream组件的声明，与这些声明相对应的定义被放在几个不同的头中，包括<sstream>,<streambuf>,<fstream>和<iostream>。</iostream></fstream></streambuf></sstream></iosfwd></iosfwd></p>
+<p><iosfwd>有另外一个指导性的意义，就是要弄清楚这个条款的建议不仅适用于templates，同样适用于非templates。虽然Item30解释了在许多编译环境中·，模板定义通常会放在头文件中，一些编译环境也允许将模板定义放在非头文件中，因此为模板提供只包含声明的头仍然是有意义的。<iosfwd>就是这样的头。</iosfwd></iosfwd></p>
+<p>C++中同样提供了export关键字，它可以使模板声明从模板定义中分离出来。不行的是，支持export的编译器是稀少的，在现实世界中使用export的经验同样稀少。因此，评价</p>
+<p>export会在高效C++编程中发挥什么作用还为时尚早。，</p>
+<h2 id="5-句柄类"><a href="#5-句柄类" class="headerlink" title="5. 句柄类"></a>5. 句柄类</h2><p>像Person这样使用了“指向实现的指针”（pimpl idiom）的类通常被叫做句柄类（handle class），如果你想知道这样的类是如何做到无所不能的，一种方法是将所有的函数调用转移到对应的实现类中，真正的工作在实现类中进行。举个例子，下面展示了Person类的两个成员函数是如何被实现的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">#include "Person.h" // we’re implementing the Person class,</div><div class="line"></div><div class="line">// so we must #include its class definition</div><div class="line"></div><div class="line">#include "PersonImpl.h" // we must also #include PersonImpl’s class</div><div class="line"></div><div class="line">// definition, otherwise we couldn’t call</div><div class="line"></div><div class="line">// its member functions; note that</div><div class="line"></div><div class="line">// PersonImpl has exactly the same public</div><div class="line"></div><div class="line">// member functions as Person — their</div><div class="line"></div><div class="line">// interfaces are identical</div><div class="line"></div><div class="line">Person::Person(const std::string&amp; name, const Date&amp; birthday,</div><div class="line"></div><div class="line">const Address&amp; addr)</div><div class="line"></div><div class="line">: pImpl(new PersonImpl(name, birthday, addr))</div><div class="line"></div><div class="line">&#123;&#125;</div><div class="line"></div><div class="line">std::string Person::name() const</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">return pImpl-&gt;name();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意Person构造函数是如何调用PersonImpl构造函数的（通过使用new <a href="http://www.cnblogs.com/harlanc/p/6422351.html" title="Item 16" target="_blank" rel="external">Item 16</a>），以及Person::name是如何调用PersonImpl::name的，这很重要。将Person类定义成句柄类并没有改变Person类能做什么，只是修改了Person类做什么的实现方式。</p>
+<h2 id="6-抽象基类"><a href="#6-抽象基类" class="headerlink" title="6. 抽象基类"></a>6. 抽象基类</h2><p>使用句柄类的另外一种替代方法是将Person定义成特殊的抽象基类，也就是接口类。使用这种类的意图是为派生类指定一个接口（Item 34）。这种类没有数据成员，没有构造函数，有一个虚析构函数（<a href="http://www.cnblogs.com/harlanc/p/6395052.html" title="Item 7" target="_blank" rel="external">item7</a>）和一系列纯虚函数。</p>
+<p>接口类同Java和.NET中的接口是类似的，但Java和.NET对接口强加了限制，c++却没有这做。举个例子，Java和.NET都不允许在接口中声明数据成员或者实现函数，但C++对这两者都没有限制。C++的这种更强的灵活性是有用的。在Item36中解释道，在一个继承体系中应该为所有类实现相同的非虚函数，因此对于在接口类中被声明的函数，作为接口类的一部分对其进行实现是有意义的。</p>
+<p>一个Person类的接口实现可能像下面这个样子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class Person &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">virtual ~Person();</div><div class="line"></div><div class="line">virtual std::string name() const = 0;</div><div class="line"></div><div class="line">virtual std::string birthDate() const = 0;</div><div class="line"></div><div class="line">virtual std::string address() const = 0;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p><span style="line-height: 1.5;">这个类的用户必须依靠Person指针或者引用来进行编程，因为不可能实例化包含纯虚函数的类。（然而实例化Person的派生类却是可能的）。就像句柄类的用户一样，接口类只有在其接口发生变化的情况下才需要重新编译，其它情况都不需要。</span></p>
+<p>一个接口类的用户必须要有创建新对象的方法。通常情况下，这通过调用扮演派生类构造函数角色的函数来实现，当然派生类是可以被实例化的。这样的函数通常被叫做工厂函数（<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item13</a>）或者虚构造函数（virtual constructors）。它们返回指向动态分配对象的指针（用智能指针比较好<a href="http://www.cnblogs.com/harlanc/p/6431766.html" title="Item 18" target="_blank" rel="external">Item 18</a>）。这样的函数在接口类中通常被声明为static：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">class Person &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">static std::tr1::shared_ptr&lt;Person&gt; // return a tr1::shared_ptr to a new</div><div class="line"></div><div class="line">create(const std::string&amp; name, // Person initialized with the</div><div class="line"></div><div class="line">const Date&amp; birthday, // given params; see Item18 for</div><div class="line"></div><div class="line">const Address&amp; addr); // why a tr1::shared_ptr is returned</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>用户像下面这样使用：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">std::string name;</div><div class="line"></div><div class="line">Date dateOfBirth;</div><div class="line"></div><div class="line">Address address;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">// create an object supporting the Person interface</div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;Person&gt; pp(Person::create(name, dateOfBirth, address));</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">std::cout &lt;&lt; pp-&gt;name() // use the object via the</div><div class="line"></div><div class="line">&lt;&lt; " was born on " // Person interface</div><div class="line"></div><div class="line">&lt;&lt; pp-&gt;birthDate()</div><div class="line"></div><div class="line">&lt;&lt; " and now lives at "</div><div class="line"></div><div class="line">&lt;&lt; pp-&gt;address();</div><div class="line"></div><div class="line">... // the object is automatically</div><div class="line"></div><div class="line">// deleted when pp goes out of</div><div class="line"></div><div class="line">// scope — see Item13</div></pre></td></tr></table></figure>
+<p>当然，必须定义支持接口类接口的具现类，并且在具现类中必须调用真正的构造函数。这在包含了虚构造函数实现的文件中都会发生。举个例子：Person接口类可能有一个具现化派生类RealPerson，它为继承自基类的虚函数提供了实现：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">class RealPerson: public Person &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">RealPerson(const std::string&amp; name, const Date&amp; birthday,</div><div class="line"></div><div class="line">const Address&amp; addr)</div><div class="line"></div><div class="line">:  theName(name), theBirthDate(birthday), theAddress(addr)</div><div class="line"></div><div class="line">&#123;&#125;</div><div class="line"></div><div class="line">virtual ~RealPerson() &#123;&#125;</div><div class="line"></div><div class="line">std::string name() const; // implementations of these</div><div class="line"></div><div class="line">std::string birthDate() const; // functions are not shown, but</div><div class="line"></div><div class="line">std::string address() const; // they are easy to imagine</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">std::string theName;</div><div class="line"></div><div class="line">Date theBirthDate;</div><div class="line"></div><div class="line">Address theAddress;</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>给出RealPerson的定义后，实现Person::create就变得微不足道了：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">std::tr1::shared_ptr&lt;Person&gt; Person::create(const std::string&amp; name,</div><div class="line"></div><div class="line">const Date&amp; birthday,</div><div class="line"></div><div class="line">const Address&amp; addr)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">return std::tr1::shared_ptr&lt;Person&gt;(new RealPerson(name, birthday,</div><div class="line"></div><div class="line">addr));</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Person::create的一个更加现实的实现是创建不同的派生类对象，对象类型可能会依赖于额外的函数参数，从文件或者数据库中读取的数据或环境变量等等。</p>
+<p>实现一个接口类有两个最普通的机制，RealPerson展示出了其中的一个：它的接口继承自接口类（Person），然后在接口中实现函数。实现接口类的第二种方法涉及到多继承，在Item40中会涉及到这个话题。</p>
+<h2 id="7-使用接口类和句柄类需要花费额外的开销"><a href="#7-使用接口类和句柄类需要花费额外的开销" class="headerlink" title="7. 使用接口类和句柄类需要花费额外的开销"></a>7. 使用接口类和句柄类需要花费额外的开销</h2><p>句柄类和接口类将接口从实现中解耦出来，从而减少了文件间的编译依赖。你可能会问，这种伎俩会让我付出什么？答案也是计算机科学中的常见回答：它会让运行时速度变慢，</p>
+<p>另外会为每个对象分配额外的空间。</p>
+<p>在句柄类的例子中，成员函数必须通过指向实现的指针才能到达对象数据。这为每次访问添加了一个间接层。你必须将这个实现指针的大小添加到存储每个对象需要的内存容量上。最后，实现指针必须被初始化为指向动态分配的实现对象，因此你引入了动态分配内存（还有接下来的内存销毁）所固有的开销，还有可能遇到的bad_alloc(内存溢出)异常。</p>
+<p>对接口类来说，每次函数调用都是virtual的，所以在你每次调用一个函数的时候，都会有一次间接跳转的开销（<a href="http://www.cnblogs.com/harlanc/p/6395052.html" title="Item 7" target="_blank" rel="external">Item 7</a>）。同时，从接口类中派生出来的对象必须包含一个虚表指针（Item7）。这个指针可能会增加对象存储需要的内存容量，取决于接口类是否为此对象提供虚函数的唯一来源。</p>
+<p>最后，脱离inline函数句柄类和接口类都不会有很大作为。<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item30</a>解释了为什么函数体必须要放在头文件中从而被inline，但是句柄和接口类正是用来设计隐藏像函数体一样的实现细节的。</p>
+<p>如果你仅仅因为额外的开销就放弃使用句柄类和接口类就大错特错了。虚函数也是如此，你并不想放弃它们，对吧？（如果想放弃，你看的书就是错误的）相反，使用一种循序渐进的方式来使用它们。在开发过程中使用接口类和句柄类最小化修改实现造成的对用户的影响。如果使用句柄类和接口类对速度和容量造成的影响要大于类之间的耦合，那么用具现类进行替换。</p>
+<h2 id="8-总结："><a href="#8-总结：" class="headerlink" title="8. 总结："></a>8. 总结：</h2><p>最小化编译依赖背后的知道思想是依赖于声明而不是依赖于定义。基于这个思想的方法是句柄类和接口类。</p>
+<p>库头文件应该以完全且仅有声明的方式存在。不管是否涉及到模板都适用。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/08/2017-03-08_21_36_读书笔记_effective_c++_Item_30_理解内联的里里外外_(大师入场啦)/" rel="next" title="读书笔记 effective c++ Item 30 理解内联的里里外外 (大师入场啦)">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 30 理解内联的里里外外 (大师入场啦)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/14/2017-03-14_22_28_读书笔记_effective_c++__Item_32_确保public继承建立“is-a”模型/" rel="prev" title="读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型">
+                读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-牵一发而动全身"><span class="nav-number">1.1.</span> <span class="nav-text">1. 牵一发而动全身</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-编译依赖是如何发生的"><span class="nav-number">1.2.</span> <span class="nav-text">2. 编译依赖是如何发生的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-尝试将类的实现分离出来"><span class="nav-number">1.3.</span> <span class="nav-text">3. 尝试将类的实现分离出来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-最小化编译依赖的设计策略"><span class="nav-number">1.4.</span> <span class="nav-text">4. 最小化编译依赖的设计策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-句柄类"><span class="nav-number">1.5.</span> <span class="nav-text">5. 句柄类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-抽象基类"><span class="nav-number">1.6.</span> <span class="nav-text">6. 抽象基类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-使用接口类和句柄类需要花费额外的开销"><span class="nav-number">1.7.</span> <span class="nav-text">7. 使用接口类和句柄类需要花费额外的开销</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-总结："><span class="nav-number">1.8.</span> <span class="nav-text">8. 总结：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

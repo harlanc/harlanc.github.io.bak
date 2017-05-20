@@ -1,0 +1,909 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 问题的提出：要求函数返回对象时，可以返回引用么？一旦程序员理解了按值传递有可能存在效率问题之后（Item 20）,许多人都成了十字军战士，决心清">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用">
+<meta property="og:url" content="http://yoursite.com/2017/02/26/2017-02-26_19_06_读书笔记_effective_c++_Item_21_当你必须返回一个对象的时候，不要尝试返回引用/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 问题的提出：要求函数返回对象时，可以返回引用么？一旦程序员理解了按值传递有可能存在效率问题之后（Item 20）,许多人都成了十字军战士，决心清">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.544Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用">
+<meta name="twitter:description" content="1. 问题的提出：要求函数返回对象时，可以返回引用么？一旦程序员理解了按值传递有可能存在效率问题之后（Item 20）,许多人都成了十字军战士，决心清">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/26/2017-02-26_19_06_读书笔记_effective_c++_Item_21_当你必须返回一个对象的时候，不要尝试返回引用/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/26/2017-02-26_19_06_读书笔记_effective_c++_Item_21_当你必须返回一个对象的时候，不要尝试返回引用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-26T19:06:00+08:00">
+                2017-02-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/26/2017-02-26_19_06_读书笔记_effective_c++_Item_21_当你必须返回一个对象的时候，不要尝试返回引用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/26/2017-02-26_19_06_读书笔记_effective_c++_Item_21_当你必须返回一个对象的时候，不要尝试返回引用/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-问题的提出：要求函数返回对象时，可以返回引用么？"><a href="#1-问题的提出：要求函数返回对象时，可以返回引用么？" class="headerlink" title="1. 问题的提出：要求函数返回对象时，可以返回引用么？"></a>1. 问题的提出：要求函数返回对象时，可以返回引用么？</h2><p>一旦程序员理解了按值传递有可能存在效率问题之后（<a href="http://www.cnblogs.com/harlanc/p/6440868.html" title="Item 20" target="_blank" rel="external">Item 20</a>）,许多人都成了十字军战士，决心清<br><a id="more"></a><br>所有隐藏的按值传递所引起的开销。对纯净的按引用传递（不需要额外的构造或者析构）的追求丝毫没有懈怠，但他们的始终如一会产生致命的错误：<strong>它们开始传递指向并不存在的对象的引用</strong>。这可不是好事情。</p>
+<p>考虑表示有理数的一个类，它包含将两个有理数相乘的函数(<a href="http://www.cnblogs.com/harlanc/p/6384546.html" title="Item 3" target="_blank" rel="external">Item 3</a>)：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line">Rational(<span class="keyword">int</span> numerator = <span class="number">0</span>, <span class="comment">// see Item 24 for why this</span></div><div class="line"></div><div class="line"><span class="keyword">int</span> denominator = <span class="number">1</span>); <span class="comment">// ctor isn’t declared explicit</span></div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"><span class="keyword">private</span>:</div><div class="line"></div><div class="line"><span class="keyword">int</span> n, d; <span class="comment">// numerator and denominator</span></div><div class="line"></div><div class="line">friend</div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational <span class="comment">// see Item 3 for why the</span></div><div class="line"></div><div class="line"><span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs, <span class="comment">// return type is const</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational&amp; rhs);</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Operator* 的这个版本为按值返回结果，如果你没有为调用这个对象的构造函数和析构函数造成的开销而担心，你就是在逃避你的专业职责。如果这个对象不是必须的，你就不想为这样一个对象的开销去买单。所以问题是：这个对象的生成是必须的么？</p>
+<h2 id="2-问题的分析（一）：如返回引用，必须为返回的引用创建一个新的对象"><a href="#2-问题的分析（一）：如返回引用，必须为返回的引用创建一个新的对象" class="headerlink" title="2. 问题的分析（一）：如返回引用，必须为返回的引用创建一个新的对象"></a>2. 问题的分析（一）：如返回引用，必须为返回的引用创建一个新的对象</h2><p>如果你能够返回一个引用那么就不是必须为其买单。但是记住引用只是一个别名，一个已存对象的别名。每当你声明一个引用时，你应该马上问问自己它用来做谁的别名，因为它必须是某些东西的别名。对于operator*来说，如果这个函数返回一个引用，它必须返回一个指向已存在Rational对象的引用，这个对象包含了两个对象的乘积结果。</p>
+<p>没有任何理由假设在调用operator*之前这样一个对象已经存在了。也就是说，如果你进行下面的操作：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function">Rational <span class="title">a</span>(<span class="params"><span class="number">1</span>, <span class="number">2</span></span>)</span>; <span class="comment">// a = 1/2</span></div><div class="line"></div><div class="line"><span class="function">Rational <span class="title">b</span>(<span class="params"><span class="number">3</span>, <span class="number">5</span></span>)</span>; <span class="comment">// b = 3/5</span></div><div class="line"></div><div class="line">Rational c = a * b; <span class="comment">// c should be 3/10</span></div></pre></td></tr></table></figure>
+<p>期望已经存在一个值为3/10的有理数看上去是不合理的。如果operator*即将返回一个指向值为3/10的有理数的引用，它必须自己创建出来。</p>
+<h2 id="3-问题的分析（二）：创建新对象的三种错误方法"><a href="#3-问题的分析（二）：创建新对象的三种错误方法" class="headerlink" title="3. 问题的分析（二）：创建新对象的三种错误方法"></a>3. 问题的分析（二）：创建新对象的三种错误方法</h2><h3 id="3-1-在栈上创建reference指向的对象"><a href="#3-1-在栈上创建reference指向的对象" class="headerlink" title="3.1 在栈上创建reference指向的对象"></a>3.1 在栈上创建reference指向的对象</h3><p>一个函数只可以通过两种方法来创建一个新的对象：<strong>在栈上或者在堆上</strong>。通过定义一个本地变量来完成栈上的对象创建。使用这个策略，你可以尝试使用下面的方法来实现：operator*:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> Rational&amp; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs, <span class="comment">// warning! bad code!</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational&amp; rhs)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line"><span class="function">Rational <span class="title">result</span>(<span class="params">lhs.n * rhs.n, lhs.d * rhs.d</span>)</span>;</div><div class="line"></div><div class="line"><span class="keyword">return</span> result;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>你会立即否决这种做法，因为你的目标是避免调用构造函数，但是这里的result必须被构造出来。更加严重的问题是：这个函数返回指向result的引用，但result是一个本地对象，当函数退出的时候这个对象就会被销毁。所以这个版本的operator<em>并没有返回指向Rational的引用，它返回的引用指向从前的Rational对象，现在变成了一个空的，令人讨厌的,已经腐烂的Rational对象的尸体,它已经被销毁了。任何使用这个函数的返回值的调用者都将会马上进入未定义行为的范围。事实是，<em>*任何返回指向本地对象的引用的函数都是被破坏掉的函数</em></em>。（返回指向本地对象的指针的函数也是如此）。</p>
+<h3 id="3-2-在堆上创建reference指向的对象"><a href="#3-2-在堆上创建reference指向的对象" class="headerlink" title="3.2 在堆上创建reference指向的对象"></a>3.2 在堆上创建reference指向的对象</h3><p>让我们再考虑一下下面这种用法的可能性：<strong>在堆上创建一个对象并且返回指向它的引用</strong>。堆上的对象通过使用new来创建，所以你可以像下面这样实现一个基于堆的operator*:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> Rational&amp; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs, <span class="comment">// warning! more bad</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational&amp; rhs) <span class="comment">// code!</span></div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">Rational *result = <span class="keyword">new</span> Rational(lhs.n * rhs.n, lhs.d * rhs.d);</div><div class="line"></div><div class="line"><span class="keyword">return</span> *result;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里你仍然需要为构造函数的调用买单，对new分配的内存进行初始化是通过调用一个合适的构造函数来实现的，但是现在有另外一个问题：谁在这个对象上应用new召唤出来的delete?</p>
+<p>即使是一个认真负责的，心怀善意的调用者，对于下面这种合理的使用场景，他们也没有什么方法来避免内存泄漏：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Rational w, x, y, z;</div><div class="line"></div><div class="line">w = x * y * z; <span class="comment">// same as operator*(operator*(x, y), z)</span></div></pre></td></tr></table></figure>
+<p>这里，在同一个语句中调用了两次operator<em>，因此使用了两次new，这也需要使用两次delete来对new出来的对象进行销毁。没有什么合理的方法来让operator</em>的客户来进行这些调用，因为对于他们来说没有合理的方法来获取隐藏在从operator*返回回来的引用后面的指针。这么做保证会产生资源泄漏。</p>
+<h3 id="3-3-为reference创建-static对象"><a href="#3-3-为reference创建-static对象" class="headerlink" title="3.3 为reference创建 static对象"></a>3.3 为reference创建 static对象</h3><h4 id="3-3-1单一static-对象"><a href="#3-3-1单一static-对象" class="headerlink" title="3.3.1单一static 对象"></a>3.3.1单一static 对象</h4><p>你可能注意到了，<strong>不管是在堆上还是栈上创建从**</strong>operator<strong>*</strong>返回的结果，你都必须要调用一个构造函数<em>*。可能你能回忆起来我们的初衷是避免这样的构造函数调用。可能你认为你知道一种只需要调用一次构造函数，其余的构造函数被避免调用的方法。下面的这种实现突然出现了，这种方法基于另外一种operator</em>的实现：令其返回指向static Rational对象的引用，函数实现如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> Rational&amp; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs, <span class="comment">// warning! yet more</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational&amp; rhs) <span class="comment">// bad code!</span></div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line"><span class="keyword">static</span> Rational result; <span class="comment">// static object to which a</span></div><div class="line"></div><div class="line"><span class="comment">// reference will be returned</span></div><div class="line"></div><div class="line">result = ... ; <span class="comment">// multiply lhs by rhs and put the</span></div><div class="line"></div><div class="line"><span class="comment">// product inside result</span></div><div class="line"></div><div class="line"><span class="keyword">return</span> result;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>像所有使用静态对象的设计一样，这种方法增加了对于线程安全的梳理工作，但这个缺点是比较明显的。为了看一下更深层次的缺陷，考虑一份完全合理的客户代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">bool</span> <span class="keyword">operator</span>==(<span class="keyword">const</span> Rational&amp; lhs, <span class="comment">// an operator==</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational&amp; rhs); <span class="comment">// for Rationals</span></div><div class="line"></div><div class="line">Rational a, b, c, d;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"><span class="keyword">if</span> ((a * b) == (c * d)) &#123;</div><div class="line"></div><div class="line"><span class="keyword">do</span> whatever’s appropriate when the products are equal;</div><div class="line"></div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">do</span> whatever’s appropriate when they’re not;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>你猜怎么着？表达式((a<em>b) == (c</em>d))的求值结果总为true，而不管a,b,c,d的值是什么！</p>
+<p>将表达式用等价的函数形式进行重写，上面的不可思议的事情就能很容易明白：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (<span class="keyword">operator</span>==(<span class="keyword">operator</span>*(a, b), <span class="keyword">operator</span>*(c, d)))</div></pre></td></tr></table></figure>
+<p>注意当operator==被调用的时候，已经调用了两次operato<em>，每次调用都会返回指向operator</em>中的static Raitional对象的引用。因此，operator==会对operator<em>中的static Rational对象和operator</em> 中的static Rational对象进行比较。如果不相等就奇怪了。</p>
+<h4 id="3-3-2-Static数组"><a href="#3-3-2-Static数组" class="headerlink" title="3.3.2 Static数组"></a>3.3.2 Static数组</h4><p>这应该足够使你相信从像operator*一样的函数中返回一个引用是在浪费时间，但是一些人现在开始想了：好，如果一个static不够，可能一个static数组能够达到目的。。。</p>
+<p>我不能提供示例代码来让这个设计显得如此高贵，但是我能描述一下为什么这个想法会让你感到羞愧脸红。<strong>首先</strong>，你必须选择一个合适的n,也就是数组的大小。如果n太小，你可能会耗尽存储函数返回值的空间，这样对于上面的单一静态对象设计来说，我们没有获得任何好处。如果n太大，你的程序的性能会降低，因为即使这个函数仅被使用一次，在第一次被调用之前，数组中的每一个对象都会被构造出来。这会让你付出调用n个构造函数和n个析构函数的代价。如果最优化（optimization）是改善软件性能的一个过程，那么这种事情应该被叫做“最差化”（pessimization）。<strong>最后</strong>，想象一下你该如何把你所需要的值放入数组的对象中，并且这样做会付出什么代价。最直接的方法是通过赋值来对对象之间的值进行移动，但是赋值的代价是什么呢？对于许多类型来说，赋值等同于调用一个析构函数（释放旧值）和一个构造函数（拷贝新值）。但是你的目标是要避免析构和构造的开销！直面它把，这个方法没有奏效。（使用vector来代替数组也不会对问题有所改善。）</p>
+<h2 id="4-问题结论：从函数中返回新对象的正确方法是——返回对象"><a href="#4-问题结论：从函数中返回新对象的正确方法是——返回对象" class="headerlink" title="4. 问题结论：从函数中返回新对象的正确方法是——返回对象"></a>4. 问题结论：从函数中返回新对象的正确方法是——返回对象</h2><p>实现一个必须返回一个新对象的函数的正确方法是让函数返回新的对象（value不是reference）。对于Rational的opertaor*函数来说，其实现如下面的代码（或者与其等价的代码）：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">inline <span class="keyword">const</span> Rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs, <span class="keyword">const</span> Rational&amp; rhs)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line"><span class="keyword">return</span> Rational(lhs.n * rhs.n, lhs.d * rhs.d);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当然，你会从operator<em>的返回值中引入构造和析构的开销，但从长远来看，这是为正确的行为付出了一个小的代价。此外，让你毛骨悚然的账单再也不会到来。像许多编程语言一样，C++允许编译器实现者在不改变可视化代码行为的前提下，对代码进行优化，以达到改善生成码性能的目的。在一些情况中，我们发现,operator</em>返回值的构造和析构可以被安全的消除。当编译器利用了这个事实（编译器经常这么做），你的程序就会以你所期望的方式进行下去，只是比你想要的要快。</p>
+<p>将本条款归结如下：在返回一个引用还是返回一个对象之间做决定时，<strong>你的工作是选择能够提供正确行为的那个</strong>。对于“如何使这个选择有尽可能小的开销”这个问题的解决，让编译器供应商去斗争把。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>绝不要返回指向本地栈对象的指针或者引用，指向堆对象的引用，或者在有可能需要多个对象的时候返回指向本地静态对象的指针或者引用。(<a href="http://www.cnblogs.com/harlanc/p/6389927.html" title="Item 4" target="_blank" rel="external">Item 4</a>)给出了一种设计的一个例子，说明了返回指向本地静态对象的引用是合理的，至少在单线程环境中。)</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/25/2017-02-25_07_53_读书笔记_effctive_c++_Item_20_优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by_value)/" rel="next" title="读书笔记 effctive c++ Item 20 优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by value)">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effctive c++ Item 20 优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by value)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/27/2017-02-27_08_03_读书笔记_effective_c++_Item_22_将数据成员声明成private/" rel="prev" title="读书笔记 effective c++ Item 22 将数据成员声明成private">
+                读书笔记 effective c++ Item 22 将数据成员声明成private <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-问题的提出：要求函数返回对象时，可以返回引用么？"><span class="nav-number">1.</span> <span class="nav-text">1. 问题的提出：要求函数返回对象时，可以返回引用么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-问题的分析（一）：如返回引用，必须为返回的引用创建一个新的对象"><span class="nav-number">2.</span> <span class="nav-text">2. 问题的分析（一）：如返回引用，必须为返回的引用创建一个新的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-问题的分析（二）：创建新对象的三种错误方法"><span class="nav-number">3.</span> <span class="nav-text">3. 问题的分析（二）：创建新对象的三种错误方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-在栈上创建reference指向的对象"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 在栈上创建reference指向的对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-在堆上创建reference指向的对象"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 在堆上创建reference指向的对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-为reference创建-static对象"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 为reference创建 static对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-1单一static-对象"><span class="nav-number">3.3.1.</span> <span class="nav-text">3.3.1单一static 对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-2-Static数组"><span class="nav-number">3.3.2.</span> <span class="nav-text">3.3.2 Static数组</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-问题结论：从函数中返回新对象的正确方法是——返回对象"><span class="nav-number">4.</span> <span class="nav-text">4. 问题结论：从函数中返回新对象的正确方法是——返回对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

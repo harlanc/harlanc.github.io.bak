@@ -1,0 +1,932 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. new-handler介绍当操作符new不能满足内存分配请求的时候，它就会抛出异常。很久之前，它会返回一个null指针，一些旧的编译器仍然会这么做。你仍然会看到这种旧行为，但是我会把关于它的讨论推迟到本条款结束的时候。 1.1 调用set_new_handle">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 49 理解new-handler的行为">
+<meta property="og:url" content="http://yoursite.com/2017/04/17/2017-04-17_08_01_读书笔记_effective_c++_Item_49_理解new-handler的行为/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. new-handler介绍当操作符new不能满足内存分配请求的时候，它就会抛出异常。很久之前，它会返回一个null指针，一些旧的编译器仍然会这么做。你仍然会看到这种旧行为，但是我会把关于它的讨论推迟到本条款结束的时候。 1.1 调用set_new_handle">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.357Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 49 理解new-handler的行为">
+<meta name="twitter:description" content="1. new-handler介绍当操作符new不能满足内存分配请求的时候，它就会抛出异常。很久之前，它会返回一个null指针，一些旧的编译器仍然会这么做。你仍然会看到这种旧行为，但是我会把关于它的讨论推迟到本条款结束的时候。 1.1 调用set_new_handle">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/17/2017-04-17_08_01_读书笔记_effective_c++_Item_49_理解new-handler的行为/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 49 理解new-handler的行为 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/17/2017-04-17_08_01_读书笔记_effective_c++_Item_49_理解new-handler的行为/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 49 理解new-handler的行为</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-17T08:01:00+08:00">
+                2017-04-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/17/2017-04-17_08_01_读书笔记_effective_c++_Item_49_理解new-handler的行为/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/17/2017-04-17_08_01_读书笔记_effective_c++_Item_49_理解new-handler的行为/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 49 理解new-handler的行为">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-new-handler介绍"><a href="#1-new-handler介绍" class="headerlink" title="1. new-handler介绍"></a>1. new-handler介绍</h2><p>当操作符new不能满足内存分配请求的时候，它就会抛出异常。很久之前，它会返回一个null指针，一些旧的编译器仍然会这么做。你仍然会看到这种旧行为，但是我会把关于它的讨论推迟到本条款结束的时候。</p>
+<h3 id="1-1-调用set-new-handle"><a href="#1-1-调用set-new-handle" class="headerlink" title="1.1 调用set_new_handle"></a>1.1 调用set_new_handle</h3><a id="more"></a>
+<p>来指定全局new-handler</p>
+<p>在operator new由于不能满足内存分配要求而抛出异常之前，它会调用一个客户指定的叫做new-handler的错误处理函数。（这也不是完全正确的。Operator new的真正行为更加复杂。详细内容在Item 51中描述。）为了指定内存溢出处理（out-of-memory-handling）函数，客户可以调用set_new_handler函数，这个标准库函数被声明在<new>中：</new></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">namespace</span> <span class="title">std</span> &#123;</div><div class="line"><span class="function">typedef <span class="title">void</span> (<span class="params">*new_handler</span>)(<span class="params"></span>)</span>;</div><div class="line"><span class="function">new_handler <span class="title">set_new_handler</span>(<span class="params">new_handler p</span>) <span class="title">throw</span>(<span class="params"></span>)</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>正如你所看到的，new_handler是一个函数指针的typedef，这个函数没有参数没有返回值，set_new_handler是一个参数和返回值都为new_handler的函数。（函数set_new_handler声明结束处的”throw()”是一个异常指定（exception<br>specification）。从本质上来说它的意思是说这个函数不会抛出任何异常，然而事实更加有意思。详细内容见<a href="http://www.cnblogs.com/harlanc/p/6516877.html" title="Item 29" target="_blank" rel="external">Item 29</a>。）</p>
+<p>set_new_handler的参数是指向函数的指针，operator new会在请求的内存无法分配的情况下调用这个函数。Set_new_handler的返回值也是指向函数的指针，返回的是在调用set_new_handler之前调用的new_handler函数（也就是在new_handler被替换之前的函数）。</p>
+<p>你可以像下面这样使用set_new_handler：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">// function to call if operator new can’t allocate enough memory</div><div class="line">void outOfMem()</div><div class="line">&#123;</div><div class="line">std::cerr &lt;&lt; "Unable to satisfy request for memory\n";</div><div class="line">std::abort();</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">std::set_new_handler(outOfMem);</div><div class="line">int *pBigDataArray = new int[100000000L];</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果operaotr new无法为100,000,000个整数分配内存，就会调用outOfMem，也就是输出一个error信息之后程序终止（abort）。（顺便说一下，考虑在向cerr中写入error信息期间如果必须动态的分配内存会发生什么。。）</p>
+<h3 id="1-2-如何设计一个良好的new-handler函数"><a href="#1-2-如何设计一个良好的new-handler函数" class="headerlink" title="1.2 如何设计一个良好的new-handler函数"></a>1.2 如何设计一个良好的new-handler函数</h3><p>当operator new不能满足一个内存请求的时候，它会反复调用new-handler函数直到它发现有足够的内存可以分配了。引起这些函数被反复调用的代码在Item 51中可以找到，但是这种高级别的描述信息足够让我们得出结论：一个设计良好的new-handler函数必须能够做到如下几点。</p>
+<ul>
+<li>提供更多的可被使用的内存。这可以保证下次在operator new内部尝试分配内存时能够成功。实现这个策略的一种方法是在程序的开始阶段分配一大块内存，然后在第一次调用new-handler的时候释放它。</li>
+<li>安装一个不同的new-handler。如果当前的new-handler不能够为你提供更多的内存，可能另外一个new-handler可以。如果是这样，可以在当前的new-handler的位置上安装另外一个new-handler（通过调用set_new_handler）。下次operator new调用new-handler函数的时候，它会调用最近安装的。（这个主题的一个变种是一个使用new_handler来修改它自己的行为，所以在下次触发这个函数的时候，它就会做一些不同的事情。达到这个目的的一个方法是让new_handler修改影响new-handler行为的static数据,命名空间数据或者全局数据。）</li>
+<li>卸载new-handler，也就是为set_new_handler传递null指针。如果没有安装new-handler，operator  new在内存分配失败的时候会抛出异常。</li>
+<li>没有返回值，调用abort或者exit。</li>
+</ul>
+<p>这些选择让你在实现new-handler的时候有相当大的灵活性。</p>
+<h2 id="2-为特定类指定new-handler"><a href="#2-为特定类指定new-handler" class="headerlink" title="2. 为特定类指定new-handler"></a>2. 为特定类指定new-handler</h2><p>有时候你想用不同方式来处理内存分配失败，这依赖于需要分配内存的对象所属的类：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">X</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">outOfMemory</span>(<span class="params"></span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Y</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">outOfMemory</span>(<span class="params"></span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line">X* p1 = <span class="keyword">new</span> X; <span class="comment">// if allocation is unsuccessful,</span></div><div class="line"><span class="comment">// call X::outOfMemory</span></div><div class="line">Y* p2 = <span class="keyword">new</span> Y; <span class="comment">// if allocation is unsuccessful,</span></div><div class="line"><span class="comment">// call Y::outOfMemory</span></div></pre></td></tr></table></figure>
+<p>C++没有为类提供指定的new-handlers，但也不需要。你可以自己实现这种行为。你可以使每个类提供自己版本的set_new_handler和operator new。类中的set_new_handler允许客户为类提供new_handler（就像标准的set_new_handler允许客户指定全局的new-handler一样）。类的operator new确保为类对象分配内存时，会使用其指定的new-handler来替代全局new-handler。</p>
+<h3 id="2-1-在类中声明static-new-handler成员"><a href="#2-1-在类中声明static-new-handler成员" class="headerlink" title="2.1 在类中声明static new_handler成员"></a>2.1 在类中声明static new_handler成员</h3><p>假设你想对Widget类对象的内存分配失败做一下处理。当operator new不能为Widget对象分配足够的内存的时候你必须跟踪一下函数调用过程，所以你要声明一个类型为new_handler的static成员，来指向这个类的new-handler函数。Widget将会是下面这个样子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">class Widget &#123;</div><div class="line">public:</div><div class="line">static std::new_handler set_new_handler(std::new_handler p) throw();</div><div class="line">static void* operator new(std::size_t size) throw(std::bad_alloc);</div><div class="line">private:</div><div class="line">static std::new_handler currentHandler;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>静态类成员必须在类外部定义（除非他们是const整型，见<a href="http://www.cnblogs.com/harlanc/p/6376536.html" title="Item 2" target="_blank" rel="external">Item 2</a>）,所以：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">std::new_handler Widget::currentHandler = 0; // init to null in the class</div><div class="line">// impl. File</div></pre></td></tr></table></figure>
+<p>Widget中的set_new_handler函数会把传递进去的指针（所指向的new-handler函数）保存起来，并且会返回调用set_new_handler之前所保存的指针。这也是标准版本set_new_handler的做法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">std::new_handler Widget::set_new_handler(std::new_handler p) throw()</div><div class="line">&#123;</div><div class="line">std::new_handler oldHandler = currentHandler;</div><div class="line">currentHandler = p;</div><div class="line">return oldHandler;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="2-2-重新定义operator-new"><a href="#2-2-重新定义operator-new" class="headerlink" title="2.2 重新定义operator new"></a>2.2 重新定义operator new</h3><p>最后，Widget的operator new将会做下面的事情：</p>
+<ol>
+<li>调用标准set_new_handler，参数为Widget的错误处理函数。这就将Widget的new-handler安装成为了全局的new-handler。</li>
+<li>调用全局的operator new来执行实际的内存分配。如果分配失败，全局的operator new会触发Widget的new-handler，因为这个函数已经被安装为全局new-handler。如果全局的operator new最终不能分配内存，它会抛出bad_alloc异常。在这种情况下，Widget的operator new必须恢复原来的全局new-handler，然后传播异常。为了确保源new-handler总是能被恢复，Widget将全局new-handler作为资源来处理，遵循<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>的建议，使用资源管理对象来防止资源泄漏。</li>
+<li>如果全局operator new能够为Widget对象分配足够的内存。Widget的operator new就会返回指向被分配内存的指针。管理全局new-handler的对象的析构函数会自动恢复调用Widget的operator new之前的new-handler。</li>
+</ol>
+<p>这里我们以资源处理（resource-handling）类开始，只包含基本的RAII处理操作，包括在构造时获取资源和在在析构时释放资源（Item 13）:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">class NewHandlerHolder &#123;</div><div class="line">public:</div><div class="line">explicit NewHandlerHolder(std::new_handler nh) // acquire current</div><div class="line">: handler(nh) &#123;&#125; // new-handler</div><div class="line"></div><div class="line">~NewHandlerHolder()                             // release it</div><div class="line"></div><div class="line">&#123; std::set_new_handler(handler); &#125;           </div><div class="line"></div><div class="line">private:                                                    </div><div class="line"></div><div class="line">std::new_handler handler;                             // remember it</div><div class="line"></div><div class="line">NewHandlerHolder(const NewHandlerHolder&amp;);      // prevent copying</div><div class="line"></div><div class="line">NewHandlerHolder&amp;                                   // ([see Item 14](http://www.cnblogs.com/harlanc/p/6414789.html "Item 14"))</div><div class="line"></div><div class="line">operator=(const NewHandlerHolder&amp;);     </div><div class="line"></div><div class="line">&#125;;         </div></pre></td></tr></table></figure>
+<p> 这会使得Widget的operator new的实现非常简单：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">void* Widget::operator new(std::size_t size) throw(std::bad_alloc)</div><div class="line">&#123;</div><div class="line">NewHandlerHolder // install Widget’s</div><div class="line">h(std::set_new_handler(currentHandler)); // new-handler</div><div class="line"></div><div class="line">return ::operator new(size);        // allocate memory</div><div class="line">// or throw</div><div class="line"></div><div class="line">&#125;                                                  // restore global</div><div class="line">// new-handler</div><div class="line"></div><div class="line">void outOfMem();                                 // decl. of func. to call if mem. alloc.</div><div class="line">// for Widget objects fails</div><div class="line"></div><div class="line">Widget::set_new_handler(outOfMem); // set outOfMem as Widget’s</div><div class="line">// new-handling function</div><div class="line"></div><div class="line">Widget *pw1 = new Widget;                 // if memory allocation</div><div class="line">// fails, call outOfMem</div><div class="line"></div><div class="line">std::string *ps = new std::string;           // if memory allocation fails,</div><div class="line">// call the global new-handling</div><div class="line">// function (if there is one)</div><div class="line"></div><div class="line">Widget::set_new_handler(0);                // set the Widget-specific</div><div class="line">// new-handling function to</div><div class="line">// nothing (i.e., null)</div><div class="line"></div><div class="line">Widget *pw2 = new Widget;                 // if mem. alloc. fails, throw an</div><div class="line">// exception immediately. (There is</div><div class="line">// no new- handling function for</div><div class="line">// class Widget.)</div></pre></td></tr></table></figure>
+<h3 id="2-3-将NewHandlerHolder转换为模板"><a href="#2-3-将NewHandlerHolder转换为模板" class="headerlink" title="2.3 将NewHandlerHolder转换为模板"></a>2.3 将NewHandlerHolder转换为模板</h3><p>不管在什么类中，实现的这个主题的代码都是一样的，所以我们可以为其设一个合理的目标，就是代码能够在其他地方重用。达到这个目标的一个简单方法是创建一个“混合风格（mixin-style）”的基类，也就是设计一个基类，允许派生类继承单一特定的能力——在这个例子中，这种能力就是为类指定new-handler。然后将基类变为一个模板，于是你可以为每个继承类获得一份不同的类数据的拷贝。</p>
+<p>这个设计的基类部分<strong>使得派生类能够继承它们都需要的**</strong>set_new_handler和operator new函数<strong>，同时设计的模板部分</strong>确保每个继承类获得一个不同的<strong>**currentHandler数据成员</strong>。说起来有些复杂，但是代码看上去很熟悉。事实上，唯一真正不一样的是现在任何类都能够获得这个功能：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt; // “mixin-style” base class for</div><div class="line">class NewHandlerSupport &#123; // class-specific set_new_handler</div><div class="line">public: // support</div><div class="line">static std::new_handler set_new_handler(std::new_handler p) throw();</div><div class="line">static void* operator new(std::size_t size) throw(std::bad_alloc);</div><div class="line">... // other versions of op. new —</div><div class="line">// see Item 52</div><div class="line">private:</div><div class="line">static std::new_handler currentHandler;</div><div class="line">&#125;;</div><div class="line">template&lt;typename T&gt;</div><div class="line">std::new_handler</div><div class="line">NewHandlerSupport&lt;T&gt;::set_new_handler(std::new_handler p) throw()</div><div class="line">&#123;</div><div class="line">std::new_handler oldHandler = currentHandler;</div><div class="line">currentHandler = p;</div><div class="line">return oldHandler;</div><div class="line">&#125;</div><div class="line">template&lt;typename T&gt;</div><div class="line">void* NewHandlerSupport&lt;T&gt;::operator new(std::size_t size)</div><div class="line">throw(std::bad_alloc)</div><div class="line">&#123;</div><div class="line">NewHandlerHolder h(std::set_new_handler(currentHandler));</div><div class="line">return ::operator new(size);</div><div class="line">&#125;</div><div class="line">// this initializes each currentHandler to null</div><div class="line">template&lt;typename T&gt;</div><div class="line">std::new_handler NewHandlerSupport&lt;T&gt;::currentHandler = 0;</div></pre></td></tr></table></figure>
+<p>有了这个类模板之后，向Widget中添加set_new_handler支持就变得容易了：Widget只需要继承自NewHandlerSupport<widget>。（这可能看上去比较独特，接下来我会进行详细的解释。）</widget></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">class Widget: public NewHandlerSupport&lt;Widget&gt; &#123;</div><div class="line">... // as before, but without declarations for</div><div class="line"></div><div class="line">&#125;;                             // set_new_handler or operator new</div></pre></td></tr></table></figure>
+<p>这是Widget提供一个特定的set_new_handler需要做的所有事情。</p>
+<p>但是对于Widget继承自NewHandlerSupport<widget>，你可能还是有些不安。如果是这样，当你注意到NewHandlerSupport模板永远不会使用类型参数T之后你的不安可能会加剧。你没有必要这样。对于每个继承自NewHandlerSupport的类来说，我们所有需要的是一份不同的NewHandlerSupport的拷贝——特别是静态数据成员currentHandler的不同拷贝。模板机制自身会为每个T自动生成currentHandler的一份拷贝，NewHandlerSupport使用这个T来进行实例化。</widget></p>
+<p>对于Widget继承自一个使用Widget作为类型参数的模板基类来说，如果这个概念让你感觉眩晕，不要感觉不好。每个人看到开始看到它的时候都会有这种感觉。但是，它是非常有用的技术，它有一个名字，这个名字如果这个概念一样，第一次看到它的人没有人会感觉它很自然，它叫做怪异的循环模板模式（curiously<br>recurring template pattern CRTP）。</p>
+<p>我曾经写过一遍文章建议为它起一个更好的名字：do it for me，因为当Widget继承自NewHandlerSupport<widget>，它真的像是在说：“我是Widget，我需要为Widget继承NewHandlerSupport类“。没有人使用我建议的名字，但是使用“do it for me”来想象一下CRTP可能会帮助你理解模板化的继承会做什么。</widget></p>
+<p>有了像NewHandlerSupport这样的模板，为任何需要new-hadler的类添加一个特定的new-handler就会变得容易。混合风格的继承总是会将你引入多继承的主题，在开始进入这个主题之前，你可能想读一下<a href="http://www.cnblogs.com/harlanc/p/6641852.html" title="Item 40" target="_blank" rel="external">Item<br>40</a>。</p>
+<h2 id="3-Nothrow版本的new"><a href="#3-Nothrow版本的new" class="headerlink" title="3. Nothrow版本的new"></a>3. Nothrow版本的new</h2><p>直到1993年，当不能满足分配内存的要求时，C++要求operator new要返回null。现在指定operator new要抛出bad_alloc异常，但是大量的C++是在编译器支持修订版本之前写出来的。C++标准委员会也不想废弃test-for-null的代码，所以它们为operator<br>new提供了一种替代形式，它能够提供传统的“失败产生null（failure-yields-null）”行为。这些形式被叫做“nothrow”形式，某种程度上是因为他们使用了不会抛出异常的对象（定义在头文件<new>中），new在这种情况下被使用：</new></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">class Widget &#123; ... &#125;;</div><div class="line">Widget *pw1 = new Widget;                        // throws bad_alloc if</div><div class="line">// allocation fails</div><div class="line"></div><div class="line">if (pw1 == 0) ...                                             // this test must fail</div><div class="line"></div><div class="line">Widget *pw2 = new (std::nothrow) Widget;   // returns 0 if allocation for</div><div class="line">// the Widget fails</div><div class="line"></div><div class="line">if (pw2 == 0) ...                                             // this test may succeed</div></pre></td></tr></table></figure>
+<p>nothrow版本的new不会像从表面上看起来这样可靠，对于异常它没有提供让人信服的保证。对于表达式“new (std::nothrow) Widget”，会发生两件事情。首先，通过调用nothrow版本的operator<br>new来为一个Widget 对象分配足够的内存。如果分配失败了，operator<br>new会返回null指针。然而如果分配成功了，Widget构造函数会被调用，到这个时候，就会世事难料了。Widget构造函数能够做任何它想做的。它自己可能new一些内存，如果是这样，并没有强迫它使用nothrow版本的new。虽然在”new (std::nothrow) Widget”中的operator<br>new不会抛出异常，但是Widget构造函数却可能抛出来。如果是这样，异常会像平时一样传播出去。结论是什么？使用nothrow<br>new只能保证operator new不会抛出异常，不能保证像“new(std::nothrow)<br>Widget”这样的表达式不抛出异常。十有八九，你将永远不会有使用nothrow new的需要。</p>
+<p>不论你是使用”普通的”（也就是抛出异常的）new还是nothrow版本的new，重要的是你需要明白new-handler的行为，因为在两种new中都会使用到它。</p>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4. 总结"></a>4. 总结</h2><ul>
+<li>Set_new_handler允许你在分配内存不能满足要求的时候指定一个特定的被调用的函数。</li>
+<li>Nothrow new功能有限，因为它只能被应用在内存分配上；相关联的构造函数调用可能仍然会抛出异常。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/15/2017-04-15_12_54_读书笔记_effective_c++_Item_48__了解模板元编程/" rel="next" title="读书笔记 effective c++ Item 48  了解模板元编程">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 48  了解模板元编程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/19/2017-04-19_08_00_读书笔记_effective_c++_Item_50_了解何时替换new和delete_是有意义的/" rel="prev" title="读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的">
+                读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-new-handler介绍"><span class="nav-number">1.</span> <span class="nav-text">1. new-handler介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-调用set-new-handle"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 调用set_new_handle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-如何设计一个良好的new-handler函数"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 如何设计一个良好的new-handler函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-为特定类指定new-handler"><span class="nav-number">2.</span> <span class="nav-text">2. 为特定类指定new-handler</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-在类中声明static-new-handler成员"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 在类中声明static new_handler成员</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-重新定义operator-new"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 重新定义operator new</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-将NewHandlerHolder转换为模板"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 将NewHandlerHolder转换为模板</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Nothrow版本的new"><span class="nav-number">3.</span> <span class="nav-text">3. Nothrow版本的new</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-总结"><span class="nav-number">4.</span> <span class="nav-text">4. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

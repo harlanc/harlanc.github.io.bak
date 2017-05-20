@@ -1,0 +1,928 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 多继承的两个阵营当我们谈论到多继承（MI）的时候，C++委员会被分为两个基本阵营。一个阵营相信如果单继承是好的C++性质，那么多继承肯定会更好。另外一个阵营则争辩道单继承诚然是好的，但多继承太麻烦，而不值得去使用它。在这个条款中，我的主要目标是让你明白多继承的这两个观点。 ##">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective C++ Item 40 明智而谨慎的使用多继承">
+<meta property="og:url" content="http://yoursite.com/2017/03/29/2017-03-29_21_23_读书笔记_effective_C++_Item_40_明智而谨慎的使用多继承/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 多继承的两个阵营当我们谈论到多继承（MI）的时候，C++委员会被分为两个基本阵营。一个阵营相信如果单继承是好的C++性质，那么多继承肯定会更好。另外一个阵营则争辩道单继承诚然是好的，但多继承太麻烦，而不值得去使用它。在这个条款中，我的主要目标是让你明白多继承的这两个观点。 ##">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170329211732108-290056894.png">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170329211801889-1656444068.png">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170329211937108-429689836.png">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.081Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective C++ Item 40 明智而谨慎的使用多继承">
+<meta name="twitter:description" content="1. 多继承的两个阵营当我们谈论到多继承（MI）的时候，C++委员会被分为两个基本阵营。一个阵营相信如果单继承是好的C++性质，那么多继承肯定会更好。另外一个阵营则争辩道单继承诚然是好的，但多继承太麻烦，而不值得去使用它。在这个条款中，我的主要目标是让你明白多继承的这两个观点。 ##">
+<meta name="twitter:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170329211732108-290056894.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/29/2017-03-29_21_23_读书笔记_effective_C++_Item_40_明智而谨慎的使用多继承/"/>
+
+
+
+
+
+  <title>读书笔记 effective C++ Item 40 明智而谨慎的使用多继承 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/29/2017-03-29_21_23_读书笔记_effective_C++_Item_40_明智而谨慎的使用多继承/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective C++ Item 40 明智而谨慎的使用多继承</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-29T21:23:00+08:00">
+                2017-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/29/2017-03-29_21_23_读书笔记_effective_C++_Item_40_明智而谨慎的使用多继承/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/29/2017-03-29_21_23_读书笔记_effective_C++_Item_40_明智而谨慎的使用多继承/" class="leancloud_visitors" data-flag-title="读书笔记 effective C++ Item 40 明智而谨慎的使用多继承">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-多继承的两个阵营"><a href="#1-多继承的两个阵营" class="headerlink" title="1. 多继承的两个阵营"></a>1. 多继承的两个阵营</h2><p>当我们谈论到多继承（MI）的时候，C++委员会被分为两个基本阵营。一个阵营相信如果单继承是好的C++性质，那么多继承肯定会更好。另外一个阵营则争辩道单继承诚然是好的，但多继承太麻烦，而不值得去使用它。在这个条款中，我的主要目标是让你明白多继承的这两个观点。</p>
+<p>##<br><a id="more"></a></p>
+<ol>
+<li>从多个基类中继承的名字不能相同</li>
+</ol>
+<p>第一件事情是你需要认识到使用MI进行设计时，从多个基类中可能会继承相同的名字（例如函数或者typedef等等）。这就会导致模棱两可的问题，例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">class BorrowableItem &#123;      // something a library lets you borrow</div><div class="line"></div><div class="line">public:                    </div><div class="line"></div><div class="line">void checkOut();                // check the item out from the library</div><div class="line"></div><div class="line">...                                       </div><div class="line"></div><div class="line">&#125;;                                       </div><div class="line"></div><div class="line">class ElectronicGadget &#123;    </div><div class="line"></div><div class="line">private:                             </div><div class="line"></div><div class="line">bool checkOut() const; // perform self-test, return whether</div><div class="line">... // test succeeds</div><div class="line">&#125;;</div><div class="line">class MP3Player: // note MI here</div><div class="line"></div><div class="line">public BorrowableItem,    // (some libraries loan MP3 players)</div><div class="line"></div><div class="line">public ElectronicGadget   </div><div class="line"></div><div class="line">&#123; ... &#125;;               // class definition is unimportant</div><div class="line"></div><div class="line">MP3Player mp;</div><div class="line">mp.checkOut();          // ambiguous! which checkOut?</div></pre></td></tr></table></figure>
+<p>注意在这个例子中，对checkout的调用是模棱两可的，即使只有两个函数中的一个是可访问的。（checkout在BorrowableItem中是public的而在ElectronicGadget中是private的）。这对应着C++规则中对重载函数是如何解决的：<strong>在寻找是否有一个函数可被访问之前，**</strong>C++<strong>**首先首先识别出函数调用的最佳匹配函数</strong>。找到最佳匹配函数之后才会检查函数的可访问性。在这种情况下，搜寻名字的时候checkOut是模棱两可的，所以既不能解决函数重载的问题也不能决定最佳匹配函数。ElectronicGadget::checkOut的可访问性根本不会被检查到。</p>
+<p>为了解决这个模棱两可的问题，你必须指定调用哪个基类的函数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mp.BorrowableItem::checkOut();   // ah, that checkOut</div></pre></td></tr></table></figure>
+<p>当然你也可以显示调用ElectronicGadget::checkOut，但是模棱两可的错误将会被下面的错误所替代——“你在尝试调用一个private成员函数”</p>
+<h2 id="3-钻石型多继承"><a href="#3-钻石型多继承" class="headerlink" title="3. 钻石型多继承"></a>3. 钻石型多继承</h2><h3 id="3-1-钻石型继承中数据成员的重复问题"><a href="#3-1-钻石型继承中数据成员的重复问题" class="headerlink" title="3.1 钻石型继承中数据成员的重复问题"></a>3.1 钻石型继承中数据成员的重复问题</h3><p>多继承仅仅意味着从多个基类（多于一个）中继承，但是对于多继承来说在继承体系中发现更高层次的基类也并不是不常见。这就导致了我们常说的致命的“钻石型多继承”：</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170329211732108-290056894.png" alt=""> </p>
+<p>任何时候在一个继承体系中，如果基类和派生类之间的路径多于一条，你必须面对基类中的数据成员是否在每条路径上都要被复制的问题。例如，假设File类有一个数据成员，fileName。IOFile应该有它的几份拷贝？从一方面讲，它从每个基类中都继承了一份拷贝，所以表明IOFile应该会有两个fileName数据成员。从另外一方面讲，一个IOFIle只有一个文件名，所以从两个基类中继承的fileName部分不应该被重复。</p>
+<h3 id="3-2-C-如何处理钻石型继承"><a href="#3-2-C-如何处理钻石型继承" class="headerlink" title="3.2 C++如何处理钻石型继承"></a>3.2 C++如何处理钻石型继承</h3><p>C++在这场辩论中没有任何立场。它很高兴的支持两种选择，默认的选择是执行重复。如果这不是你想要的，你必须将包含数据（也即是File）的类变为虚基类。为了达到这个目的，你会对所有继承自它的类使用虚继承。</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170329211801889-1656444068.png" alt=""></p>
+<p>标准C++库包含一个多继承体系，就像上面的继承一样，但是类模版的类不在其中，这些类的名字是basic_ios，basic_istream，basic_ostream和basic_iostream,它们分别替换了File，InputFile，OutputFile和IOFile。</p>
+<h3 id="3-3-虚继承耗费资源，不能随意使用"><a href="#3-3-虚继承耗费资源，不能随意使用" class="headerlink" title="3.3 虚继承耗费资源，不能随意使用"></a>3.3 虚继承耗费资源，不能随意使用</h3><p> 从正确行为的角度，public继承应该总是virtual的。如果你只考虑这一点，规则会很简单：在你使用public继承的任何时候都要使用virtual public继承。但正确性不是我们要唯一关注的，为了阻止对继承而来的字段进行重复，编译器会在背后耍一些花招，结果是使用虚继承的类创建出来的对象会比不使用虚继承的类创建出来的对象要大。访问虚基类中的数据成员比访问非虚基类中的数据成员要慢。详细情况随编译器的不同而不同，但是基本的观点很清楚：虚继承耗费资源。</p>
+<p>资源耗费也体现在其他方面。管理虚基类初始化列表的规则比非虚基类更加复杂，更加不直观。初始化虚基类部分的责任由继承体系中最底层的派生类承担。这种规则就意味着：（1）继承自虚基类的类如果需要初始化，它们必须意识到虚基类的存在，无论这个虚基类离派生类有多远。（2）当一个派生类被添加到继承体系中的时候，它必须承担初始化虚基类的责任（无论是直接的还是间接的虚基类）。</p>
+<p>我对于使用虚基类（也就是虚继承）的建议很简单。首先，不要使用虚基类，除非你需要它。默认情况下使用非虚基类。第二，如果你必须使用虚基类，尝试着不要在这些类中放置数据。这样你就不必为这些类的初始化（还有赋值）规则的古怪行为进行担心了。值得注意的是,Java和.NET中的接口（在许多方面相当于C++的虚基类）是不允许包含任何数据的。</p>
+<h2 id="4-另外一种多继承的使用场景"><a href="#4-另外一种多继承的使用场景" class="headerlink" title="4. 另外一种多继承的使用场景"></a>4. 另外一种多继承的使用场景</h2><p>让我们看一下下面的C++接口类（见<a href="http://www.cnblogs.com/harlanc/p/6538258.html" title="Item 31" target="_blank" rel="external">Item 31</a>），这个类为persons建模：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">class IPerson &#123;</div><div class="line">public:</div><div class="line">virtual ~IPerson();</div><div class="line">virtual std::string name() const = 0;</div><div class="line">virtual std::string birthDate() const = 0;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>IPerson的客户必须依赖IPerson指针和引用来进行编程，因为抽象类不能被实例化。为了创建可以被IPerson对象操作的对象，IPerson的客户使用工厂函数（<a href="http://www.cnblogs.com/harlanc/p/6538258.html" title="Item 31" target="_blank" rel="external">Item 31</a>）来实例化派生自IPerson的具现类：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">// factory function to create a Person object from a unique database ID;</div><div class="line">// see [Item 18](http://www.cnblogs.com/harlanc/p/6431766.html "Item 18") for why the return type isn’t a raw pointer</div><div class="line">std::tr1::shared_ptr&lt;IPerson&gt; makePerson(DatabaseID personIdentifier);</div><div class="line"></div><div class="line">// function to get a database ID from the user</div><div class="line">DatabaseID askUserForDatabaseID();</div><div class="line">DatabaseID id(askUserForDatabaseID());</div><div class="line">std::tr1::shared_ptr&lt;IPerson&gt; pp(makePerson(id)); // create an object</div><div class="line">// supporting the</div><div class="line">// IPerson interface</div><div class="line"></div><div class="line">...                                                                            // manipulate *pp via</div><div class="line">// IPerson’s member</div><div class="line">// functions</div></pre></td></tr></table></figure>
+<p>但是如何使用makePerson创建返回指针指向的对象呢？很清楚，必须有一些派生自IPerson具现类，使得makePerson能够对这些具现类进行实例化。</p>
+<p>我们把这个类叫做CPerson。作为一个具现类，CPerson必须为继承自IPerson的纯虚函数提供一份实现。我们可以从头开始实现这个函数，但是利用现成的组件来对其进行实现更好，这些现成的组件实现了大部分或者全部的必要功能。例如，假设一个旧数据库指定的类PersonInfo为CPerson提供了它需要的最基本的东西：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">PersonInfo</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">PersonInfo</span>(<span class="params">DatabaseID pid</span>)</span>;</div><div class="line"><span class="keyword">virtual</span> ~PersonInfo();</div><div class="line"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span> * theName() <span class="keyword">const</span>;</div><div class="line"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span> * theBirthDate() <span class="keyword">const</span>;</div><div class="line">...</div><div class="line"><span class="keyword">private</span>:</div><div class="line"></div><div class="line"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span> * valueDelimOpen() <span class="keyword">const</span>; <span class="comment">// see</span></div><div class="line"><span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keyword">char</span> * valueDelimClose() <span class="keyword">const</span>; <span class="comment">// below</span></div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>你能够识别出来这是一个旧类，因为成员函数返回的是const<br>char*而不是string对象。并且如果鞋是合适的，为什么不穿上呢？这个类的成员函数的名字也表明了使用结果会非常棒。</p>
+<p>你现在发现了PersonInfo的设计是用来帮助打印不同格式的数据库字段的，这些字段值的开始和结尾处都由特殊的字符串进行分隔。默认情况下，字段值的开始和结束分隔符是方括号，所以值”Ring-tailed<br>Lemur”会被格式化成下面的字符串：</p>
+<p>[Ring-tailed Lemur]</p>
+<p>认识到方括号并不能被PersonInfo的客户普遍接受，虚函数valueDelimOpen和valueDelimClose允许派生类指定它们自己的开始和结束分隔字符串。PersonInfo的成员函数的实现会调用这些虚函数来为返回值添加合适的分隔符。使用PersonInfo::theName作为例子，代码可能像下面这样：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">const char * PersonInfo::valueDelimOpen() const</div><div class="line">&#123;</div><div class="line"></div><div class="line">return "[";                                                                          // default opening delimiter</div><div class="line"></div><div class="line">&#125;                                                                                        </div><div class="line"></div><div class="line">const char * PersonInfo::valueDelimClose() const            </div><div class="line"></div><div class="line">&#123;                                                                                        </div><div class="line"></div><div class="line">return "]";                                                                                      // default closing delimiter</div><div class="line"></div><div class="line">&#125;                                                                                                   </div><div class="line"></div><div class="line">const char * PersonInfo::theName() const                                    </div><div class="line"></div><div class="line">&#123;                                                                                                   </div><div class="line"></div><div class="line">// reserve buffer for return value; because this is                        </div><div class="line"></div><div class="line">// static, it’s automatically initialized to all zeros                         </div><div class="line"></div><div class="line">static char value[Max_Formatted_Field_Value_Length];               </div><div class="line"></div><div class="line">// write opening delimiter                                                           </div><div class="line"></div><div class="line">std::strcpy(value, valueDelimOpen());                                         </div><div class="line"></div><div class="line">append to the string in value this object’s name field (being careful </div><div class="line"></div><div class="line">to avoid buffer overruns!)                                                            </div><div class="line"></div><div class="line">// write closing delimiter                                                             </div><div class="line"></div><div class="line">std::strcat(value, valueDelimClose());                                          </div><div class="line"></div><div class="line">return value;                                                                                </div><div class="line"></div><div class="line">&#125;                  </div></pre></td></tr></table></figure>
+<p>有人可能对PersonInfo::theName的过时设计发出疑问（特使是对固定大小的static缓存的使用，有时会造成越界或者线程问题，见<a href="http://www.cnblogs.com/harlanc/p/6445461.html" title="Item 21" target="_blank" rel="external">Item 21</a>），但是将这种问题放到一边，我们将焦点放在下面这件事情上：theName调用valueDelimOpen来为返回的string生成开始分隔符，然后生成名字本身，最后调用valueDelimClose。</p>
+<p>因为valueDelimOpen和valueDelimClose是虚函数，由theName返回的值不仅依赖于PerosnInfo同时依赖于PersonInfo的派生类。</p>
+<p>作为CPerson的实现者，这是个好消息，因为当对IPerson的文档进行精读时，你发现name和birthDate需要返回没有分隔符的值。也就是一个叫做”Homer”的人，对这个名字进行函数调用会返回“Homer”而不是“[Homer]”。</p>
+<p>CPerson和PersonInfo之间的关系是PersonInfo恰好有一些函数使得CPerson的实现更加容易。它们的关系因此为“is-implemented-in-terms-of”,我们知道这种关系可以被表现为其它两种形式：通过组合（<a href="http://www.cnblogs.com/harlanc/p/6628670.html" title="Item 38" target="_blank" rel="external">Item 38</a>）和private继承（<a href="http://www.cnblogs.com/harlanc/p/6636917.html" title="Item 39" target="_blank" rel="external">Item 39</a>）。Item 39指出组合通常讲比Private继承要更好，但如果虚函数需要重定义，private继承就是必须的。在这种情况中，CPerson需要重新定义valueDelimOpen和valueDelimClose，所以使用组合在这里不能工作。最简单直接的解决方案是让CPerson private继承PersonInfo，虽然Item 39解释道如果多做一些工作，CPerson可以使用组合和继承的结合体来有效重定义PersonInfo的虚函数。在这里，我们使用private继承。</p>
+<p>但是CPerson同样必须实现IPerson接口，这些接口为public继承所用。这也导致了合理的多继承应用：将一个接口的public接口和一个实现的private继承结合起来使用：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">class IPerson &#123;                                      // this class specifies the</div><div class="line"></div><div class="line">public:                                                  // interface to be implemented</div><div class="line"></div><div class="line">virtual ~IPerson();                              </div><div class="line"></div><div class="line">virtual std::string name() const = 0;     </div><div class="line"></div><div class="line">virtual std::string birthDate() const = 0;       </div><div class="line"></div><div class="line">&#125;;                                                         </div><div class="line"></div><div class="line">class DatabaseID &#123; ... &#125;;            // used below; details are</div><div class="line">// unimportant</div><div class="line"></div><div class="line">class PersonInfo &#123;   // this class has functions</div><div class="line"></div><div class="line">public: // useful in implementing</div><div class="line">explicit PersonInfo(DatabaseID pid); // the IPerson interface</div><div class="line">virtual ~PersonInfo();</div><div class="line">virtual const char * theName() const;</div><div class="line">virtual const char * theBirthDate() const;</div><div class="line">...</div><div class="line">private:</div><div class="line">virtual const char * valueDelimOpen() const;</div><div class="line">virtual const char * valueDelimClose() const;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"></div><div class="line">class CPerson: public IPerson, private PersonInfo &#123; // note use of MI</div><div class="line">public:</div><div class="line">explicit CPerson(DatabaseID pid): PersonInfo(pid) &#123;&#125;</div><div class="line">virtual std::string name() const // implementations</div><div class="line">&#123; return PersonInfo::theName(); &#125; // of the required</div><div class="line">// IPerson member</div><div class="line">virtual std::string birthDate() const // functions</div><div class="line">&#123; return PersonInfo::theBirthDate(); &#125;</div><div class="line">private: // redefinitions of</div><div class="line">const char * valueDelimOpen() const &#123; return ""; &#125; // inherited virtual</div><div class="line">const char * valueDelimClose() const &#123; return ""; &#125; // delimiter</div><div class="line"></div><div class="line">&#125;;                                                                   // functions</div></pre></td></tr></table></figure>
+<p>用UML来表示：</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170329211937108-429689836.png" alt=""></p>
+<p>这个例子表明了多继承是有用的和可被理解的。</p>
+<h2 id="5-何时使用多继承"><a href="#5-何时使用多继承" class="headerlink" title="5. 何时使用多继承"></a>5. 何时使用多继承</h2><p>最后，多继承只是面向对象工具包中的另外一个工具。和单继承相比，使用和理解都更加复杂，所以如果你碰到一个和多继承设计基本相当的单继承设计，使用单继承设计基本上会是更好的选择。如果你只能想出多继承设计，你应该更加努力的思考——肯定有一些方法来让单继承正常的工作。同时，多继承有时是最干净的，最容易维护以及最合理的，它能使工作有效进行。如果你碰到这种情况，不要害怕使用它。确保合理而谨慎的使用private继承就可以了。</p>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><ul>
+<li>多继承比单继承更加复杂。它会引起新的模棱两可的问题，因此需要使用虚继承。</li>
+<li>虚继承的使用会增大体积，降低速度，增加初始化和赋值的复杂度。在虚基类中没有数据的情况下使用多继承是最实际的。</li>
+<li>多继承也有合理的使用场景。一种使用场景涉及到将对接口类的public继承和将对实现类的private继承相结合的情况。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/28/2017-03-28_21_14_读书笔记_effective_c++_Item_39_明智而谨慎的使用private继承/" rel="next" title="读书笔记 effective c++ Item 39 明智而谨慎的使用private继承">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 39 明智而谨慎的使用private继承
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/30/2017-03-30_22_56_读书笔记_effective_c++_Item_41_理解隐式接口和编译期多态/" rel="prev" title="读书笔记 effective c++ Item 41 理解隐式接口和编译期多态">
+                读书笔记 effective c++ Item 41 理解隐式接口和编译期多态 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-多继承的两个阵营"><span class="nav-number">1.</span> <span class="nav-text">1. 多继承的两个阵营</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-钻石型多继承"><span class="nav-number">2.</span> <span class="nav-text">3. 钻石型多继承</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-钻石型继承中数据成员的重复问题"><span class="nav-number">2.1.</span> <span class="nav-text">3.1 钻石型继承中数据成员的重复问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-C-如何处理钻石型继承"><span class="nav-number">2.2.</span> <span class="nav-text">3.2 C++如何处理钻石型继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-虚继承耗费资源，不能随意使用"><span class="nav-number">2.3.</span> <span class="nav-text">3.3 虚继承耗费资源，不能随意使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-另外一种多继承的使用场景"><span class="nav-number">3.</span> <span class="nav-text">4. 另外一种多继承的使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-何时使用多继承"><span class="nav-number">4.</span> <span class="nav-text">5. 何时使用多继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-总结"><span class="nav-number">5.</span> <span class="nav-text">6. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,903 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 问题的引入——将operator*模板化Item 24中解释了为什么对于所有参数的隐式类型转换，只有非成员函数是合格的，并且使用了一个为Rati">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数">
+<meta property="og:url" content="http://yoursite.com/2017/04/11/2017-04-11_08_38_读书笔记_effective_c++_Item_46_如果想进行类型转换，在模板内部定义非成员函数/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 问题的引入——将operator*模板化Item 24中解释了为什么对于所有参数的隐式类型转换，只有非成员函数是合格的，并且使用了一个为Rati">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.259Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数">
+<meta name="twitter:description" content="1. 问题的引入——将operator*模板化Item 24中解释了为什么对于所有参数的隐式类型转换，只有非成员函数是合格的，并且使用了一个为Rati">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/11/2017-04-11_08_38_读书笔记_effective_c++_Item_46_如果想进行类型转换，在模板内部定义非成员函数/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/11/2017-04-11_08_38_读书笔记_effective_c++_Item_46_如果想进行类型转换，在模板内部定义非成员函数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-11T08:38:00+08:00">
+                2017-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/11/2017-04-11_08_38_读书笔记_effective_c++_Item_46_如果想进行类型转换，在模板内部定义非成员函数/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/11/2017-04-11_08_38_读书笔记_effective_c++_Item_46_如果想进行类型转换，在模板内部定义非成员函数/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-问题的引入——将operator-模板化"><a href="#1-问题的引入——将operator-模板化" class="headerlink" title="1. 问题的引入——将operator*模板化"></a>1. 问题的引入——将operator*模板化</h2><p><a href="http://www.cnblogs.com/harlanc/p/6482417.html" title="Item 24" target="_blank" rel="external">Item 24</a>中解释了为什么对于所有参数的隐式类型转换，只有非成员函数是合格的，并且使用了一个为Rati<br><a id="more"></a><br>nal 类创建的operator<em>函数作为实例。在继续之前建议你先回顾一下这个例子，因为这个条款的讨论是对它的扩展，我们会对<a href="http://www.cnblogs.com/harlanc/p/6482417.html" title="Item 24" target="_blank" rel="external">Item 24</a>的实例做一些看上去无伤大雅的修改：对Rational和opeartor</em>同时进行模板化：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">Rational(<span class="keyword">const</span> T&amp; numerator = <span class="number">0</span>, <span class="comment">// see [Item 20](http://www.cnblogs.com/harlanc/p/6440868.html "Item 20") for why params</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> T&amp; denominator = <span class="number">1</span>);         <span class="comment">// are now passed by reference</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">const</span> T <span class="title">numerator</span>(<span class="params"></span>) <span class="keyword">const</span></span>;          <span class="comment">// see [Item 28](http://www.cnblogs.com/harlanc/p/6512595.html "Item 28") for why return</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">const</span> T <span class="title">denominator</span>(<span class="params"></span>) <span class="keyword">const</span></span>; <span class="comment">// values are still passed by value,</span></div><div class="line">... <span class="comment">//[ Item 3](http://www.cnblogs.com/harlanc/p/6384546.html "Item 3") for why they’re const</span></div><div class="line">&#125;;</div><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&lt;T&gt;&amp; lhs,</div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt;&amp; rhs)</div><div class="line">&#123; ... &#125;</div></pre></td></tr></table></figure>
+<p>正如<a href="http://www.cnblogs.com/harlanc/p/6482417.html" title="Item 24" target="_blank" rel="external">Item 24</a>中讨论的，我们想支持混合模式的算术运算，所以我们想让下面的代码通过编译。这应该没有问题，因为我们在<a href="http://www.cnblogs.com/harlanc/p/6482417.html" title="Item 24" target="_blank" rel="external">Item 24</a>中使用了相同的代码。唯一的区别是Rational和operator*现在变成了模板：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function">Rational&lt;<span class="keyword">int</span>&gt; <span class="title">oneHalf</span>(<span class="params"><span class="number">1</span>, <span class="number">2</span></span>)</span>;            <span class="comment">// this example is from Item 24,</span></div><div class="line"><span class="comment">// except Rational is now a template</span></div><div class="line"></div><div class="line">Rational&lt;<span class="keyword">int</span>&gt; result = oneHalf * <span class="number">2</span>; <span class="comment">// error! won’t compile</span></div></pre></td></tr></table></figure>
+<h2 id="2-问题分析——模板参数演绎不能进行隐式转换"><a href="#2-问题分析——模板参数演绎不能进行隐式转换" class="headerlink" title="2. 问题分析——模板参数演绎不能进行隐式转换"></a>2. 问题分析——模板参数演绎不能进行隐式转换</h2><p>但事实上上面的代码不会通过编译，这就表明了模板化的Rational和非模板版本有些地方还是不一样的，确实是有区别的。在<a href="http://www.cnblogs.com/harlanc/p/6482417.html" title="Item 24" target="_blank" rel="external">Item<br>24</a>中，编译器知道我们尝试调用什么函数（带两个Rational参数的operator<em>），但是这里，编译器不知道我们想要调用哪个函数。相反，它们尝试确认<strong>从模板**</strong>operator<em>**</em></em>中实例化出（也即是创建）什么样的函数<strong>。它们知道它们想实例化一些名字为operator*的函数，这些函数带有两个类型为Rational<t>的参数，但是为了进行实例化，</t></strong>它们必须确认<strong><strong>T</strong></strong>是什么。问题是他们不可能知道**。</p>
+<p>为了演绎出T类型，它们看到了调用operator*时传递的参数类型。在上面的例子中，两个参数类型分别是Rational<int>（oneHalf的类型）和int(2的类型)。每个参数进行单独考虑。</int></p>
+<p>使用oneHalf进行演绎（deduction）很容易，operator<em>的第一个参数所需要的类型为Rational<t>，实际上这里传递给operator</t></em>的第一个参数的类型是Rational<int>，所以T必须为int。不幸的是，对其他参数的演绎就没有这么简单了，operator<em>的第二个参数所需要的类型也为Rational<t>，但是传递给operator</t></em>的第二个参数是一个int值。在这种情况下编译器该如何确认T是什么呢？你可能期望它们使用Rational<int>的非显示构造函数来将2转换为一个Rational<int>，这样就允许它们将T演绎成int，但是它们没有这么做。<strong>因为在模板参数演绎期间永远不会考虑使用隐式类型转换函数</strong>。这样的转换是在函数调用期间被使用的，所以在你调用一个函数之前，你必须知道哪个函数是存在的。为了知道这些，你就必须为相关的函数模板演绎出参数类型（然后你才能实例化出合适的函数。）但是在模板参数演绎期间不会通过调用构造函数来进行隐式转换<strong>。</strong>Item 24没有涉及到模板，所以模板参数的演绎不是问题。现在我们正在讨论C++的模板部分（<a href="http://www.cnblogs.com/harlanc/p/6371997.html" title="Item 1" target="_blank" rel="external">Item<br>1</a>）,这变为了主要问题。</int></int></int></p>
+<h2 id="3-问题解决——使用友元函数"><a href="#3-问题解决——使用友元函数" class="headerlink" title="3. 问题解决——使用友元函数"></a>3. 问题解决——使用友元函数</h2><h3 id="3-1-在类模板中声明友元函数——编译通过"><a href="#3-1-在类模板中声明友元函数——编译通过" class="headerlink" title="3.1 在类模板中声明友元函数——编译通过"></a>3.1 在类模板中声明友元函数——编译通过</h3><p>我们可以利用如下事实来缓和编译器接受的对模板参数演绎的挑战：<strong>模板类中的一个友元声明能够引用一个实例化函数</strong>。这就意味着类Ration<t>能够为Ration<t>声明一个友元函数的operator<em>。类模板不再依赖于模板参数演绎（这个过程只应用于函数模板），所以T总是在类Ration<t>被实例化的时候就能被确认。所以声明一个合适的友元operator</t></em>函数能简化整个问题：</t></t></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">...</div><div class="line"></div><div class="line">friend <span class="comment">// declare operator*</span></div><div class="line"><span class="keyword">const</span> Rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs, <span class="comment">// function (see</span></div><div class="line"><span class="keyword">const</span> Rational&amp; rhs); <span class="comment">// below for details)</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line">template&lt;typename T&gt;                                                              <span class="comment">// define operator*</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&lt;T&gt;&amp; lhs, <span class="comment">// functions  </span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt;&amp; rhs)</div><div class="line">&#123; ... &#125;</div></pre></td></tr></table></figure>
+<p>现在我们对operator<em>的混合模式的调用就能通过编译了，因为当对象oneHalf被声明为类型Rational<int>的时候，Ratinonal<t>被实例化称Rational<int>,作为这个过程的一部分，参数为Rational<int>的友元函数operator</int></int></t></int></em>被自动声明。<strong>作为一个被声明的函数</strong>（不是函数模板），<strong>编译器在调用它时就能够使用隐式类型转换函数</strong>（像Rational的非显示构造函数），<strong>这就是如何使混合模式调用成功的</strong>。</p>
+<h3 id="3-2-关于模板和模板参数的速写符号"><a href="#3-2-关于模板和模板参数的速写符号" class="headerlink" title="3.2 关于模板和模板参数的速写符号"></a>3.2 关于模板和模板参数的速写符号</h3><p>虽然代码能够通过编译，但是却不能链接成功。我们稍后处理，但是对于上面的语法我首先要讨论的是在Rational中声明operator*。</p>
+<p>在一个类模板中，<strong>模板的名字能够被用来当作模板和模板参数的速写符号</strong>，所以在Rational<t>中，我们可以写成Rational来代替Rational<t>。在这个例子中只为我们的输入减少了几个字符，但是如果有多个参数或者更长的参数名字的时候，它既能减少输入也能使代码看起来更清晰。我提出这些是因为在上面的例子中operator*的声明用Rational作为参数和返回值，而不是Rational<t>。下面的声明效果是一样的：</t></t></t></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">...</div><div class="line">friend</div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&lt;T&gt;&amp; lhs,</div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt;&amp; rhs);</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>然而，使用速写形式更加容易（更加大众化）。</p>
+<h3 id="3-3-把友元函数的定义合并到声明中——链接通过"><a href="#3-3-把友元函数的定义合并到声明中——链接通过" class="headerlink" title="3.3 把友元函数的定义合并到声明中——链接通过"></a>3.3 把友元函数的定义合并到声明中——链接通过</h3><p>现在让我们回到链接问题。混合模式的代码能够通过编译，因为编译器知道我们想调用一个实例化函数（带两个Rational<int>参数的operator<em>函数），但是这个函数只在Rational内部进行声明，而不是被定义。我们的意图是让类外部的operator</em>模板提供定义，但是编译器不会以这种方式进行工作。<strong>如果我们自己声明一个函数（这是我们在**</strong>Rational<strong>**模板内部所做的），我们同样有责任去定义这个函数</strong>。在上面的例子中，我们并没有提供一个定义，这就是为什么连接器不能知道函数定义的原因。</int></p>
+<p>最简单的可能工作的解决方案是将operator*函数体合并到声明中：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">...</div><div class="line">friend <span class="keyword">const</span> Rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp; lhs, <span class="keyword">const</span> Rational&amp; rhs)</div><div class="line">&#123;</div><div class="line"><span class="keyword">return</span> Rational(lhs.numerator() * rhs.numerator(), <span class="comment">// same impl</span></div><div class="line">lhs.denominator() * rhs.denominator()); <span class="comment">// as in</span></div><div class="line">&#125; <span class="comment">// Item 24</span></div><div class="line">&#125;;</div><div class="line"></div></pre></td></tr></table></figure>
+<p>确实这能够工作：对operator*的混合模式调用，编译，链接，运行都没有问题。</p>
+<h3 id="3-4-如此使用友元函数很意思"><a href="#3-4-如此使用友元函数很意思" class="headerlink" title="3.4 如此使用友元函数很意思"></a>3.4 如此使用友元函数很意思</h3><p>这种技术的有意思的地方是<strong>友元函数并没有被用来访问类的非**</strong>public<strong>**部分</strong>。为了使所有参数间的类型转换成为可能，我们需要一个非成员函数（Item 24在这里仍然适用）；并且为了让合适的函数被自动实例化出来，我们需要在类内部声明一个函数。在类内部声明一个非成员函数的唯一方法是将其声明为友元函数。这就是我们所做的，不符合惯例？是的。有效么？毋庸置疑。</p>
+<h2 id="4-关于模板友元函数inline的讨论"><a href="#4-关于模板友元函数inline的讨论" class="headerlink" title="4. 关于模板友元函数inline的讨论"></a>4. 关于模板友元函数inline的讨论</h2><p>正如在<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item 30</a>中解释的，在类内部定义的函数被隐式的声明为inline函数，这同样包含像operator<em>这样的友元函数。你可以最小化这种inline声明的影响：通过让operator</em>只调用一个定义在类体外的helper函数。在这个条款的例子中没有必要这么做，因为operator*已经被实现成了只有一行的函数，对于更加复杂的函数体，helper才可能是你想要的。“让友元函数调用helper”的方法值得一看。</p>
+<p>Rationl是模板的事实意味着helper函数通常情况下也会是一个模板，所以在头文件中定义Rational的代码会像下面这个样子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt; <span class="keyword">class</span> <span class="title">Rational</span>; <span class="comment">// declare</span></div><div class="line"><span class="comment">// Rational</span></div><div class="line"><span class="comment">// template</span></div><div class="line"></div><div class="line">template&lt;typename T&gt; <span class="comment">// declare</span></div><div class="line"><span class="function"><span class="keyword">const</span> Rational&lt;T&gt; <span class="title">doMultiply</span>(<span class="params"> <span class="keyword">const</span> Rational&lt;T&gt;&amp; lhs, // helper</span></span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt;&amp; rhs);                                         <span class="comment">// template</span></div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">Rational</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">...</div><div class="line">friend</div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt; <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&lt;T&gt;&amp; lhs,</div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt;&amp; rhs)                                          <span class="comment">// Have friend</span></div><div class="line"></div><div class="line">&#123; <span class="keyword">return</span> doMultiply(lhs, rhs); &#125;                <span class="comment">// call helper</span></div><div class="line"></div><div class="line">...                                                            </div><div class="line"></div><div class="line">&#125;;           </div></pre></td></tr></table></figure>
+<p>许多编译器从根本上强制你将所有的模板定义放在头文件中，所以你可能同样需要在你的头文件中定义doMultiply。（正如<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item30</a>解释的，这样的模板不需要inline）。这会像下面这个样子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt; <span class="comment">// define</span></div><div class="line"><span class="function"><span class="keyword">const</span> Rational&lt;T&gt; <span class="title">doMultiply</span>(<span class="params"><span class="keyword">const</span> Rational&lt;T&gt;&amp; lhs, // helper</span></span></div><div class="line"><span class="keyword">const</span> Rational&lt;T&gt;&amp; rhs) <span class="comment">// template in</span></div><div class="line">&#123; <span class="comment">// header file,</span></div><div class="line"><span class="keyword">return</span> Rational&lt;T&gt;(lhs.numerator() * rhs.numerator(), <span class="comment">// if necessary</span></div><div class="line">lhs.denominator() * rhs.denominator());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当然，作为一个模板，doMultiply不支持混合模式的乘法，但是也不需要支持。它只被operator<em>调用，operator</em>支持混合模式操作就够了！从根本上来说，函数operator*支持必要的类型转换，以确保两个Rational对象被相乘，然后它将这两个对象传递到doMultiply模板的合适实例中进行实际的乘法操作。协同行动，不是么？</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>当实现一个提供函数的类模版时，如果这些函数的所有参数支持和模板相关的隐式类型转换，将这些函数定义为类模板内部的友元函数。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/10/2017-04-10_08_36_读书笔记_effective_c++_Item_45_使用成员函数模板来接受“所有兼容类型”/" rel="next" title="读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型”">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型”
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/13/2017-04-13_08_40_读书笔记_effective_c++_Item_47_使用traits_class表示类型信息/" rel="prev" title="读书笔记 effective c++ Item 47 使用traits class表示类型信息">
+                读书笔记 effective c++ Item 47 使用traits class表示类型信息 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-问题的引入——将operator-模板化"><span class="nav-number">1.</span> <span class="nav-text">1. 问题的引入——将operator*模板化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-问题分析——模板参数演绎不能进行隐式转换"><span class="nav-number">2.</span> <span class="nav-text">2. 问题分析——模板参数演绎不能进行隐式转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-问题解决——使用友元函数"><span class="nav-number">3.</span> <span class="nav-text">3. 问题解决——使用友元函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-在类模板中声明友元函数——编译通过"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 在类模板中声明友元函数——编译通过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-关于模板和模板参数的速写符号"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 关于模板和模板参数的速写符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-把友元函数的定义合并到声明中——链接通过"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 把友元函数的定义合并到声明中——链接通过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-如此使用友元函数很意思"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 如此使用友元函数很意思</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-关于模板友元函数inline的讨论"><span class="nav-number">4.</span> <span class="nav-text">4. 关于模板友元函数inline的讨论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

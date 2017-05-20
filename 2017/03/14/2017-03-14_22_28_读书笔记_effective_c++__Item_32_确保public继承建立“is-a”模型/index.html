@@ -1,0 +1,920 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 何为public继承的”is-a”关系在C++面向对象准则中最重要的准则是：public继承意味着“is-a”。记住这个准则。 如果你实现一个类D(derived)public继承自类B(base),你在告诉c++编译器（也在告诉代码阅读者），">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型">
+<meta property="og:url" content="http://yoursite.com/2017/03/14/2017-03-14_22_28_读书笔记_effective_c++__Item_32_确保public继承建立“is-a”模型/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 何为public继承的”is-a”关系在C++面向对象准则中最重要的准则是：public继承意味着“is-a”。记住这个准则。 如果你实现一个类D(derived)public继承自类B(base),你在告诉c++编译器（也在告诉代码阅读者），">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.869Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型">
+<meta name="twitter:description" content="1. 何为public继承的”is-a”关系在C++面向对象准则中最重要的准则是：public继承意味着“is-a”。记住这个准则。 如果你实现一个类D(derived)public继承自类B(base),你在告诉c++编译器（也在告诉代码阅读者），">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/14/2017-03-14_22_28_读书笔记_effective_c++__Item_32_确保public继承建立“is-a”模型/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/14/2017-03-14_22_28_读书笔记_effective_c++__Item_32_确保public继承建立“is-a”模型/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-14T22:28:00+08:00">
+                2017-03-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/14/2017-03-14_22_28_读书笔记_effective_c++__Item_32_确保public继承建立“is-a”模型/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/14/2017-03-14_22_28_读书笔记_effective_c++__Item_32_确保public继承建立“is-a”模型/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++  Item 32 确保public继承建立“is-a”模型">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><h2 id="1-何为public继承的”is-a”关系"><a href="#1-何为public继承的”is-a”关系" class="headerlink" title="1. 何为public继承的”is-a”关系"></a>1. 何为public继承的”is-a”关系</h2><p>在C++面向对象准则中最重要的准则是：public继承意味着“is-a”。记住这个准则。</p>
+<p>如果你实现一个类D(derived)public继承自类B(base),你在告诉c++编译器（也在告诉代码阅读者），<br><a id="more"></a><br>个类型D的对象也是一个类型B的对象，反过来说是不对的。你正在诉说B比D表示了一个更为一般的概念，而D比B表现了一个更为特殊的概念。你在主张：任何可以使用类型B的地方，也能使用类型D，因为每个类型D的对象都是类型B的对象；反过来却不对，也就是可以使用类型D的地方却不可以使用类型B：D是B，B不是D。</p>
+<p>C++ 会为public继承强制执行这个解释。看下面的例子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Person</span> &#123; ... &#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Student</span>: <span class="title">public</span> <span class="title">Person</span> &#123; ... &#125;;</div></pre></td></tr></table></figure>
+<p>从日常生活中我们知道每个学生都是一个人，但并不是每个人都是学生。这正是上面的继承体系所主张的。我们期望对人来说为真的任何事情——例如一个人有出生年月——对学生来说也是真的。我们不期望对学生来说为真的任何事情——例如在一个特定的学校登记入学——对普通大众来说也是真的。人的概念比学生要更加一般化；而学生是人的一个特定类型。</p>
+<p>在C++的领域内，需要Person类型（或者指向Person的指针或者指向Person的引用）参数的任何函数也同样可以使用Student参数（或者指针或引用）：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">eat</span>(<span class="params"><span class="keyword">const</span> Person&amp; p</span>)</span>;     <span class="comment">// anyone can eat</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">study</span>(<span class="params"><span class="keyword">const</span> Student&amp; s</span>)</span>;            <span class="comment">// only students study</span></div><div class="line"></div><div class="line">Person p;                            <span class="comment">// p is a Person</span></div><div class="line"></div><div class="line">Student s;       <span class="comment">// s is a Student</span></div><div class="line"></div><div class="line">eat(p);    <span class="comment">// fine, p is a Person</span></div><div class="line"></div><div class="line">eat(s);    <span class="comment">// fine, s is a Student,</span></div><div class="line"><span class="comment">// and a Student is-a Person</span></div><div class="line"></div><div class="line">study(s);        <span class="comment">// fine</span></div><div class="line"></div><div class="line">study(p);        <span class="comment">// error! p isn’t a Student</span></div></pre></td></tr></table></figure>
+<p>这仅对public继承来说是有效的。C++仅仅在Student公共继承自Person的时候，其行为表现才会如上面所描述的。Private继承的意义就完全变了（Item 39）,protected继承是至今都让我感到困惑的东西。</p>
+<h2 id="2-Public继承可能误导你——例子一，企鹅不会飞"><a href="#2-Public继承可能误导你——例子一，企鹅不会飞" class="headerlink" title="2. Public继承可能误导你——例子一，企鹅不会飞"></a>2. Public继承可能误导你——例子一，企鹅不会飞</h2><p>Public继承和”is-a”是等价的听起来简单，但有时候你的直觉会误导你。举个例子，企鹅是鸟这是个事实，鸟能飞也是事实。如果尝试用C++表示，将会产生下面的代码： </p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Bird</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fly</span>(<span class="params"></span>)</span>;            <span class="comment">// birds can fly</span></div><div class="line"></div><div class="line">...                                   </div><div class="line"></div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Penguin</span>: <span class="title">public</span> <span class="title">Bird</span> &#123;    <span class="comment">// penguins are birds</span></div><div class="line"></div><div class="line">...                                   </div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>我们突然陷入了麻烦，因为这个继承体系表明了企鹅会飞，我们知道这不是真的。发生了什么？</p>
+<h3 id="2-1-处理上述问题的方法一——更加精确的建模，不定义fly"><a href="#2-1-处理上述问题的方法一——更加精确的建模，不定义fly" class="headerlink" title="2.1 处理上述问题的方法一——更加精确的建模，不定义fly"></a>2.1 处理上述问题的方法一——更加精确的建模，不定义fly</h3><p>在这种情况下，我们是一种不精确语言——英语——的受害者。当我们说鸟能飞，我们并没有说所有的鸟都能飞，通常情况下只有有这个能力的才行。如果更加精确一些，我们能够识别出有一些不能飞的鸟的种类，就可以使用如下的继承体系，它更好的模拟了现实：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Bird</span> &#123;</div><div class="line">...                                       <span class="comment">// no fly function is declared</span></div><div class="line"></div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">FlyingBird</span>: <span class="title">public</span> <span class="title">Bird</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fly</span>(<span class="params"></span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Penguin</span>: <span class="title">public</span> <span class="title">Bird</span> &#123;</div><div class="line">...                                       <span class="comment">// no fly function is declared</span></div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这个继承体系比原来的设计更加忠于现实。 </p>
+<p>关于这些家禽的事情还没有完，因为对于一些软件系统来说，没有必要对能飞和不能飞的鸟进行区分。如果你的应用更加关注鸟嘴和鸟的翅膀而对会不会飞漠不关心，最开始的两个类的继承体系就足够了。这反应了一个简单的事实：<strong>没有一个理想的设计适用于所有软件</strong>。<strong>最好的设计取决于需要系统去做什么，无论是现在还是将来</strong>。如果你的应用没有与飞相关的知识，并且永远也不会有，对能不能飞不做区分或许是一个完美并且有效的设计决策。事实上，能够区分它们的设计或许更可取，因为你尝试为其建模的这种区分有一天可能会从世界上消失。</p>
+<h3 id="2-2-处理上述问题的方法二——产生运行时错误"><a href="#2-2-处理上述问题的方法二——产生运行时错误" class="headerlink" title="2.2 处理上述问题的方法二——产生运行时错误"></a>2.2 处理上述问题的方法二——产生运行时错误</h3><p>有另外一个学派来处理我上面所描述的“所有的鸟能飞，企鹅是鸟，企鹅不能飞”问题。就是重新为企鹅定义fly函数，但是让其产生运行时错误：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">error</span>(<span class="params"><span class="keyword">const</span> std::<span class="keyword">string</span>&amp; msg</span>)</span>; <span class="comment">// defined elsewhere</span></div><div class="line"><span class="keyword">class</span> <span class="title">Penguin</span>: <span class="title">public</span> <span class="title">Bird</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fly</span>(<span class="params"></span>) </span>&#123; error(<span class="string">"Attempt to make a penguin fly!"</span>); &#125;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"></div></pre></td></tr></table></figure>
+<p>上面所说的可能会和你想的不一样，能够辨别它们很重要。上面的代码并没有说，“企鹅不能飞。”而是说，“企鹅能飞，但是它们如果尝试这么做会是一个错误”。</p>
+<h3 id="2-3-区分二者的不同——编译期错误和运行时错误"><a href="#2-3-区分二者的不同——编译期错误和运行时错误" class="headerlink" title="2.3 区分二者的不同——编译期错误和运行时错误"></a>2.3 区分二者的不同——编译期错误和运行时错误</h3><p>你如何才能说出它们的不同？从错误被检测出来的时间点看，“企鹅不能飞“这个禁令能够被编译器强制执行，但是如果违反“企鹅尝试飞行是一个错误”这个规则只能够在运行时能够被检测出来。</p>
+<p>为了表示“企鹅不能飞”这个限制，你要确保对Penguin对象来说没有这样的函数被定义：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Bird</span> &#123;</div><div class="line">...                                     <span class="comment">// no fly function is declared</span></div><div class="line"></div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Penguin</span>: <span class="title">public</span> <span class="title">Bird</span> &#123;</div><div class="line">...                                     <span class="comment">// no fly function is declared</span></div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>如果你尝试让企鹅飞起来，编译器会谴责你的行为：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Penguin p;</div><div class="line"></div><div class="line">p.fly();                                      <span class="comment">// error!</span></div><div class="line"></div></pre></td></tr></table></figure>
+<p>这同产生运行时错误的方法有着很大的不同。如果你使用运行时报错的方法，编译器对p.fly的调用不会说一句话。<a href="http://www.cnblogs.com/harlanc/p/6431766.html" title="Item 18" target="_blank" rel="external">Item 18</a>解释了好的接口应该在编译期就能够阻止无效代码，所以比起只能在运行时才能侦测出来错误的设计，你应该更加喜欢在编译期就能拒绝企鹅飞翔的设计。</p>
+<h2 id="3-Public继承可能误导你——例子二，矩形和正方形"><a href="#3-Public继承可能误导你——例子二，矩形和正方形" class="headerlink" title="3. Public继承可能误导你——例子二，矩形和正方形"></a>3. Public继承可能误导你——例子二，矩形和正方形</h2><p>可能你会做出让步是因为你对鸟类学知识的匮乏，但是你能够依靠你对初步几何的精通，对吧？矩形和正方形会有多复杂呢？</p>
+<p>现在回答这个简单的问题：正方形类应该public继承自长方形类么？</p>
+<p>你会说“当然应该！每个人都知道正方形是一个矩形，反之却不成立。”再真不过了，至少是在学校里面。但是我认为我们已经不在学校里面了。</p>
+<p>考虑下面的代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Rectangle</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">setHeight</span>(<span class="params"><span class="keyword">int</span> newHeight</span>)</span>;</div><div class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">setWidth</span>(<span class="params"><span class="keyword">int</span> newWidth</span>)</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">height</span>(<span class="params"></span>) <span class="keyword">const</span></span>;        <span class="comment">// return current values</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">width</span>(<span class="params"></span>) <span class="keyword">const</span></span>;       </div><div class="line"></div><div class="line">...                                            </div><div class="line"></div><div class="line">&#125;;                                           </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">makeBigger</span>(<span class="params">Rectangle&amp; r</span>)   <span class="comment">// function to increase r’s area</span></span></div><div class="line"></div><div class="line">&#123;                                                  </div><div class="line"></div><div class="line"><span class="keyword">int</span> oldHeight = r.height();           </div><div class="line"></div><div class="line">r.setWidth(r.width() + <span class="number">10</span>);   <span class="comment">// add 10 to r’s width</span></div><div class="line"></div><div class="line">assert(r.height() == oldHeight);         <span class="comment">// assert that r’s</span></div><div class="line"></div><div class="line">&#125;                                                             <span class="comment">// height is unchanged</span></div></pre></td></tr></table></figure>
+<p>很清楚，断言永远不会出错，makeBigger只会修改r的宽度。高度永远不会被修改。</p>
+<p>现在考虑下面的代码，使用public继承，可以使正方形被当作矩形处理：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Square</span>: <span class="title">public</span> <span class="title">Rectangle</span> &#123; ... &#125;;</div><div class="line"></div><div class="line">Square s;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">assert(s.width() == s.height());</div><div class="line"></div><div class="line"><span class="comment">// this must be true for all squares</span></div><div class="line"></div><div class="line">makeBigger(s);</div><div class="line"></div><div class="line"><span class="comment">// by inheritance, s is-a Rectangle,</span></div><div class="line"></div><div class="line"><span class="comment">// so we can increase its area</span></div><div class="line">assert(s.width() == s.height()); <span class="comment">// this must still be true</span></div><div class="line"><span class="comment">// for all squares</span></div></pre></td></tr></table></figure>
+<p>很清楚的是第二个断言永远不能失败。根据定义，一个正方形的宽度和高度应该一样。</p>
+<p>但是现在我们有一个问题。我们怎么才能使下面的断言一致呢？</p>
+<ul>
+<li>在调用makeBigger之前，s的高度和宽度是一样的；</li>
+<li>在makeBigger里面，s的宽度被改变了，但是高度却没有；</li>
+<li>makeBigger返回之后，s的高度和宽度仍然相同。（注意s被按引用传递给makeBigger，所以makeBigger修改了s本身，而不是s的拷贝）</li>
+</ul>
+<p>欢迎来到public继承的精彩世界，你在其它领域学习而来的直觉（包括数学）,使用起来可能和你想要的不一样。上面例子的基本的难点在于适用于矩形的东西（宽度独立于高度被修改）却不适用于正方形（长宽必须相同）。但是public继承主张适用于基类对象的任何东西同样适用于派生类对象。对于长方形和正方形的情况（还有Item38中涉及到的sets和lists的例子），这个主张不再适用，所以使用public继承来为其建模是不正确的。编译器可能会让你这么做，但是正如我们刚刚看到的，我们不能够确保代码的行为是正确的。这也是每个程序员必须要学到的：编码编译通过了不代表它能工作。</p>
+<h2 id="4-使用public继承要有新的洞察力"><a href="#4-使用public继承要有新的洞察力" class="headerlink" title="4. 使用public继承要有新的洞察力"></a>4. 使用public继承要有新的洞察力</h2><p>这些年里使用面向对象设计的时候软件上的直觉会让你失败，不要烦躁。这些知识仍然有价值，现在你的设计兵工厂中又添加了可供替换的继承，你必须用新的洞察力来扩大你的直觉，指导你合适的使用继承。当一些人向你展示长达几页的函数时，你会想起企鹅继承自鸟类或者正方形继承自长方形这些让你感觉有趣的事情。它可能是处理事情的正确方法，只是不是特别像。</p>
+<h2 id="5-其它两种类关系"><a href="#5-其它两种类关系" class="headerlink" title="5. 其它两种类关系"></a>5. 其它两种类关系</h2><p>“is-a”关系不是存在类之间的仅有的关系。另外两个普通的类之间的关系是“has-a”和“is-implemented-in-terms-of”。这些关系在Item38和Item39中被介绍。C++设计出现错误并非不常见，因为其他重要的类关系有可能不正确的被建模为”is-a”，所以你应该确保能明白这些关系之间的区别，并且知道C++中如何最好的塑造它们。</p>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><p>Public继承意味着“is-a”.应用于base类的每件东西必须也能应用于派生类，因为每个派生类对象是一个基类对象。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/12/2017-03-12_16_25_读书笔记_effective_c++_Item_31_把文件之间的编译依赖降到最低/" rel="next" title="读书笔记 effective c++ Item 31 把文件之间的编译依赖降到最低">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 31 把文件之间的编译依赖降到最低
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/" rel="prev" title="读书笔记 effective C++ Item 33 避免隐藏继承而来的名字">
+                读书笔记 effective C++ Item 33 避免隐藏继承而来的名字 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-何为public继承的”is-a”关系"><span class="nav-number">1.1.</span> <span class="nav-text">1. 何为public继承的”is-a”关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Public继承可能误导你——例子一，企鹅不会飞"><span class="nav-number">1.2.</span> <span class="nav-text">2. Public继承可能误导你——例子一，企鹅不会飞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-处理上述问题的方法一——更加精确的建模，不定义fly"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 处理上述问题的方法一——更加精确的建模，不定义fly</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-处理上述问题的方法二——产生运行时错误"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 处理上述问题的方法二——产生运行时错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-区分二者的不同——编译期错误和运行时错误"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 区分二者的不同——编译期错误和运行时错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Public继承可能误导你——例子二，矩形和正方形"><span class="nav-number">1.3.</span> <span class="nav-text">3. Public继承可能误导你——例子二，矩形和正方形</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-使用public继承要有新的洞察力"><span class="nav-number">1.4.</span> <span class="nav-text">4. 使用public继承要有新的洞察力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-其它两种类关系"><span class="nav-number">1.5.</span> <span class="nav-text">5. 其它两种类关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-总结"><span class="nav-number">1.6.</span> <span class="nav-text">6. 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

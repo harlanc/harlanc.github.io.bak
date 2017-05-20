@@ -1,0 +1,910 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 使用模板可能导致代码膨胀使用模板是节省时间和避免代码重用的很好的方法。你不需要手动输入20个相同的类名，每个类有15个成员函数，相反，你只需要输入一个类模板，然后让编译器来为你实例化20个特定的类和300个你需要的函数。（只有在被使用的情况下类模版的成员函数才会被隐式的实例">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 44  将与模板参数无关的代码抽离出来">
+<meta property="og:url" content="http://yoursite.com/2017/04/07/2017-04-07_22_01_读书笔记_effective_c++_Item_44__将与模板参数无关的代码抽离出来/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 使用模板可能导致代码膨胀使用模板是节省时间和避免代码重用的很好的方法。你不需要手动输入20个相同的类名，每个类有15个成员函数，相反，你只需要输入一个类模板，然后让编译器来为你实例化20个特定的类和300个你需要的函数。（只有在被使用的情况下类模版的成员函数才会被隐式的实例">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.197Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 44  将与模板参数无关的代码抽离出来">
+<meta name="twitter:description" content="1. 使用模板可能导致代码膨胀使用模板是节省时间和避免代码重用的很好的方法。你不需要手动输入20个相同的类名，每个类有15个成员函数，相反，你只需要输入一个类模板，然后让编译器来为你实例化20个特定的类和300个你需要的函数。（只有在被使用的情况下类模版的成员函数才会被隐式的实例">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/07/2017-04-07_22_01_读书笔记_effective_c++_Item_44__将与模板参数无关的代码抽离出来/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 44  将与模板参数无关的代码抽离出来 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/07/2017-04-07_22_01_读书笔记_effective_c++_Item_44__将与模板参数无关的代码抽离出来/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 44  将与模板参数无关的代码抽离出来</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-07T22:01:00+08:00">
+                2017-04-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/07/2017-04-07_22_01_读书笔记_effective_c++_Item_44__将与模板参数无关的代码抽离出来/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/07/2017-04-07_22_01_读书笔记_effective_c++_Item_44__将与模板参数无关的代码抽离出来/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 44  将与模板参数无关的代码抽离出来">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-使用模板可能导致代码膨胀"><a href="#1-使用模板可能导致代码膨胀" class="headerlink" title="1. 使用模板可能导致代码膨胀"></a>1. 使用模板可能导致代码膨胀</h2><p>使用模板是节省时间和避免代码重用的很好的方法。你不需要手动输入20个相同的类名，每个类有15个成员函数，相反，你只需要输入一个类模板，然后让编译器来为你实例化20个特定的类和300个你需要的函数。（只有在被使用的情况下类模版的成员函数才会被隐式的实例<br><a id="more"></a><br>，所以只有在300个函数被实际用到的情况下才会生成300个成员函数。）函数模板同样吸引人。你不用手动实现许多函数，你只需要实现一个函数模板，然后让编译器来做余下的事情。</p>
+<p>然而在有些时候，如果你不小心，使用模板会导致代码膨胀（code bloat）:产生重复代码或者数据的二进制文件，或者两者都有。结果可能是源码看起来合身整齐，但是目标代码（object code）臃肿松弛。臃肿松弛很不好，因此你需要知道如果避免这样的二进制浮夸。</p>
+<h2 id="2-共性和可变性分析"><a href="#2-共性和可变性分析" class="headerlink" title="2. 共性和可变性分析"></a>2. 共性和可变性分析</h2><p> 你的主要工具有着很威风的名字：共性和可变性分析（commonality and variability analysis），但是这个概念很平常。即使在你的编程生涯中从未实现过一个模板，你也总是会做这样的分析。</p>
+<h3 id="2-1-函数和类中的代码重复分析"><a href="#2-1-函数和类中的代码重复分析" class="headerlink" title="2.1 函数和类中的代码重复分析"></a>2.1 函数和类中的代码重复分析</h3><p>当你正在实现一个函数，你意识到函数实现的某些部分同另外一个函数实现基本上是相同的 ，你会重复这些代码么？当然不会。你将两个函数的公共代码提取出来，放进第三个函数中，然后在两个函数中调用这个新函数。总结一下就是，你对两个函数进行分析，找到相同和不同的部分，将相同的部分移到一个新的函数中去，将不同的部分保留在原来的函数中。类似的，如果你正在实现一个类，你意识到类中的一部分另一个类中的一部分是相同的，你不应该重写相同的部分。相反，你可以将相同的部分移到一个新类中，然后使用继承或者组合（<a href="http://www.cnblogs.com/harlanc/p/6551155.html" title="Item 32" target="_blank" rel="external">Item 32</a>,<a href="http://www.cnblogs.com/harlanc/p/6628670.html" title="Item 38" target="_blank" rel="external">Item 38</a>,<a href="http://www.cnblogs.com/harlanc/p/6636917.html" title="Item 39" target="_blank" rel="external">Item 39</a>）让原始类访问共同的特性。原始类中不同的部分仍然保留在原来的位置。</p>
+<h3 id="2-2-模板中的代码重复分析及消除重复方法"><a href="#2-2-模板中的代码重复分析及消除重复方法" class="headerlink" title="2.2 模板中的代码重复分析及消除重复方法"></a>2.2 模板中的代码重复分析及消除重复方法</h3><p>当实现模板的时候，你也会做相同的分析，你会使用相同的方式来阻止重复，但是这里有一个让你伤痛的地方。在非模板(non-template)代码中，重复是显示的：你可以看到在函数之间或者类之间会有代码重复。在模板代码中，重复是隐式的：只有一份模板源码，<strong>所以你必须训练你自己当一个模板被实例化多次的时候，你能够感觉到重复会不会发生</strong>。</p>
+<h4 id="2-2-1-消除代码膨胀第一关——去掉非类型参数"><a href="#2-2-1-消除代码膨胀第一关——去掉非类型参数" class="headerlink" title="2.2.1 消除代码膨胀第一关——去掉非类型参数"></a>2.2.1 消除代码膨胀第一关——去掉非类型参数</h4><p>例如，假设你想为固定大小的矩阵实现一个模板，需要支持矩阵的转置。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T, // template for n x n matrices of</div><div class="line">std::size_t n&gt; // objects of type T; see below for info</div><div class="line">class SquareMatrix &#123; // on the size_t parameter</div><div class="line">public:</div><div class="line">...</div><div class="line"></div><div class="line">void invert();                         // invert the matrix in place</div><div class="line"></div><div class="line">&#125;;     </div></pre></td></tr></table></figure>
+<p>这个模板带了一个类型参数，T，但是也带了一个类型size_t的参数，一个非类型（non-type）参数。非类型参数比类型参数少了共性，但是它们是完全合法的，并且在这个例子中，它们也能非常自然。</p>
+<p>现在考虑下面的代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">SquareMatrix&lt;<span class="keyword">double</span>, <span class="number">5</span>&gt; sm1;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">sm1.invert();</div><div class="line"></div><div class="line"><span class="comment">// call SquareMatrix&lt;double, 5&gt;::invert</span></div><div class="line"></div><div class="line">SquareMatrix&lt;<span class="keyword">double</span>, <span class="number">10</span>&gt; sm2;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">sm2.invert();</div><div class="line"></div><div class="line"><span class="comment">// call SquareMatrix&lt;double, 10&gt;::invert</span></div><div class="line"></div></pre></td></tr></table></figure>
+<p>在这里将会实例化invert的两份拷贝。这两个函数并不相同，因为一个在5<em>5的矩阵上工作，另外一个在10</em>10的矩阵上工作，但是如果不考虑常量5和10，这两个函数将会是一样的。这是使得包含模板的代码出现膨胀的典型方式。</p>
+<p>如果你看到两个函数，它们的所有字符都是相同的，除了一个版本使用5而另外一个版本使用10，你接下来会做什么？你的直觉是会创建一个带一个参数的函数版本，然后以5或者10为入参调用这个函数而不是重复代码。你的直觉能够很好的为你服务！这是实现SquareMatrix的第一关：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"> template&lt;typename T&gt; // size-independent base class for</div><div class="line"> class SquareMatrixBase &#123; // square matrices</div><div class="line"> protected:</div><div class="line"> ...</div><div class="line"> void invert(std::size_t matrixSize); // invert matrix of the given size</div><div class="line"> ...</div><div class="line"> &#125;;</div><div class="line"> template&lt;typename T, std::size_t n&gt;</div><div class="line"> class SquareMatrix: private SquareMatrixBase&lt;T&gt; &#123;</div><div class="line"> private:</div><div class="line"> using SquareMatrixBase&lt;T&gt;::invert; // make base class version of invert</div><div class="line"> // visible in this class; see [Items 33</div><div class="line">](http://www.cnblogs.com/harlanc/p/6556371.html "Item 33") // and [Item 43](http://www.cnblogs.com/harlanc/p/6665825.html "Item 43")</div><div class="line"> public:</div><div class="line"> ...</div><div class="line"> void invert() &#123; invert(n); &#125; // make inline call to base class</div><div class="line"> &#125;; // version of invert</div></pre></td></tr></table></figure>
+<p>正如你所看到的，带参数的invert版本被放在基类SquareMatrixBase中。像SquareMatrix一样，SquareMatrixBase是一个模板，但是与SquareMatrix不同的是，它在矩阵中只对对象类型进行模板化。因此，包含一个给定类型对象的所有矩阵将会分享一个单一的SquareMatrixBase类。这样它们会分享SquareMatrixBase类的invert版本的单一拷贝。（你不能将其声明为inline，因为一旦被inline了，每个SquareMatrix::invert的实例都会得到SquareMatrixBase::invert代码的一份拷贝（看<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item 30</a>）,你会发现你有回到了对象代码重复的原点。）</p>
+<p>SquareMatrixBase::invert只被用来在派生类中防止代码重复，所以是protected而不是public的。调用它的额外开销应该是0，因为派生类的inverts调用基类版本使用了inline函数。（inline是隐式的 见<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item 30</a>）同时注意SquareMatrix和SquareMarixBase之间的继承是private的。这精确的反映出一个事实：<strong>使用基类的唯一原因是帮助派生类的实现，并非表达出**</strong>SquareMatrix<strong><strong>和</strong></strong>SquareMatrixBase<strong><strong>之间的“</strong></strong>is-a<strong>**”关系</strong>。（有关private继承的信息，见<a href="http://www.cnblogs.com/harlanc/p/6636917.html" title="Item 39" target="_blank" rel="external">Item 39</a>）</p>
+<h4 id="2-2-2-消除代码膨胀第二关——派生类如何告知基类数据在哪里"><a href="#2-2-2-消除代码膨胀第二关——派生类如何告知基类数据在哪里" class="headerlink" title="2.2.2 消除代码膨胀第二关——派生类如何告知基类数据在哪里"></a>2.2.2 消除代码膨胀第二关——派生类如何告知基类数据在哪里</h4><p>到现在为止看上去都很好，但是还有一个我们没有处理的棘手的问题。SquareMatrixBase::invert如何知道在什么数据上进行操作？它从参数中得知矩形的大小，但是它如何知道为特殊矩阵提供的数据在哪里？大概只有派生类才会知道。派生类如何同基类进行通讯才能让基类执行invert?</p>
+<p>一个可能的方法是向SquareMatrixBase::invert中添加另外一个参数，可能是一个指向一块内存的指针，内存中存放矩形数据。这种方法可以工作，但是十有八九，invert<strong>不是</strong>存在于SquareMatrix中的能够以独立于size的方式重写的，并且移入SquareMatrixBase中的<strong>唯一函数</strong>。如果有几个这样的函数，我们就需要一种方法能够找到存放矩形数据的内存，我们可以为所有的函数添加一个额外的参数，但是如此以来我们就重复告诉了SquareMatrixBase同样的信息。这看上去是错误的。</p>
+<p>一个替换方法是让SquareMatrixBase存储一个指向存放矩形数据的内存的指针。这同存放矩形大小有相同的效果。结果如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">class SquareMatrixBase &#123;</div><div class="line">protected:</div><div class="line">SquareMatrixBase(std::size_t n, T *pMem) // store matrix size and a</div><div class="line">: size(n), pData(pMem) &#123;&#125; // ptr to matrix values</div><div class="line"></div><div class="line">void setDataPtr(T *ptr) &#123; pData = ptr; &#125;   // reassign pData</div><div class="line"></div><div class="line">...                                                            </div><div class="line"></div><div class="line">private:                                                  </div><div class="line"></div><div class="line">std::size_t size;           // size of matrix</div><div class="line"></div><div class="line">T *pData;       // pointer to matrix values</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这就让派生类来决定如何分配内存。一些实现会在SquareMatrix对象内部存储矩形数据：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T, std::size_t n&gt;</div><div class="line">class SquareMatrix: private SquareMatrixBase&lt;T&gt; &#123;</div><div class="line">public:</div><div class="line">SquareMatrix() // send matrix size and</div><div class="line">: SquareMatrixBase&lt;T&gt;(n, data) &#123;&#125; // data ptr to base class</div><div class="line">...</div><div class="line">private:</div><div class="line">T data[n*n];</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这种类型的对象没有必要做动态内存分配，但是对象本身可能会非常大。一个替换的方法是为每个矩形在堆上存放数据：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T, std::size_t n&gt;</div><div class="line">class SquareMatrix: private SquareMatrixBase&lt;T&gt; &#123;</div><div class="line">public:</div><div class="line">SquareMatrix() // set base class data ptr to null,</div><div class="line">: SquareMatrixBase&lt;T&gt;(n, 0), // allocate memory for matrix</div><div class="line">pData(new T[n*n]) // values, save a ptr to the</div><div class="line">&#123; this-&gt;setDataPtr(pData.get()); &#125; // memory, and give a copy of it</div><div class="line"></div><div class="line">...                                              // to the base class</div><div class="line"></div><div class="line">private:</div><div class="line">boost::scoped_array&lt;T&gt; pData;          // see[ Item 13](http://www.cnblogs.com/harlanc/p/6412222.html "Item 13") for info on</div><div class="line"></div><div class="line">&#125;;                                   // boost::scoped_array</div></pre></td></tr></table></figure>
+<h4 id="2-2-3-消除代码膨胀前后效率对比"><a href="#2-2-3-消除代码膨胀前后效率对比" class="headerlink" title="2.2.3 消除代码膨胀前后效率对比"></a>2.2.3 消除代码膨胀前后效率对比</h4><p>不管将数据存放在哪里，从代码膨胀的角度来说，关键结果是<strong>现在很多（可能是所有的）**</strong>SquareMatrix的成员函数可以简单的inline调用基类的（non-inline）函数版本，所有持有相同类型数据的矩形共享基类中的函数，不管size是多少**。同时，不同size的SquareMatrix对象属于不同类型，所以即使SquareMatrix<double,5>和SquareMatrix<double,10>对象在SquareMatrixBase<double>中使用相同的成员函数，把一个SquareMatrix<double,5>对象传给一个需要SquareMatrix<double,10>的函数是没有机会的。好还是不好呢。</double,10></double,5></double></double,10></double,5></p>
+<p>好是好，但是需要付出代价。矩形size大小固定的invert版本比按函数参数传递size大小（或者存储在对象中）的invert版本可能产生更好的代码。例如，在指定size的版本中，sizes是编译期常量，因此是常量传播优化的合格者，也可以把其放入生成指令中作为直接操作数。这在同size无关的版本中无法做到。</p>
+<p>从另外一个方面，为不同size的矩阵只提供一个invert版本可以减小可执行程序的大小，这能减少程序的工作集大小，并且能够强化指令高速缓存的引用集中化。这些东西能够使得程序运行速度更快，并且相对size指定的版本才能做出的优化，它可能会做出更好的补偿。哪种方法效果更好？唯一的方法是两种方法都试一下，在你的特定平台和有代表性的数据集上观察它们的行为。</p>
+<p>另外一个有关效率的需要考虑的地方是有关对象的大小。如果你不介意，将size大小无关的版本向上移动到基类中会增加每个对象的大小。例如，在我刚刚展示的代码中，每个SquareMatrix对象有一个指向SquareMatrixBase类中数据的指针。即使每个派生类中已经有取得数据的方法，这也为每个SquareMatrix对象至少增加一个指针的大小。我们可以修改设计来去掉指针，但是这也是需要付出代价的。例如，让基类存储一个指向数据的protected指针，但会导致封装性的降低（<a href="http://www.cnblogs.com/harlanc/p/6471815.html" title="Item 22" target="_blank" rel="external">Item 22</a>）.它同样能导致资源管理并发症：如果基类存储了指向矩阵数据的指针，但是数据既有可能是动态分配的也可能存储在派生类对象中（正如我们看到的），如何决定是不是需要delete指针？这样的问题是有答案的，但是你做的越精细事情就变得越复杂。从某种意义上讲，有一点代码重复开始开起来有点幸运了。</p>
+<h3 id="2-3-如何处理类型模板参数导致的代码膨胀"><a href="#2-3-如何处理类型模板参数导致的代码膨胀" class="headerlink" title="2.3 如何处理类型模板参数导致的代码膨胀"></a>2.3 如何处理类型模板参数导致的代码膨胀</h3><p>这个条款仅仅讨论了由于非类型模板参数导致的代码膨胀，但是类型参数同样可以导致代码膨胀。例如，在许多平台中，int和long有着相同的二进制表示，所以在成员函数中使用vector<int>和vector<long>看起来会一样，这正是代码膨胀的定义。一些连接器会把相同的代码实现整合到一起，但是有一些不会，这就意味着由模板实例化的int和long版本会在一些环境中导致代码膨胀。类似的，在大多数平台上，所有的指针类型有着相同的二进制表示，所以带指针类型的模板（例如，list<int*>,list<const*>,list<squarematrix<long,3><em>&gt;等等）应该通常能够为每个成员函数使用一个单一的底层实现。特别的，这就意味着实现一个强类型指针（T</em> 指针）的成员函数时，让它们调用一个无类型指针的函数（void*指针）。一些标准C++库的实现为模板就是这么做的（如vector,deque,和list）。如果你关心在你的模板中出现的代码膨胀问题，你可能就会想开发出做相同事情的模板。</squarematrix<long,3></const*></int*></long></int></p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><ul>
+<li>模板会产生多个类和多个函数，所以任何模板不应该依赖于会导致代码膨胀的模板参数。</li>
+<li>非类型模板参数导致的代码膨胀通常情况下可以将模板参数<strong>替换为函数参数或者类数据成员</strong>来清除。</li>
+<li>由类型参数导致的代码膨胀也可以被降低，方式是为实例化类型共享相同的二进制表示。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/04/2017-04-04_18_20_读书笔记_effective_c++_Item_43_了解如何访问模板化基类中的名字/" rel="next" title="读书笔记 effective c++ Item 43 了解如何访问模板化基类中的名字">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 43 了解如何访问模板化基类中的名字
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/10/2017-04-10_08_36_读书笔记_effective_c++_Item_45_使用成员函数模板来接受“所有兼容类型”/" rel="prev" title="读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型”">
+                读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型” <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-使用模板可能导致代码膨胀"><span class="nav-number">1.</span> <span class="nav-text">1. 使用模板可能导致代码膨胀</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-共性和可变性分析"><span class="nav-number">2.</span> <span class="nav-text">2. 共性和可变性分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-函数和类中的代码重复分析"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 函数和类中的代码重复分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-模板中的代码重复分析及消除重复方法"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 模板中的代码重复分析及消除重复方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-消除代码膨胀第一关——去掉非类型参数"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 消除代码膨胀第一关——去掉非类型参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-消除代码膨胀第二关——派生类如何告知基类数据在哪里"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 消除代码膨胀第二关——派生类如何告知基类数据在哪里</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-消除代码膨胀前后效率对比"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 消除代码膨胀前后效率对比</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-如何处理类型模板参数导致的代码膨胀"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 如何处理类型模板参数导致的代码膨胀</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-总结"><span class="nav-number">3.</span> <span class="nav-text">3. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

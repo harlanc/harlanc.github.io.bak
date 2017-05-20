@@ -1,0 +1,917 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. TMP是什么？模板元编程（template metaprogramming TMP**）是实现基于模板的C++**程序的过程，它能够在编译期执行。你可以想一想：一个模板元程序是用C++实现的并且可以在C++编译器内部运行的一个程序，它的输出——从模板中实例化出来的C++源码">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 48  了解模板元编程">
+<meta property="og:url" content="http://yoursite.com/2017/04/15/2017-04-15_12_54_读书笔记_effective_c++_Item_48__了解模板元编程/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. TMP是什么？模板元编程（template metaprogramming TMP**）是实现基于模板的C++**程序的过程，它能够在编译期执行。你可以想一想：一个模板元程序是用C++实现的并且可以在C++编译器内部运行的一个程序，它的输出——从模板中实例化出来的C++源码">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.310Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 48  了解模板元编程">
+<meta name="twitter:description" content="1. TMP是什么？模板元编程（template metaprogramming TMP**）是实现基于模板的C++**程序的过程，它能够在编译期执行。你可以想一想：一个模板元程序是用C++实现的并且可以在C++编译器内部运行的一个程序，它的输出——从模板中实例化出来的C++源码">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/15/2017-04-15_12_54_读书笔记_effective_c++_Item_48__了解模板元编程/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 48  了解模板元编程 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/15/2017-04-15_12_54_读书笔记_effective_c++_Item_48__了解模板元编程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 48  了解模板元编程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-15T12:54:00+08:00">
+                2017-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/15/2017-04-15_12_54_读书笔记_effective_c++_Item_48__了解模板元编程/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/15/2017-04-15_12_54_读书笔记_effective_c++_Item_48__了解模板元编程/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 48  了解模板元编程">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-TMP是什么？"><a href="#1-TMP是什么？" class="headerlink" title="1. TMP是什么？"></a>1. TMP是什么？</h2><p><strong>模板元编程（template metaprogramming TMP**</strong>）是实现基于模板的C++<strong>**程序的过程，它能够在编译期执行</strong>。你可以想一想：一个模板元程序是用C++实现的并且可以在C++编译器内部运行的一个程序，它的输出——从模板中实例化出来的C++源码<br><a id="more"></a><br>段——会像往常一样被编译。</p>
+<h2 id="2-使用TMP的优势"><a href="#2-使用TMP的优势" class="headerlink" title="2. 使用TMP的优势"></a>2. 使用TMP的优势</h2><p>如果这没有冲击到你，是因为你没有足够尽力去想。</p>
+<p>C++不是为了模板元编程而设计的，但是自从TMP早在1990年被发现之后，它就被证明是非常有用的，为了使TMP的使用更加容易，在C++语言和标准库中加入了一些扩展。是的，TMP是被发现的，而不是被发明。当模板被添加到C++中的时候TMP这个特性就被引入了。对于某些人来说所有需要做的就是关注如何以一种聪明的和意想不到的方式来使用它。</p>
+<p>TMP有两种强大的力量。<strong>第一，它使得一些事情变得容易</strong>，<strong>也即是说如果没有**</strong>TMP<strong>**，这些事情做起来很难或者不可能实现</strong>。<strong>第二，因为模板元编程在**</strong>C++<strong>**编译期执行，它们可以将一些工作从运行时移动到编译期</strong>。一个结果就是一些原来通常在运行时能够被发现的错误，现在在编译期就能够被发现了。另外一个结果就是使用TMP的C++程序在基本上每个方面都更加高效：<strong>更小的执行体，更短的运行时间，更少的内存需求</strong>。（然而，将工作从运行时移到编译期的一个后果就是<strong>编译时间增加</strong>了。使用TMP的程序比没有使用TMP的程序可能消耗更长的时间来进行编译。）</p>
+<h2 id="3-如何使用TMP？"><a href="#3-如何使用TMP？" class="headerlink" title="3. 如何使用TMP？"></a>3. 如何使用TMP？</h2><h3 id="3-1-再次分析Item-47中的实例"><a href="#3-1-再次分析Item-47中的实例" class="headerlink" title="3.1 再次分析Item 47中的实例"></a>3.1 再次分析<a href="http://www.cnblogs.com/harlanc/p/6702242.html" title="Item 47" target="_blank" rel="external">Item 47</a>中的实例</h3><p>考虑在<a href="http://www.cnblogs.com/harlanc/p/6702242.html" title="Item 47" target="_blank" rel="external">Item 47</a>中为STL的advance写出来的伪代码。我已经为伪代码部分做了粗体：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT, typename DistT&gt;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">advance</span>(<span class="params">IterT&amp; iter, DistT d</span>)</span></div><div class="line">&#123;</div><div class="line"><span class="keyword">if</span> (iter <span class="keyword">is</span> a random access iterator) &#123;</div><div class="line"></div><div class="line">iter += d;                           <span class="comment">// use iterator arithmetic</span></div><div class="line"></div><div class="line">&#125;                                        <span class="comment">// for random access iters</span></div><div class="line"></div><div class="line"><span class="keyword">else</span> &#123;                                </div><div class="line"></div><div class="line"><span class="keyword">if</span> (d &gt;= <span class="number">0</span>) &#123; <span class="keyword">while</span> (d--) ++iter; &#125; <span class="comment">// use iterative calls to</span></div><div class="line"><span class="keyword">else</span> &#123; <span class="keyword">while</span> (d++) --iter; &#125; <span class="comment">// ++ or -- for other</span></div><div class="line">&#125; <span class="comment">// iterator categories</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们可以使用typeid替换伪代码，让程序能够执行。这就产生了一个“普通的”C++方法——也就是所有工作都在运行时开展的方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT, typename DistT&gt;</div><div class="line">void advance(IterT&amp; iter, DistT d)</div><div class="line">&#123;</div><div class="line">if ( typeid(typename std::iterator_traits&lt;IterT&gt;::iterator_category) ==</div><div class="line">typeid(std::random_access_iterator_tag)) &#123;</div><div class="line"></div><div class="line">iter += d;                           // use iterator arithmetic</div><div class="line"></div><div class="line">&#125;                                        // for random access iters</div><div class="line"></div><div class="line">else &#123;                               </div><div class="line"></div><div class="line">if (d &gt;= 0) &#123; while (d--) ++iter; &#125; // use iterative calls to</div><div class="line">else &#123; while (d++) --iter; &#125; // ++ or -- for other</div><div class="line">&#125; // iterator categories</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><a href="http://www.cnblogs.com/harlanc/p/6702242.html" title="Item 47" target="_blank" rel="external">Item 47</a>指出这种基于typeid的方法比使用trait效率更低，因为通过使用这种方法，（1）<strong>类型测试发生在运行时而不是编译期</strong>（2）<strong>执行运行时类型测试的代码在运行的时候必须可见</strong>。事实上，这个例子也展示出了为什么TMP比一个“普通的”C++程序更加高效，因为traits方式属于TMP。记住，trait使得在类型上进行编译期if…else运算成为可能。</p>
+<p>我已经在前面提到过一些东西说明其在TMP中比在“普通”C++中更加容易，Item 47中也提供了一个advance的例子。Item 47中提到了advance的基于typeid的实现会导致编译问题，看下面的例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">std::list&lt;int&gt;::iterator iter;</div><div class="line">...</div><div class="line">advance(iter, 10);               // move iter 10 elements forward;</div><div class="line">// won’t compile with above impl.</div></pre></td></tr></table></figure>
+<p>考虑为上面调用所产生的advance的版本，将模板参数IterT和DistT替换为iter和10的类型之后，我们得到下面的代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"> void advance(std::list&lt;int&gt;::iterator&amp; iter, int d)</div><div class="line"> &#123;</div><div class="line"> if (typeid(std::iterator_traits&lt;std::list&lt;int&gt;::iterator&gt;::iterator_category) ==</div><div class="line"> typeid(std::random_access_iterator_tag)) &#123;</div><div class="line"></div><div class="line"> **iter += d;</div><div class="line">** </div><div class="line"> // error! won’t compile</div><div class="line"></div><div class="line"> &#125;</div><div class="line"> else &#123;</div><div class="line"> if (d &gt;= 0) &#123; while (d--) ++iter; &#125;</div><div class="line"> else &#123; while (d++) --iter; &#125;</div><div class="line"> &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>有问题的是高亮部分，就是使用+=的语句。在这个例子中，我们在list<int>::iterator上使用+=，但是list<int>::iterator是一个双向迭代器（见Item 47），所以它不支持+=。只有随机访问迭代器支持+=。现在，我们知道了+=这一行将永远不会被执行到，因为为list<int>::iteraotr执行的typeid测试永远都不会为真，<strong>但是编译器有责任确保所有的源码都是有效的，即使不被执行到</strong>，当iter不是随机访问迭代器“iter+=d”就是无效代码。将它同基于tratis的TMP解决方案进行比较，后者把为不同类型实现的代码分别放到了不同的函数中，每个函数中进行的操作只针对特定的类型。</int></int></int></p>
+<h3 id="3-2-TMP是图灵完全的"><a href="#3-2-TMP是图灵完全的" class="headerlink" title="3.2 TMP是图灵完全的"></a>3.2 TMP是图灵完全的</h3><p>TMP已经被证明是图灵完全的（Turing-Complete），这也就意味着它足够强大到可以计算任何东西。使用TMP，你可以声明变量，执行循环，实现和调用函数等等。但是这些概念同“普通”C++相对应的部分看起来非常不同。例如，Item 47中if…else条件在TMP中是如何通过使用模板和模板特化来表现的。但这是程序级别（assembly-level）的TMP。TMP库（例如，Boost MPL，见Item 55）提供了更高级别的语法，这些语法不会让你误认为是“普通的”C++。</p>
+<h3 id="3-3-TMP中的循环通过递归来实现"><a href="#3-3-TMP中的循环通过递归来实现" class="headerlink" title="3.3 TMP中的循环通过递归来实现"></a>3.3 TMP中的循环通过递归来实现</h3><p>再瞥一眼事情在TMP中是如何工作的，让我们看一下循环。TMP中没有真正的循环的概念，所以循环的效果是通过递归来完成的。（如果一提到递归你就不舒服，在进入TMP 冒险之前你就需要处理好它。TMP主要是一个函数式语言，递归对于函数式语言就如同电视对美国流行文化一样重要：它们是不可分割的。）即使是递归也不是普通的递归，因为TMP循环没有涉及到递归函数调用，所涉及到的是递归模板实例化（template instantiations）。</p>
+<p>TMP的“hello world”程序是在编译期计算阶乘。它算不上是令人激动的程序，“hello world”也不是，但是这两个例子对于介绍语言都是有帮助的。TMP阶乘计算通过对模板实例进行递归来对循环进行示范。也同样示范了变量是如何在TMP中被创建和使用的，看下面的代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;unsigned n&gt;          // general case: the value of</div><div class="line"></div><div class="line">struct Factorial &#123;                   // Factorial&lt;n&gt; is n times the value</div><div class="line"></div><div class="line">// of Factorial&lt;n-1&gt;</div><div class="line">enum &#123; value = n * Factorial&lt;n-1&gt;::value &#125;;</div><div class="line">&#125;;</div><div class="line">template&lt;&gt; // special case: the value of</div><div class="line">struct Factorial&lt;0&gt; &#123; // Factorial&lt;0&gt; is 1</div><div class="line">enum &#123; value = 1 &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>考虑上面的模板元编程（真的仅仅是单一的元函数Factorial），你通过引用Factorial<n>::value来得到factorial(n)的值。</n></p>
+<p>代码的循环部分发生在模板实例Factorial<n>引用模板实例Factorial<n-1>的时候。像所有递归一样，有一种特殊情况来让递归终止。在这里是模板特化Factorial<0>。</0></n-1></n></p>
+<p>每个Factorial模板的实例都是一个结构体，每个结构体使用enum hack（<a href="http://www.cnblogs.com/harlanc/p/6376536.html" title="Item 2" target="_blank" rel="external">Item 2</a>）来声明一个叫做value的TMP变量。Value持有递归计算的当前值。如果TMP有一个真正的循环结构，value将会每次循环的时候进行更新。既然TMP使用递归模板实例来替换循环，每个实例会得到它自己的value的拷贝，每个拷贝都会有一个和“循环”中位置想对应的合适的值。</p>
+<p>你可以像下面这样使用Facorial：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">int main()</div><div class="line">&#123;</div><div class="line">std::cout &lt;&lt; Factorial&lt;5&gt;::value; // prints 120</div><div class="line"></div><div class="line">std::cout &lt;&lt; Factorial&lt;10&gt;::value;       // prints 3628800</div><div class="line"></div><div class="line">&#125;        </div></pre></td></tr></table></figure>
+<p> 如果你认为这比冰激凌更酷，你就已经获得模板元程序员需要的素材。如果模板和特化，递归实例和enum hacks,还有像Factorial<n-1>::value这样的输入使你毛骨悚然，你还是一个“普通的”C++程序员。</n-1></p>
+<h3 id="3-4-TMP还能够做什么？"><a href="#3-4-TMP还能够做什么？" class="headerlink" title="3.4 TMP还能够做什么？"></a>3.4 TMP还能够做什么？</h3><p>当然，Factorial对TMP的功能进行了示范，如同“hello world”程序对任何传统编程语言的功能进行示范一样。为了让你明白为什么TMP是值得了解的，知道它能够做什么很重要，这里有三个例子：</p>
+<ul>
+<li>确保因次单位（dimensional unit）的正确性。在科学和工程应用中，把因次单位（例如，质量，距离和时间）正确的拼到一起是很必要的。将表示质量的变量赋值给表示速度的变量是错误的，但是用距离变量除以时间变量然后将结果赋值被速度变量就没有问题。通过使用TMP，确保（在编译期间）程序中的所有因次单元组合的正确性就是可能的，不管计算有多复杂。（这也是使用TMP来侦测早期错误的一个例子。）TMP这种用法的一个有趣的方面是它能够支持分数因次的指数。这需要在编译期间将分数简化，然后编译器才能够确认，例如，单元 time1/2同time4/8是相同的。</li>
+<li>优化矩阵操作。<a href="http://www.cnblogs.com/harlanc/p/6445461.html" title="Item 21" target="_blank" rel="external">Item 21</a>中解释了有一些函数（包括 operator*）必须返回新的对象，<a href="http://www.cnblogs.com/harlanc/p/6680216.html" title="Item 44" target="_blank" rel="external">Item 44</a>中引入了SquareMatrix类，考虑下面的代码：</li>
+</ul>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="number">1</span> typedef SquareMatrix&lt;<span class="keyword">double</span>, <span class="number">10000</span>&gt; BigMatrix;</div><div class="line"><span class="number">2</span> BigMatrix m1, m2, m3, m4, m5; <span class="comment">// create matrices and</span></div><div class="line"><span class="number">3</span> ... <span class="comment">// give them values</span></div><div class="line"><span class="number">4</span> BigMatrix result = m1 * m2 * m3 * m4 * m5; <span class="comment">// compute their product</span></div></pre></td></tr></table></figure>
+<p> 用“普通的”方式来计算result会有四次创建临时matrice对象的调用，每次调用都应用在对operator*调用的返回值上面。这些独立的乘法在矩阵元素上产生了四          次循环。使用TMP的高级模板技术——表达式模板（expression templates），来消除临时对象以及合并循环是有可能的，并且不用修改上面的客户端代码的语法。最   后的程序使用了更少的内存，而且运行速度会有很大的提升。</p>
+<ul>
+<li>产生个性化的设计模式实现。像策略模式，观察者模式，访问者模式等等这些设计模式能够以很多方式被实现。使用基于模板的技术被叫做policy-based设计，我们可以创建表示独立设计选择（choice或者叫”policies”）的 模板，这些模板可以以任意的方式进行组合来产生个性化的模式实现。例如，使用这种技术能够创建一些实现智能指针行为策略（policies）的模板,使用它能够产生（在编译期）上百种不同的智能指针类型。这项技术已经超越了编程工艺领域，如设计模式和智能指针，它成为了生殖编程（generative programming）的基础。</li>
+</ul>
+<h2 id="4-TMP现状分析"><a href="#4-TMP现状分析" class="headerlink" title="4. TMP现状分析"></a>4. TMP现状分析</h2><p>TMP并不是为每个人准备的。因为语法不直观，支持的相关工具也很弱。（像为模板元编程提供的调试器。）作为一个“突然性“的语言它只是最近才被发现的，TMP编程的一些约定正在实验阶段。然而通过将工作从运行时移到编译期所带来的效率提升带给人很深刻的印象，对一些行为表达的能力（很难或者不可能在运行时实现）也是很吸引人的。</p>
+<p>对于TMP的支持正在上升期。很可能下个版本的C++就是显示的支持它。TR1中已经支持了（Item 54）。关于这个主题的书籍已经开始出来了，网上的一些关于TMP信息也越来越多。TMP可能永远不会成为主流，但是对于一些程序员来说——尤其是程序库的实现者——几乎必然会成为主要手段。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><ul>
+<li>模板元编程可以将工作从运行时移到编译期，这样可以更早的发现错误，并且提高运行时性能。</li>
+<li>基于策略选择（policy choices）的组合TMP能够被用来产生个性化的代码，也能够用来防止为特定类型生成不合适的代码。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/13/2017-04-13_08_40_读书笔记_effective_c++_Item_47_使用traits_class表示类型信息/" rel="next" title="读书笔记 effective c++ Item 47 使用traits class表示类型信息">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 47 使用traits class表示类型信息
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/17/2017-04-17_08_01_读书笔记_effective_c++_Item_49_理解new-handler的行为/" rel="prev" title="读书笔记 effective c++ Item 49 理解new-handler的行为">
+                读书笔记 effective c++ Item 49 理解new-handler的行为 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-TMP是什么？"><span class="nav-number">1.</span> <span class="nav-text">1. TMP是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-使用TMP的优势"><span class="nav-number">2.</span> <span class="nav-text">2. 使用TMP的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-如何使用TMP？"><span class="nav-number">3.</span> <span class="nav-text">3. 如何使用TMP？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-再次分析Item-47中的实例"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 再次分析Item 47中的实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-TMP是图灵完全的"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 TMP是图灵完全的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-TMP中的循环通过递归来实现"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 TMP中的循环通过递归来实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-TMP还能够做什么？"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 TMP还能够做什么？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-TMP现状分析"><span class="nav-number">4.</span> <span class="nav-text">4. TMP现状分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

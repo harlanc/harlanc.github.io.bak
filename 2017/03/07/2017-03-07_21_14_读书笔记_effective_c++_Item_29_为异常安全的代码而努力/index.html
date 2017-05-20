@@ -1,0 +1,936 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="异常安全在某种意义上来说就像怀孕。。。但是稍微想一想。在没有求婚之前我们不能真正的讨论生殖问题。 假设我们有一个表示GUI菜单的类，这个GUI菜单有背景图片。这个类将被使用在多线程环境中，所以需要mutex进行并发控制。 12345678910111213141516&amp;lt;!--more--&amp;gt;class PrettyMenu &amp;#123; public: ... void changeB">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 29 为异常安全的代码而努力">
+<meta property="og:url" content="http://yoursite.com/2017/03/07/2017-03-07_21_14_读书笔记_effective_c++_Item_29_为异常安全的代码而努力/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="异常安全在某种意义上来说就像怀孕。。。但是稍微想一想。在没有求婚之前我们不能真正的讨论生殖问题。 假设我们有一个表示GUI菜单的类，这个GUI菜单有背景图片。这个类将被使用在多线程环境中，所以需要mutex进行并发控制。 12345678910111213141516&amp;lt;!--more--&amp;gt;class PrettyMenu &amp;#123; public: ... void changeB">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.772Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 29 为异常安全的代码而努力">
+<meta name="twitter:description" content="异常安全在某种意义上来说就像怀孕。。。但是稍微想一想。在没有求婚之前我们不能真正的讨论生殖问题。 假设我们有一个表示GUI菜单的类，这个GUI菜单有背景图片。这个类将被使用在多线程环境中，所以需要mutex进行并发控制。 12345678910111213141516&amp;lt;!--more--&amp;gt;class PrettyMenu &amp;#123; public: ... void changeB">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/07/2017-03-07_21_14_读书笔记_effective_c++_Item_29_为异常安全的代码而努力/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 29 为异常安全的代码而努力 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/07/2017-03-07_21_14_读书笔记_effective_c++_Item_29_为异常安全的代码而努力/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 29 为异常安全的代码而努力</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-07T21:14:00+08:00">
+                2017-03-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/07/2017-03-07_21_14_读书笔记_effective_c++_Item_29_为异常安全的代码而努力/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/07/2017-03-07_21_14_读书笔记_effective_c++_Item_29_为异常安全的代码而努力/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 29 为异常安全的代码而努力">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><p>异常安全在某种意义上来说就像怀孕。。。但是稍微想一想。在没有求婚之前我们不能真正的讨论生殖问题。</p>
+<p>假设我们有一个表示GUI菜单的类，这个GUI菜单有背景图片。这个类将被使用在多线程环境中，所以需要mutex进行并发控制。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">&lt;!--more--&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">PrettyMenu</span> &#123;</div><div class="line"> <span class="keyword">public</span>:</div><div class="line"> ...</div><div class="line"> <span class="function"><span class="keyword">void</span> <span class="title">changeBackground</span>(<span class="params">std::istream&amp; imgSrc</span>)</span>; <span class="comment">// change background</span></div><div class="line"> ... <span class="comment">// image</span></div><div class="line"></div><div class="line"> <span class="keyword">private</span>:</div><div class="line"> Mutex mutex;       <span class="comment">// mutex for this object</span></div><div class="line"></div><div class="line"> Image *bgImage; <span class="comment">// current background image</span></div><div class="line"></div><div class="line"> <span class="keyword">int</span> imageChanges;          <span class="comment">// # of times image has been changed</span></div><div class="line"></div><div class="line"> &#125;;         </div></pre></td></tr></table></figure>
+<p> 我们看一种PrettyMenu的changeBackground函数的可能实现：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">void PrettyMenu::changeBackground(std::istream&amp; imgSrc)</div><div class="line">&#123;</div><div class="line"></div><div class="line">lock(&amp;mutex); // acquire mutex (as in [Item 14](http://www.cnblogs.com/harlanc/p/6414789.html "Item 14"))</div><div class="line"></div><div class="line">delete bgImage;          // get rid of old background</div><div class="line"></div><div class="line">++imageChanges; // update image change count</div><div class="line">bgImage = new Image(imgSrc); // install new background</div><div class="line"></div><div class="line">unlock(&amp;mutex);             // release mutex</div><div class="line"></div><div class="line">&#125;   </div></pre></td></tr></table></figure>
+<h2 id="1-异常安全的函数有什么特征"><a href="#1-异常安全的函数有什么特征" class="headerlink" title="1. 异常安全的函数有什么特征"></a>1. 异常安全的函数有什么特征</h2><p>从异常安全的角度来说，这个函数很糟糕。对于异常安全来说有两个要求，上面的实现没有满足任何一个。</p>
+<p>当异常被抛出时，异常安全的函数：</p>
+<ul>
+<li>不会泄露资源。上面的代码不会通过这个测试，因为如果”new Image(imgSrc)”表达式产生一个异常，unlock就永远不会被调用，当前线程会一直拥有锁。</li>
+<li>不允许数据结构被破坏。如果”new Image(imgSrc)”抛出异常，bgImage就会指向一个被销毁的对象。此外，imageChanges却被增加了，但真实的情况是新图片没有被装载。（从另一个方面来说，旧图片被完全清除掉了，所以我猜测你会争辩图片已经被“修改”过了）</li>
+</ul>
+<p>处理资源泄露问题很容易，因为<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>解释过了如何使用对象来管理资源，<a href="http://www.cnblogs.com/harlanc/p/6414789.html" title="Item 14" target="_blank" rel="external">Item 14</a>引入了Lock类来确保mutex能够被实时的释放掉：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">void PrettyMenu::changeBackground(std::istream&amp; imgSrc)</div><div class="line">&#123;</div><div class="line">Lock ml(&amp;mutex); // from Item 14: acquire mutex and</div><div class="line">// ensure its later release</div><div class="line">delete bgImage;</div><div class="line">++imageChanges;</div><div class="line">bgImage = new Image(imgSrc);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用像Lock一样的资源管理类的一个极大的好处是它通常使函数更短小。看一下为什么不再需要对unlock的调用了？作为一个通用的规则，代码越少越好，因为对代码做改动时，出错和理解错误的可能性变低了。</p>
+<h2 id="2-异常安全的三种保证级别"><a href="#2-异常安全的三种保证级别" class="headerlink" title="2. 异常安全的三种保证级别"></a>2. 异常安全的三种保证级别</h2><p>接下来让我们看一看数据结构被损坏的问题。这里我们要做出选择，但是在我们可以进行选择之前，必须对定义这些选择的术语做一下比较。</p>
+<p>异常安全的函数提供了如下三种保证的一种：</p>
+<ul>
+<li><strong>基本的保证（**</strong>basic guarantee）**,这样的函数在抛出异常的时候，程序中的所有东西仍然保持在有效状态。没有对象或者数据被损坏，并且所有对象或者数据保持一个内部一致的状态（例如所有类的约束条件继续被满足）。然而，程序的正确状态可能不能够被预测出来。例如，我们可以实现changeBackground，一旦异常被抛出，PrettyMenu对象可以继续拥有旧的背景图片，但是客户不能够预测拥有的是哪一个。（为了能够找出这个图片，大概需要调用一些成员函数，来告诉它们当前的背景图片是哪一个）</li>
+<li><strong>强保证（**</strong>strong guarantee**）。这样的函数在异常被抛出时，程序的状态不会被改变。对这些函数的调用是原子性（atomic）的，意思是如果调用成功了将会完全成功，但如果失败了，程序的状态就像没有被调用一样。</li>
+</ul>
+<p>使用提供强保证的函数比只提供基本保证的函数要更加容易，因为调用提供强保证的函数之后，只可能有两种程序状态：函数被正确执行后的状态，或者函数被调用之前的状态。而如果在调用只提供基本保证的函数的时候抛出异常，程序可以进入任何有效状态。</p>
+<ul>
+<li><strong>无异常保证**</strong>(nothrow guarantee)**。这样的函数永远不会抛出异常，因为它们总能做到它们所承诺的。所有在内建类型上进行的操作都是无异常的。这是异常安全代码的一个关键的构建基础。</li>
+</ul>
+<p>认为带有空异常明细（empty exception specification）的函数是无异常的，这可能看上去是合理的，但事实上不是这样。举个例子，考虑下面的函数：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">doSomething</span>(<span class="params"></span>) <span class="title">throw</span>(<span class="params"></span>)</span>;   <span class="comment">// note empty exception spec.</span></div></pre></td></tr></table></figure>
+<p>这并不是说doSomething永远不会抛出异常。它的意思是如果soSomething抛出异常，就会是一个严重的错误，并且会调用意料不到的函数。事实上，doSomething没有提供任何异常安全保证。这个函数的声明（如果有异常明细，也包含异常明细）并没有告诉你这个函数是否是正确的，可移植的或者效率高的，也没有为你提供任何异常安全保证。所有这些特性都由函数的实现来决定，而不是声明。</p>
+<p>异常安全的代码必须提供上面三种保证的一种。如果没有提供，它就不是异常安全的。你的选择决定了为你所实现的函数提供哪种保证。除了在处理异常不安全的旧代码时不需要提供异常安全保证之外，异常不安全的代码只有在下面一种情况下才会需要：你的团队做需求分析时发现有对资源泄露和在破环的数据结构上运行程序的需要。</p>
+<p>作为普通标准，提供最强异常安全保证是实际的想法。从异常安全的角度来说，不抛出异常的函数才是完美的。但在C++的C部分中很难不去调用可能会抛出异常的函数。使用动态分配内存的任何东西（例如，所有的STL容器）如果发现没有足够的内存可供分配都会抛出一个bad_alloc异常（Item 49）。如果能提供不抛出异常的函数更好，更多的情况是在<strong>基本保证</strong>和<strong>强保证</strong>之间做出选择。</p>
+<h2 id="3-提供异常安全的两种方法"><a href="#3-提供异常安全的两种方法" class="headerlink" title="3. 提供异常安全的两种方法"></a>3. 提供异常安全的两种方法</h2><h3 id="3-1-使用智能指针"><a href="#3-1-使用智能指针" class="headerlink" title="3.1 使用智能指针"></a>3.1 使用智能指针</h3><p> 对于changeBackground来说，提供强保证不是多难的事。首先，我们将PrettyMenu的bgImage数据成员的类型从内建的Image<em>指针<em>*替换为一种资源管理智能指针</em></em>(见 <a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>)。说真的，对于防止资源泄露来说这绝对是一个好方法。它帮我们提供强异常安全保证的事实只是简单对<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>中的论述(使用对象管理资源是好的设计的基础)做了进一步的加强。在下面的代码中，我将会展示tr1::shared_ptr的使用，因为当进行拷贝时使用tr1::shared_ptr比使用auto_ptr更加直观，因此更受欢迎。</p>
+<p>其次，<strong>我们对**</strong>changeBackground中的语句进行重新排序**，达到只有image被修改的时候才会增加imageChnages的目的。作为通用准则，一个对象的状态没有被修改就表明一些事情没有发生。</p>
+<p>下面是最终的代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class PrettyMenu &#123;</div><div class="line">...</div><div class="line">std::tr1::shared_ptr&lt;Image&gt; bgImage;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line">void PrettyMenu::changeBackground(std::istream&amp; imgSrc)</div><div class="line">&#123;</div><div class="line">Lock ml(&amp;mutex);</div><div class="line">bgImage.reset(new Image(imgSrc)); // replace bgImage’s internal</div><div class="line">// pointer with the result of the</div><div class="line">// “new Image” expression</div><div class="line">++imageChanges;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意这里不再需要手动delete旧image，因为这由智能指针在内部处理。并且，销毁操作只有在新image成功创建的时候才会发生。更精确的说，只有在参数（new Image(imgSrc)的结果）被成功创建的时候tr1::shared_ptr::reset函数才会被调用。Delete只在reset函数内部被使用，所以如果reset不被调用，delete永远不会被执行。注意资源管理对象的使用再次削减了changeBackground的长度。</p>
+<p>正如我所说的，上面的两个修改足以为changeBackground提供强异常安全保证。还有美中不足的就是关于参数imgSrc。如果Image的构造函数抛出异常，输入流的读标记可能会被移动，这个移动致使状态发生变化并且对程序接下来的运行是可见的。如果changeBackground不处理这个问题，它只能提供基本异常安全保证。</p>
+<h3 id="3-2-拷贝和交换"><a href="#3-2-拷贝和交换" class="headerlink" title="3.2 拷贝和交换"></a>3.2 拷贝和交换</h3><p>把上面的问题放到一边，我们假设changeBackground能够提供强异常安全保证。（你应该能想出一个好的办法来提供强异常安全保证，也许可以将参数类型从istream变为包含image数据的文件的名字。）<strong>有一种普通的设计策略也能提供强保证，熟悉它很重要。这个策略叫做“拷贝和交换”（**</strong>copy and swap<strong>**）</strong>。它是很简单的：先对你想要修改的对象做一份拷贝，然后在拷贝上进行所有需要的改动。如果任何修改操作抛出了异常，源对象仍然保持未修改状态。一旦修改完全成功，将源对象和修改后的对象进行不会抛出异常的交换即可（<a href="http://www.cnblogs.com/harlanc/p/6492738.html" title="Item 25" target="_blank" rel="external">Item 25</a>）。</p>
+<p>这往往会把真实的对象数据放入到一个单独的实现对象中，然后提供一个指向这个实现对象的指针。也即是指向实现的指针(pimpl idiom),Item 31中会进行详细描述。PrerttyMenu的实现如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">struct PMImpl &#123; // PMImpl = “PrettyMenu</div><div class="line">std::tr1::shared_ptr&lt;Image&gt; bgImage; // Impl.”; see below for</div><div class="line">int imageChanges; // why it’s a struct</div><div class="line">&#125;;</div><div class="line">class PrettyMenu &#123;</div><div class="line">...</div><div class="line">private:</div><div class="line">Mutex mutex;</div><div class="line">std::tr1::shared_ptr&lt;PMImpl&gt; pImpl;</div><div class="line">&#125;;</div><div class="line">void PrettyMenu::changeBackground(std::istream&amp; imgSrc)</div><div class="line">&#123;</div><div class="line">using std::swap; // see Item 25</div><div class="line">Lock ml(&amp;mutex); // acquire the mutex</div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;PMImpl&gt;          // copy obj. data</div><div class="line"></div><div class="line">pNew(new PMImpl(*pImpl));        </div><div class="line"></div><div class="line">pNew-&gt;bgImage.reset(new Image(imgSrc)); // modify the copy</div><div class="line">++pNew-&gt;imageChanges;</div><div class="line"></div><div class="line">swap(pImpl, pNew); // swap the new</div><div class="line">// data into place</div><div class="line"></div><div class="line">&#125;                           // release the mutex</div></pre></td></tr></table></figure>
+<p>在这个例子中，我选择将PMImpl定义为一个结构体而不是类，因为PrettyMenu的封装性通过pImpl的私有性（private）来保证。把PMImpl定义成类会至少和结构体一样好，虽然有一些不方便。如果需要，PMImpl可以被放在PrettyMenu中，但是打包问题（packaging）是我们所关心的。</p>
+<p>拷贝和交换策略是处理对象状态问题的卓越方法（状态要么全变要么都不变），但是一般情况下，它不能够保证所有的函数是强异常安全的。想知道为什么，考虑对changeBackground做的一个抽象，someFunc,这个函数使用拷贝和交换策略，但也包含对其它两个函数的调用，f1和f2：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">someFunc</span>(<span class="params"></span>)</span></div><div class="line">&#123;</div><div class="line"></div><div class="line">...                            <span class="comment">// make copy of local state</span></div><div class="line"></div><div class="line">f1();                      </div><div class="line"></div><div class="line">f2();                      </div><div class="line"></div><div class="line">...                                                 <span class="comment">// swap modified state into place</span></div><div class="line"></div><div class="line">&#125;            </div></pre></td></tr></table></figure>
+<p> 这里如果f1或者f2不是强异常安全的，someFunc就很难是强异常安全的。举个例子，假设f1只提供了基本保证。如果someFunc要提供强保证，必须写代码在调用f1之前确定整个程序的状态，然后捕获f1中的所有异常，如果发生异常则恢复原始状态。</p>
+<p>即使f1和f2是强异常安全的，情况也没有任何改观。因为如果f1运行完成后，程序的状态发生了变化，这时候如果f2抛出了异常，程序的状态和调用someFunc之前已经不一样了，即使f2没有修改任何东西。</p>
+<h2 id="4-不能提供强异常安全保证的两种情况"><a href="#4-不能提供强异常安全保证的两种情况" class="headerlink" title="4. 不能提供强异常安全保证的两种情况"></a>4. 不能提供强异常安全保证的两种情况</h2><p>当函数操作只影响本地状态（例如，someFunc只影响调用此函数的对象的状态），提供强异常安全保证是相对容易的。当函数对非本地数据也产生副作用时，提供强保证就相当困难了。例如，如果调用f1的副作用是数据库会被修改，很难让someFunc提供强异常安全。通常来说，对于已经提交的数据库改动，没有方法对其进行回退。其它的数据库客户端可能已经看到了数据库的新状态。</p>
+<p>即使你想提供强异常安全保证，上述问题也会阻止你。另外一个问题是效率问题。拷贝和交换的关键点在于首先对对象拷贝进行修改，然后将源数据和修改后的数据进行无异常的交换。这需要对每个要修改的对象都做一份拷贝，这需要时间和空间，你可能不能够或不愿意为其提供这些资源。大家都想获得强异常安全保证，你应该在实际的时候提供它，但不是100%的情况下都是实际可行的。</p>
+<h2 id="5-至少为代码提供基本异常安全保证（遗留代码除外）"><a href="#5-至少为代码提供基本异常安全保证（遗留代码除外）" class="headerlink" title="5. 至少为代码提供基本异常安全保证（遗留代码除外）"></a>5. 至少为代码提供基本异常安全保证（遗留代码除外）</h2><p>如果不切实际，你必须提供基本保证。在实际情况中，你可能发现你可以为一些函数提供强保证，但是在效率和复杂度方面的开销使其变得不再实际。只要你为提供强异常安全保证的函数做出努力了，没有人会因为你提供基本保证而批评你。对许多函数来说，基本保证是最合理的选择。</p>
+<p>如果你实现一个函数不提供任何异常安全的保证，事情就不一样了，因为你会一直内疚下去直到证明你是无辜的。所以你应该实现异常安全的代码。但是你可能有所抵触。再考虑一下someFunc的实现，它调用了函数f1和函数f2。假设f2没有提供异常安全保证，连基本保证也没有提供。这就意味着如果在f2内部抛出异常，资源泄露就可能会发生，也可能会出现被破坏的数据结构，例如，有序的数组不再有序，从一个数据结构传递到另一个数据结构的对象被丢失等等。someFunc没有任何方法能够对这些问题做出补偿。如果函数someFunc调用了没有提供异常安全的函数，someFunc自己也不能提供任何保证。</p>
+<p>让我们回到怀孕的话题。一个女性要么怀孕了要么没有怀孕。不可能部分的怀孕把。类似的，一个软件系统要么是异常安全的，要么不是。也没有部分异常安全的系统。如果一个系统中有一个没有提供异常安全的函数，那么整个系统也就不是异常安全的，因为对这个函数的调用会导致资源泄露和数据结构的破坏。不幸的是，许多C++遗留代码并没有被实现为异常安全的，所以如今太多的系统都不是异常安全的。</p>
+<p>没有任何理由维持这种状态。所以当写新代码或修改现有代码时，对如何使其变得异常安全需要进行仔细的考虑。首先使用对象管理资源（<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>）,这能防止资源泄露。然后为每个函数从三种异常安全保证中选取实际并且最强的那一个，只有在调用遗留代码时让你无可选择的情况下才能勉强接受无安全保证。为函数的使用者和将来的维护人员将你做的决定记录在文档中。一个函数异常安全保证是接口的可见部分，所以在你选择异常安全保证部分时，你应该像选择函数接口的其它方面一样谨慎。</p>
+<p>40年前，goto语句被认为是好的实践。现在我们却努力实现结构化控制流（structured control flows）。20年前，全局访问数据被认为是好的实践。现在我们却努力对数据进行封装。10年前，实现出不用考虑异常影响的函数被认为是好的实践。现在我们努力写出异常安全的代码。</p>
+<p>与时俱进。活到老，学到老。</p>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><ul>
+<li><ul>
+<li>异常安全函数不会造成资源泄露，也不允许数据结构被破坏，即使在抛出异常的情况下也如此。这样的函数提供基本的，强的和不抛出异常三种保证。</li>
+<li>强保证通常通过拷贝和交换来实现，但为所有函数都提供强保证是不切实际的。</li>
+<li>一个函数提供的最强异常安全保证不会强于它所调用函数中提供的最弱异常安全保证。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/06/2017-03-06_23_27_读书笔记_effective_c++_Item_28_不要返回指向对象内部数据(internals)的句柄（handles）/" rel="next" title="读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles）">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/08/2017-03-08_14_12_程序猿开发语言投票/" rel="prev" title="程序猿开发语言投票">
+                程序猿开发语言投票 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-异常安全的函数有什么特征"><span class="nav-number">1.1.</span> <span class="nav-text">1. 异常安全的函数有什么特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-异常安全的三种保证级别"><span class="nav-number">1.2.</span> <span class="nav-text">2. 异常安全的三种保证级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-提供异常安全的两种方法"><span class="nav-number">1.3.</span> <span class="nav-text">3. 提供异常安全的两种方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-使用智能指针"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 使用智能指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-拷贝和交换"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 拷贝和交换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-不能提供强异常安全保证的两种情况"><span class="nav-number">1.4.</span> <span class="nav-text">4. 不能提供强异常安全保证的两种情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-至少为代码提供基本异常安全保证（遗留代码除外）"><span class="nav-number">1.5.</span> <span class="nav-text">5. 至少为代码提供基本异常安全保证（遗留代码除外）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-总结"><span class="nav-number">1.6.</span> <span class="nav-text">6. 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

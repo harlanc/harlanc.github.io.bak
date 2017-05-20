@@ -1,0 +1,898 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="假设你正在操作一个Rectangle类。每个矩形可以通过左上角的点和右下角的点来表示。为了保证一个Rectangle对象尽可能小，你可能决定不把定义矩形范围的点存储在Rectangle类中，而是把它放入一个辅助结构体中，Rectangle中声">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles）">
+<meta property="og:url" content="http://yoursite.com/2017/03/06/2017-03-06_23_27_读书笔记_effective_c++_Item_28_不要返回指向对象内部数据(internals)的句柄（handles）/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="假设你正在操作一个Rectangle类。每个矩形可以通过左上角的点和右下角的点来表示。为了保证一个Rectangle对象尽可能小，你可能决定不把定义矩形范围的点存储在Rectangle类中，而是把它放入一个辅助结构体中，Rectangle中声">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.754Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles）">
+<meta name="twitter:description" content="假设你正在操作一个Rectangle类。每个矩形可以通过左上角的点和右下角的点来表示。为了保证一个Rectangle对象尽可能小，你可能决定不把定义矩形范围的点存储在Rectangle类中，而是把它放入一个辅助结构体中，Rectangle中声">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/06/2017-03-06_23_27_读书笔记_effective_c++_Item_28_不要返回指向对象内部数据(internals)的句柄（handles）/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles） | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/2017-03-06_23_27_读书笔记_effective_c++_Item_28_不要返回指向对象内部数据(internals)的句柄（handles）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-06T23:27:00+08:00">
+                2017-03-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/06/2017-03-06_23_27_读书笔记_effective_c++_Item_28_不要返回指向对象内部数据(internals)的句柄（handles）/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/06/2017-03-06_23_27_读书笔记_effective_c++_Item_28_不要返回指向对象内部数据(internals)的句柄（handles）/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 28 不要返回指向对象内部数据(internals)的句柄（handles）">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><p>假设你正在操作一个Rectangle类。每个矩形可以通过左上角的点和右下角的点来表示。为了保证一个Rectangle对象尽可能小，你可能决定不把定义矩形范围的点存储在Rectangle类中，而是把它放入一个辅助结构体中，Rectangle中声<br><a id="more"></a><br>一个指向它的指针就可以了：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">class Point &#123;                           // class for representing points</div><div class="line"></div><div class="line">public:                                  </div><div class="line"></div><div class="line">Point(int x, int y);                 </div><div class="line"></div><div class="line">...                                          </div><div class="line"></div><div class="line">void setX(int newVal);          </div><div class="line"></div><div class="line">void setY(int newVal);          </div><div class="line"></div><div class="line">...                                          </div><div class="line"></div><div class="line">&#125;;                                          </div><div class="line"></div><div class="line">struct RectData &#123;                                       // Point data for a Rectangle</div><div class="line"></div><div class="line">Point ulhc;                                                 // ulhc = “ upper left-hand corner”</div><div class="line"></div><div class="line">Point lrhc;                                                 // lrhc = “ lower right-hand corner”</div><div class="line"></div><div class="line">&#125;;                                                              </div><div class="line"></div><div class="line">class Rectangle &#123;                                      </div><div class="line"></div><div class="line">...                                                              </div><div class="line"></div><div class="line">private:                                                    </div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;RectData&gt; pData;      // see Item 13 for info on</div><div class="line"></div><div class="line">&#125;;                                                                // tr1::shared_ptr</div></pre></td></tr></table></figure>
+<h2 id="1-由返回指向对象内部数据的引用所引发的两个问题"><a href="#1-由返回指向对象内部数据的引用所引发的两个问题" class="headerlink" title="1. 由返回指向对象内部数据的引用所引发的两个问题"></a>1. 由返回指向对象内部数据的引用所引发的两个问题</h2><h3 id="1-1-问题分析"><a href="#1-1-问题分析" class="headerlink" title="1.1 问题分析"></a>1.1 问题分析</h3><p>因为Rectangle的客户需要能够获知一个矩形的范围，类因此提供了upperLeft和lowerRight函数。然而，Point是一个自定义的类型，所以你需要留意<a href="http://www.cnblogs.com/harlanc/p/6440868.html" title="Item 20" target="_blank" rel="external">Item 20</a>：对于用户自定义类型，按引用传递比按值传递更高效，这些函数返回了对底层Point对象的引用：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Rectangle</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">Point&amp; upperLeft() <span class="keyword">const</span> &#123; <span class="keyword">return</span> pData-&gt;ulhc; &#125;</div><div class="line"></div><div class="line">Point&amp; lowerRight() <span class="keyword">const</span> &#123; <span class="keyword">return</span> pData-&gt;lrhc; &#125;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这种设计可以编译通过，但却是错误的。事实上，它是自相矛盾的。一方面，upperLeft和lowerRight被声明成const成员函数，因为它们只用来为客户提供获知矩阵包含哪些点的方法，并没有让客户修改矩阵（<a href="http://www.cnblogs.com/harlanc/p/6384546.html" title="Item 3" target="_blank" rel="external">Item 3</a>）。另一方面，两个函数都返回指向私有内部数据的引用——而此引用能够被调用者用来修改内部数据！举个例子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function">Point <span class="title">coord1</span>(<span class="params"><span class="number">0</span>, <span class="number">0</span></span>)</span>;</div><div class="line"></div><div class="line"><span class="function">Point <span class="title">coord2</span>(<span class="params"><span class="number">100</span>, <span class="number">100</span></span>)</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">const</span> Rectangle <span class="title">rec</span>(<span class="params">coord1, coord2</span>)</span>;</div><div class="line"></div><div class="line"><span class="comment">// rec is a const rectangle from</span></div><div class="line"></div><div class="line"><span class="comment">// (0, 0) to (100, 100)</span></div><div class="line">rec.upperLeft().setX(<span class="number">50</span>); <span class="comment">// now rec goes from</span></div><div class="line"><span class="comment">// (50, 0) to (100, 100)!</span></div></pre></td></tr></table></figure>
+<p>注意upperLeft的调用者是如何利用返回的<strong>指向**</strong>rec内部的Point数据成员的引用**来修改这个成员的。但是rec是const变量。</p>
+<p>我们能从中学到两点。<strong>首先，一个数据成员的封装性同以这个数据成员的引用作为返回值的可访问级别最高（**</strong>most accessible）的成员函数一致<strong>。在这种情况下，虽然ulhc和lrhc对于Rectangle来说是private的，它们实际上是public的，因为public函数upperLeft和lowerRight返回了指向它们的引用。</strong>第二，如果一个<strong>**const成员函数返回指向数据的引用，而此数据被存储在当前对象之外，那么函数的调用者就能够修改这些数据</strong>。（这是bitwise constness局限性的附带结果<a href="http://www.cnblogs.com/harlanc/p/6384546.html" title="Item 3" target="_blank" rel="external"> Item 3</a>）。</p>
+<h3 id="1-2-句柄-handles-不仅包含引用，也包含指针和迭代器"><a href="#1-2-句柄-handles-不仅包含引用，也包含指针和迭代器" class="headerlink" title="1.2 **句柄(handles)**不仅包含引用，也包含指针和迭代器"></a><strong>1.2 **</strong>句柄(handles)**不仅包含引用，也包含指针和迭代器</h3><p>我们讨论的都是返回引用的成员函数，但是如果它们返回指针或者迭代器，同样原因导致的同样问题也将会存在。引用，指针和迭代器都是句柄（handles），返回一个指向对象内部数据的句柄常常有破坏封装型的风险。也会导致从const成员函数传递出去的对象的状态被修改掉。</p>
+<h3 id="1-3-内部数据-internals-data-不仅包含数据成员，也包括成员函数"><a href="#1-3-内部数据-internals-data-不仅包含数据成员，也包括成员函数" class="headerlink" title="1.3 内部数据(internals data)不仅包含数据成员，也包括成员函数"></a>1.3 内部数据(internals data)不仅包含数据成员，也包括成员函数</h3><p>我们通常认为一个对象的“内部数据”只针对数据成员，但非public的成员函数也是对象内部数据的一部分。因此，禁止返回指向它们的句柄同样重要。这意味着绝不要从成员函数中返回一个指向更低访问级别的函数的指针。如果你这么做了，有效的访问级别就是访问级别更高的那个函数，因为客户可以获得访问级别更低的函数的指针，然后通过指针来调用此函数。</p>
+<h2 id="2-解决上面两问题的方法，为引用添加const"><a href="#2-解决上面两问题的方法，为引用添加const" class="headerlink" title="2. 解决上面两问题的方法，为引用添加const"></a>2. 解决上面两问题的方法，为引用添加const</h2><p>返回指向成员函数指针的函数并不普通，让我们重新关注Rectangle类和它的upperLeft和lowerRight成员函数。我们发现的两个问题可以通过简单的为其返回值添加const来消除：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Rectangle</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">...</div><div class="line"><span class="keyword">const</span> Point&amp; upperLeft() <span class="keyword">const</span> &#123; <span class="keyword">return</span> pData-&gt;ulhc; &#125;</div><div class="line"><span class="keyword">const</span> Point&amp; lowerRight() <span class="keyword">const</span> &#123; <span class="keyword">return</span> pData-&gt;lrhc; &#125;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>使用这个修改后的设计，客户可以读取定义一个矩形的点，但是不能修改它们。这意味着upperLeft和lowerRight的声明不再是一个谎言，因为它们不再允许调用者修改对象的状态。对于封装问题，我们的意图是让客户能够看到组成矩形的点，因此我们故意放松了封装型。更加重要的是，这是有局限性的“放松“：这些函数是只读的。 </p>
+<h2 id="3-返回const引用会引入新的问题"><a href="#3-返回const引用会引入新的问题" class="headerlink" title="3. 返回const引用会引入新的问题"></a>3. 返回const引用会引入新的问题</h2><p>即便如此，upperLeft和lowerRight仍然返回了指向对象内部数据的句柄，这可能会在其它方面出现问题。特别是它能导致悬挂指针：<strong>指向部分对象的句柄不再存在。</strong>这种对象消失问题的最常见的根源在于按值返回的函数。举个例子，考虑一个为GUI对象返回边界框的函数，边界框用矩阵表示：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">GUIObject</span> &#123; ... &#125;;</div><div class="line"></div><div class="line"><span class="keyword">const</span> Rectangle                                      <span class="comment">// returns a rectangle by</span></div><div class="line"></div><div class="line">boundingBox(<span class="keyword">const</span> GUIObject&amp; obj);     <span class="comment">// value; see Item 3 for why</span></div><div class="line"></div><div class="line"><span class="comment">// return type is const</span></div></pre></td></tr></table></figure>
+<p>现在考虑一个客户如果使用这个函数：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">GUIObject *pgo; <span class="comment">// make pgo point to</span></div><div class="line">... <span class="comment">// some GUIObject</span></div><div class="line"><span class="keyword">const</span> Point *pUpperLeft = <span class="comment">// get a ptr to the upper</span></div><div class="line">&amp;(boundingBox(*pgo).upperLeft()); <span class="comment">// left point of its</span></div><div class="line"><span class="comment">// bounding box</span></div></pre></td></tr></table></figure>
+<p>这个对boundingBox的调用将返回一个新的临时Rectangle对象.这个对象没有名字，我们叫它temp。upperLeft将在temp上被调用，这个调用返回了指向temp内部数据的引用，temp内部数据就是组成矩形的一个Point。pUpperLeft将会指向这个Ponit对象。到现在为止一切正常，但是还没完呢，因为在声明结束时，boundingBox的返回值——temp——将会被销毁，这将间接导致temp的Point对象被析构。这样使得pUpperLeft指向一个不再存在的对象；pUpperLeft在创建它的语句结束时变成了悬挂指针！</p>
+<p>这也是为什么<strong>任何返回指向对象内部数据的句柄的函数都是危险的。不论这个句柄是一个指针，或者一个函数，或者一个迭代器</strong>。也不管这个函数有没有被声明为const。也不管成员函数返回的句柄是否为const。问题的关键在于函数有没有返回句柄，因为一旦返回了，就会有句柄比其指向的对象存在时间更长的危险。</p>
+<h2 id="4-例外的情况"><a href="#4-例外的情况" class="headerlink" title="4. 例外的情况"></a>4. 例外的情况</h2><p>这并不意味着你永远不应该让一个成员函数返回一个句柄。有时候你必须这么做。举个例子，operator[]允许你从string或者vector中将单个元素摘出来，这些operator[]返回的就是指向容器内部数据的引用（<a href="http://www.cnblogs.com/harlanc/p/6384546.html" title="Item 3" target="_blank" rel="external">Item 3</a>）——容器被销毁的时候，它里面的数据也被销毁。但这样的函数只是一个例外。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>避免返回指向对象内部数据的句柄（引用，指针或者迭代器）。不返回句柄可以增强封装性，帮助const成员函数的行为为真正的const，减少悬挂指针被创建的可能。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/05/2017-03-05_10_16_C++_11和C++98相比有哪些新特性/" rel="next" title="C++ 11和C++98相比有哪些新特性">
+                <i class="fa fa-chevron-left"></i> C++ 11和C++98相比有哪些新特性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/07/2017-03-07_21_14_读书笔记_effective_c++_Item_29_为异常安全的代码而努力/" rel="prev" title="读书笔记 effective c++ Item 29 为异常安全的代码而努力">
+                读书笔记 effective c++ Item 29 为异常安全的代码而努力 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-由返回指向对象内部数据的引用所引发的两个问题"><span class="nav-number">1.1.</span> <span class="nav-text">1. 由返回指向对象内部数据的引用所引发的两个问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-问题分析"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 问题分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-句柄-handles-不仅包含引用，也包含指针和迭代器"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 **句柄(handles)**不仅包含引用，也包含指针和迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-内部数据-internals-data-不仅包含数据成员，也包括成员函数"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 内部数据(internals data)不仅包含数据成员，也包括成员函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-解决上面两问题的方法，为引用添加const"><span class="nav-number">1.2.</span> <span class="nav-text">2. 解决上面两问题的方法，为引用添加const</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-返回const引用会引入新的问题"><span class="nav-number">1.3.</span> <span class="nav-text">3. 返回const引用会引入新的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-例外的情况"><span class="nav-number">1.4.</span> <span class="nav-text">4. 例外的情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-number">1.5.</span> <span class="nav-text">5. 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

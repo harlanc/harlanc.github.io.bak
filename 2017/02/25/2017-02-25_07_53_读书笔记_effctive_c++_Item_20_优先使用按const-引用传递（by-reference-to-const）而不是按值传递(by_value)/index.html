@@ -1,0 +1,907 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 按值传递参数会有效率问题默认情况下，C++向函数传入或者从函数传出对象都是按值传递（pass by value）(从C继承过来的典型特性)。除非你指定其他方式，函数参数会用实际参数值的拷贝进行初始化">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effctive c++ Item 20 优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by value)">
+<meta property="og:url" content="http://yoursite.com/2017/02/25/2017-02-25_07_53_读书笔记_effctive_c++_Item_20_优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by_value)/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 按值传递参数会有效率问题默认情况下，C++向函数传入或者从函数传出对象都是按值传递（pass by value）(从C继承过来的典型特性)。除非你指定其他方式，函数参数会用实际参数值的拷贝进行初始化">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.513Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effctive c++ Item 20 优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by value)">
+<meta name="twitter:description" content="1. 按值传递参数会有效率问题默认情况下，C++向函数传入或者从函数传出对象都是按值传递（pass by value）(从C继承过来的典型特性)。除非你指定其他方式，函数参数会用实际参数值的拷贝进行初始化">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/25/2017-02-25_07_53_读书笔记_effctive_c++_Item_20_优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by_value)/"/>
+
+
+
+
+
+  <title>读书笔记 effctive c++ Item 20 优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by value) | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/25/2017-02-25_07_53_读书笔记_effctive_c++_Item_20_优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by_value)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effctive c++ Item 20 优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by value)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-25T07:53:00+08:00">
+                2017-02-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/25/2017-02-25_07_53_读书笔记_effctive_c++_Item_20_优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by_value)/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/25/2017-02-25_07_53_读书笔记_effctive_c++_Item_20_优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by_value)/" class="leancloud_visitors" data-flag-title="读书笔记 effctive c++ Item 20 优先使用按const-引用传递（by-reference-to-const）而不是按值传递(by value)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-按值传递参数会有效率问题"><a href="#1-按值传递参数会有效率问题" class="headerlink" title="1. 按值传递参数会有效率问题"></a>1. 按值传递参数会有效率问题</h2><p>默认情况下，C++向函数传入或者从函数传出对象都是按值传递（pass by value）(从C继承过来的典型特性)。除非你指定其他方式，函数参数会用实际参数值的拷贝进行初始化<br><a id="more"></a><br>函数调用者会获得函数返回值的一份拷贝。这些拷贝由对象的拷贝构造函数生成。这使得按值传递（pass-by-value）变成一项昂贵的操作。举个例子，考虑下面的类继承体系(<a href="http://www.cnblogs.com/harlanc/p/6395052.html" title="Item 7" target="_blank" rel="external">Item 7</a>)：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">class Person &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">Person(); // parameters omitted for simplicity</div><div class="line"></div><div class="line">virtual ~Person(); // see Item 7 for why this is virtual</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">std::string name;</div><div class="line"></div><div class="line">std::string address;</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">class Student: public Person &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">Student(); // parameters again omitted</div><div class="line"></div><div class="line">virtual ~Student();</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">std::string schoolName;</div><div class="line"></div><div class="line">std::string schoolAddress;</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>现在考虑下面的代码，在这里我们调用了一个函数，validateStudent，这个函数有一个Student参数（按值），返回值表示验证是否通过：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">bool</span> <span class="title">validateStudent</span>(<span class="params">Student s</span>)</span>; <span class="comment">// function taking a Student</span></div><div class="line"></div><div class="line"><span class="comment">// by value</span></div><div class="line"></div><div class="line">Student plato; <span class="comment">// Plato studied under Socrates</span></div><div class="line"></div><div class="line"><span class="keyword">bool</span> platoIsOK = validateStudent(plato); <span class="comment">// call the function</span></div></pre></td></tr></table></figure>
+<p>当函数被调用时会发生什么？</p>
+<p>很清楚，Student拷贝构造函数会被调用，用plato来初始化参数s。同样很清楚的是，当validateStudent函数返回后s会被销毁。所以这个函数参数传递的开销是分别调用了构造函数和析构函数。</p>
+<p>但这不是所有的开销。一个Student对象中有两个string对象，所以每次你构建一个Student对象的时候你必须构造两个string对象。Student对象继承自Person对象，所以每次你构建一个Student对象你必须构造一个Person对象。一个Person对象中有两个额外的string对象，所以每个Person构造函数同样需要对两个额外的string进行构造。最后结果是按值传递一个Student对象导致对Student拷贝构造函数的一次调用，对Person拷贝构造函数的一次调用，对stirng拷贝构造函数的四次调用。当Student对象的拷贝被释放时，每个构造函数对应的析构函数要被调用，所以按值传递一个Student对象的总开销是6次构造和6次析构！！</p>
+<h2 id="2-按const引用传递会更高效"><a href="#2-按const引用传递会更高效" class="headerlink" title="2. 按const引用传递会更高效"></a>2. 按const引用传递会更高效</h2><p>这是正确的并且令人满意的行为。毕竟，你需要的是所有对象被可靠的初始化和销毁。并且，如果有一种方法能够绕过这些构造函数和析构函数就再好不过了。<strong>这种方法是存在的，就是：按**</strong>const<strong><strong>引用进行传递（pass by reference-to-const</strong></strong>）**。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">bool</span> <span class="title">validateStudent</span>(<span class="params"><span class="keyword">const</span> Student&amp; s</span>)</span>;</div></pre></td></tr></table></figure>
+<p>这种用法更具效率：<strong>没有构造函数或者析构函数被调用</strong>，因为没有新的对象被创建。在修订后版本的参数声明中，const是很重要的。validataStudent的原始版本有一个按值传递的Studetn参数，调用者会知道对被传递进去的Student参数的任何可能的修改都会被屏蔽掉；validateStudent只是在修改它的一份拷贝。现在Student被按照引用进行传递，将其声明为const同样是必须的，否则调用者就会为传递进去的参数是否被修改而担心。</p>
+<h2 id="3-按const引用传递能避免切片问题"><a href="#3-按const引用传递能避免切片问题" class="headerlink" title="3. 按const引用传递能避免切片问题"></a>3. 按const引用传递能避免切片问题</h2><p>按引用传递参数同样避免了切片（slicing）问题。当一个派生类对象被当作一个基类对象被传递时(按值传递),基类的拷贝构造函数会被调用，“使对象的行为看起来像派生类对象“这个特定的特性被“切掉”了。留给你的只剩下一个基类对象，因为是一个基类的构造函数创建了它。这是你永远不希望看到的。举个例子，假设你正在一些类上进行工作，这些类实现了图形化窗口系统：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Window &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">std::string name() const; // return name of window</div><div class="line"></div><div class="line">virtual void display() const; // draw window and contents</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">class WindowWithScrollBars: public Window &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">virtual void display() const;</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>所有的窗口对象都有一个名字，你可以通过name函数来获取它，并且所有的窗口都能被显示出来，你可以通过触发display函数来实现。Display函数为虚函数的事实告诉你基类Windows对象的显示方式同WindowWithScrollBars对象的显示方式是不同的（Item 34和Item 36）。</p>
+<p>现在假设你实现了一个函数，先打印窗口的名字然后让窗口显示出来。下面是实现这样一个函数的错误的方式：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">void printNameAndDisplay(Window w) // incorrect! parameter</div><div class="line"></div><div class="line">&#123; // may be sliced!</div><div class="line"></div><div class="line">std::cout &lt;&lt; w.name();</div><div class="line"></div><div class="line">w.display();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>考虑当你使用一个WindowWithScrollBars对象作为参数调用这个函数会发生什么：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">WindowWithScrollBars wwsb;</div><div class="line"></div><div class="line">printNameAndDisplay(wwsb);</div></pre></td></tr></table></figure>
+<p> 参数w将会被构造，它是按值传递的，所以w作为一个Window对象，所有让wwsb看起来像一个WIndowWithScrollBars对象的特定信息都会被切除。在printNameAndDispay内部，w的行为总是会像Window对象一样（因为他是一个Window类的对象），而不管传入函数的参数类型是什么。特别的，在printNameAndDisplay内部对display的调用总是会调用Window::display，永远不会调用WindowWithScrollBars::display。</p>
+<p>解决切片问题的方法是将w按const引用传递进去（by reference-to-const）:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">void printNameAndDisplay(const Window&amp; w) // fine, parameter won’t</div><div class="line"></div><div class="line">&#123; // be sliced</div><div class="line"></div><div class="line">std::cout &lt;&lt; w.name();</div><div class="line"></div><div class="line">w.display();</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在w的行为会和传入参数的实际类型一致了。</p>
+<h2 id="4-什么情况下按值传递是合理的"><a href="#4-什么情况下按值传递是合理的" class="headerlink" title="4. 什么情况下按值传递是合理的"></a>4. 什么情况下按值传递是合理的</h2><p>如果你偷看一下C++编译器的底层，你将会发现引用是按照指针来进行实现的，所以按引用传递一些东西就意味着传递一个指针。因此，如果你有一个内建类型的对象（例如int）按值传递比按引用传递效率更高。对于内建类型来说，当你在按值传递和按引用传递之间进行选择时，选择按值传递是合理的。这对于STL中的迭代器和函数对象同样适用，因为按照惯例，它们被设计成按值传递。迭代器和函数对象的设计者有责任留意下面两个问题：高效的拷贝和不用忍受切片问题。（这是一个规则如何被改变的例子，取决于你使用C++的哪一部分 见<a href="http://www.cnblogs.com/harlanc/p/6371997.html" title="Item 1" target="_blank" rel="external"> Item 1</a>。）</p>
+<h2 id="5-并不是对象小就应该按值传递"><a href="#5-并不是对象小就应该按值传递" class="headerlink" title="5. 并不是对象小就应该按值传递"></a>5. 并不是对象小就应该按值传递</h2><p>内建类型占用了很少的内存，所以一些人得出结论：所有这样的小的类型都是按值传递的候选者，即使它们是用户定义的类型。这个原因是靠不住的。因为一个对象占用内存少并不意味这调用它的拷贝构造函数不昂贵。许多对象——这些对象中的大多数STL容器——仅仅包含一个指针，但是拷贝这些对象会拷贝它们指向的所有东西。这可是非常昂贵的操作。</p>
+<p>即使是当小对象的拷贝构造函数的调用开销很小时，也会有性能问题。一些编译器对于内建类型和用户自定义类型有不同的对待方式，即使它们有相同的底层表示(underlying representation）。举个例子，一些编译器拒绝将只含有一个double数值的对象放入缓存中，却很高兴的为一个赤裸裸的double这么做。当这类事情发生的时候，将这些对象按引用传递会更好，因为编译器会将指针（引用的实现）放入缓存中。</p>
+<p>另外一个小的用户自定义类型不是按值传递的好的候选者的原因是，作为用户自定义类型，它们的大小会发生变化。一个类型现在可能很小但是在将来的发布中可能会变的更大，因为它的内部实现可能发生变化。当你切换到一个不同的C++实现时事情也有可能发生变化。举个例子，标准库的string类型的一些实现比其他实现大6倍。</p>
+<p>一般情况下，你能够对“按值传递是不昂贵的”进行合理假设的唯一类型就是内建类型和STL迭代器以及函数对象。对于其它的任何类型，遵循这个条款的建议，优先使用按const引用传递而不是按值传递。</p>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><ul>
+<li>优先使用按const-引用传递而不是按值传递。它更具效率并且能够避免切片问题。</li>
+<li>这个规则不适用于内建类型，STL迭代器和函数对象类型。对于它们来说，按值传递通常是合适的。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/24/2017-02-24_07_51_读书笔记_effective_c++_Item_19_像设计类型（type）一样设计类/" rel="next" title="读书笔记 effective c++ Item 19 像设计类型（type）一样设计类">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 19 像设计类型（type）一样设计类
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/26/2017-02-26_19_06_读书笔记_effective_c++_Item_21_当你必须返回一个对象的时候，不要尝试返回引用/" rel="prev" title="读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用">
+                读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-按值传递参数会有效率问题"><span class="nav-number">1.</span> <span class="nav-text">1. 按值传递参数会有效率问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-按const引用传递会更高效"><span class="nav-number">2.</span> <span class="nav-text">2. 按const引用传递会更高效</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-按const引用传递能避免切片问题"><span class="nav-number">3.</span> <span class="nav-text">3. 按const引用传递能避免切片问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-什么情况下按值传递是合理的"><span class="nav-number">4.</span> <span class="nav-text">4. 什么情况下按值传递是合理的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-并不是对象小就应该按值传递"><span class="nav-number">5.</span> <span class="nav-text">5. 并不是对象小就应该按值传递</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-总结"><span class="nav-number">6.</span> <span class="nav-text">6. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

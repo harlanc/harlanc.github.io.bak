@@ -1,0 +1,904 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="智能指针的行为像是指针，但是没有提供加的功能。例如，Item 13中解释了如何使用标准auto_ptr和tr1::shared_ptr指针在正确的时间自动删">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型”">
+<meta property="og:url" content="http://yoursite.com/2017/04/10/2017-04-10_08_36_读书笔记_effective_c++_Item_45_使用成员函数模板来接受“所有兼容类型”/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="智能指针的行为像是指针，但是没有提供加的功能。例如，Item 13中解释了如何使用标准auto_ptr和tr1::shared_ptr指针在正确的时间自动删">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.228Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型”">
+<meta name="twitter:description" content="智能指针的行为像是指针，但是没有提供加的功能。例如，Item 13中解释了如何使用标准auto_ptr和tr1::shared_ptr指针在正确的时间自动删">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/10/2017-04-10_08_36_读书笔记_effective_c++_Item_45_使用成员函数模板来接受“所有兼容类型”/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型” | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/10/2017-04-10_08_36_读书笔记_effective_c++_Item_45_使用成员函数模板来接受“所有兼容类型”/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型”</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-10T08:36:00+08:00">
+                2017-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/10/2017-04-10_08_36_读书笔记_effective_c++_Item_45_使用成员函数模板来接受“所有兼容类型”/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/10/2017-04-10_08_36_读书笔记_effective_c++_Item_45_使用成员函数模板来接受“所有兼容类型”/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 45 使用成员函数模板来接受“所有兼容类型”">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><p>智能指针的行为像是指针，但是没有提供加的功能。例如，<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>中解释了如何使用标准auto_ptr和tr1::shared_ptr指针在正确的时间自动删<br><a id="more"></a><br>堆上的资源。STL容器中的迭代器基本上都是智能指针：当然，你不能通过使用“++”来将链表中的指向一个节点的内建指针移到下一个节点上去，但是list::iterator可以这么做。</p>
+<h2 id="1-问题分析——如何实现智能指针的隐式转换"><a href="#1-问题分析——如何实现智能指针的隐式转换" class="headerlink" title="1. 问题分析——如何实现智能指针的隐式转换"></a>1. 问题分析——如何实现智能指针的隐式转换</h2><p>真正的指针能够做好的一件事情是支持隐式转换。派生类指针可以隐式转换为基类指针，指向非const的指针可以隐式转换成为指向const对象的指针，等等。例如，考虑可以在一个三层继承体系中发生的转换：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Top</span> &#123; ... &#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Middle</span>: <span class="title">public</span> <span class="title">Top</span> &#123; ... &#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Bottom</span>: <span class="title">public</span> <span class="title">Middle</span> &#123; ... &#125;;</div><div class="line">Top *pt1 = <span class="keyword">new</span> Middle;           <span class="comment">// convert Middle* ⇒ Top*</span></div><div class="line"></div><div class="line">Top *pt2 = <span class="keyword">new</span> Bottom;          <span class="comment">// convert Bottom* ⇒ Top*</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> Top *pct2 = pt1;             <span class="comment">// convert Top* ⇒ const Top*</span></div></pre></td></tr></table></figure>
+<p>在用户自定义的智能指针中模仿这种转换是很微妙的。我们想让下面的代码通过编译：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">SmartPtr</span> &#123;</div><div class="line"><span class="keyword">public</span>: <span class="comment">// smart pointers are typically</span></div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">SmartPtr</span>(<span class="params">T *realPtr</span>)</span>; <span class="comment">// initialized by built-in pointers</span></div><div class="line">...</div><div class="line">&#125;;</div><div class="line">SmartPtr&lt;Top&gt; pt1 = <span class="comment">// convert SmartPtr&lt;Middle&gt; ⇒</span></div><div class="line">SmartPtr&lt;Middle&gt;(<span class="keyword">new</span> Middle); <span class="comment">// SmartPtr&lt;Top&gt;</span></div><div class="line">SmartPtr&lt;Top&gt; pt2 = <span class="comment">// convert SmartPtr&lt;Bottom&gt; ⇒</span></div><div class="line">SmartPtr&lt;Bottom&gt;(<span class="keyword">new</span> Bottom); <span class="comment">// SmartPtr&lt;Top&gt;</span></div><div class="line">SmartPtr&lt;<span class="keyword">const</span> Top&gt; pct2 = pt1; <span class="comment">// convert SmartPtr&lt;Top&gt; ⇒</span></div><div class="line"><span class="comment">// SmartPtr&lt;const Top&gt;</span></div></pre></td></tr></table></figure>
+<p>同一个模板的不同实例之间没有固有的关系，所以编译器将SmartPtr<middle>和SmartPtr<top>视为完全不同的类，它们之间的关系不比vector<float>和Widget来的近。为了实现SmartPtr类之间的转换，我们必须显示的实现。</float></top></middle></p>
+<p>在上面的智能指针示例代码中，每个语句都创建了一个新的智能指针对象，所以现在我们把焦点放在如何实现出一个行为表现如我们所愿的智能指针构造函数。关键的一点是没有办法实现我们需要的所有构造函数。在上面的继承体系中，我们可以用一个SmartPtr<middle>或一个SmartPtr<bottom>来构造一个SmartPtr<top>，但是如果这个继承体系在未来扩展了，SmartPtr<top>对象必须能够从其他智能指针类型中构造出来。例如，如果我们增加了下面的类：</top></top></bottom></middle></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">BelowBottom</span>: <span class="title">public</span> <span class="title">Bottom</span> &#123; ... &#125;;</div></pre></td></tr></table></figure>
+<p>我们将会需要支持用SmartPtr<belowbottom>对象来创建SmartPtr<top>对象，我们当然不想通过修改SmartPtr模板来实现它。</top></belowbottom></p>
+<h2 id="2-使用成员函数模板——泛化拷贝构造函数进行隐式转换"><a href="#2-使用成员函数模板——泛化拷贝构造函数进行隐式转换" class="headerlink" title="2. 使用成员函数模板——泛化拷贝构造函数进行隐式转换"></a>2. 使用成员函数模板——泛化拷贝构造函数进行隐式转换</h2><p>从原则上来说，我们所需要的构造函数的数量是没有限制的。既然模板可以被实例化成为没有限制数量的函数，因此看上去我们不需要一个SmartPtr的构造函数，我们需要的是一个构造函数模板。这样的模板是<strong>成员函数模板</strong>(member function templates) （也被叫做member templates）的一个例子——也即是为类产生成员函数的模板：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">SmartPtr</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">template&lt;typename U&gt; <span class="comment">// member template</span></div><div class="line">SmartPtr(<span class="keyword">const</span> SmartPtr&lt;U&gt;&amp; other); <span class="comment">// for a ”generalized</span></div><div class="line"></div><div class="line">...                                  <span class="comment">// copy constructor”</span></div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这就是说对于每个类型T和每个类型U，一个SmartPtr<t>能够用SmartPtr<u>创造出来，因为SmartPtr<t>有一个以SmartPtr<u>作为参数的构造函数 。像这样的构造函数——用一个对象来创建另外一个对象，两个对象来自于相同的模板但是它们为不同类型（例如，用SmartPtr<u>来创建SmartPtr<t>）,它通常被叫做<strong>泛化拷贝构造函数</strong>（generalized copy constructors）。</t></u></u></t></u></t></p>
+<h3 id="2-1-隐式转换不需要explicit"><a href="#2-1-隐式转换不需要explicit" class="headerlink" title="2.1 隐式转换不需要explicit"></a>2.1 隐式转换不需要explicit</h3><p>上面的泛化拷贝构造函数并没有被声明为explicit。这是经过仔细考虑的。内建指针类型之间的类型转换（例如从派生类转换到基类指针）是隐式的，并且不需要cast，因此智能指针模仿这种行为就是合理的。在模板化的构造函数上省略explicit正好做到了这一点。</p>
+<h3 id="2-2-将不符合要求的模板实例化函数剔除掉"><a href="#2-2-将不符合要求的模板实例化函数剔除掉" class="headerlink" title="2.2 将不符合要求的模板实例化函数剔除掉"></a>2.2 将不符合要求的模板实例化函数剔除掉</h3><p>为SmartPtr实现的泛化拷贝构造函数比我们想要的提供了更多的东西。我们想要用SmartPtr<bottom>创建SmartPtr<top>，但是我们不想用SmartPtr<top>创建SmartPtr<bottom>，因为这违背了public继承的含义（<a href="http://www.cnblogs.com/harlanc/p/6551155.html" title="Item 32" target="_blank" rel="external">Item 32</a>）。我们同样不想用SmartPtr<double>创建SmartPtr<int>,因为没有从double<em>到int</em>之间的隐式转换。因此，我们必须将成员模板生成的这种成员函数集合剔除掉。</int></double></bottom></top></top></bottom></p>
+<p>假设SmartPtr遵循auto_ptr和tr1::shared_ptr的设计，也提供一个get成员函数来返回智能指针对象所包含的内建类型指针的一份拷贝（<a href="http://www.cnblogs.com/harlanc/p/6418038.html" title="Item 15" target="_blank" rel="external">Item 15</a>），我们可以使用构造函数模板的实现来对一些转换进行限制：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"><span class="keyword">class</span> <span class="title">SmartPtr</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">template&lt;typename U&gt;</div><div class="line">SmartPtr(<span class="keyword">const</span> SmartPtr&lt;U&gt;&amp; other) <span class="comment">// initialize this held ptr</span></div><div class="line">: heldPtr(other.<span class="keyword">get</span>()) &#123; ... &#125; <span class="comment">// with other’s held ptr</span></div><div class="line">T* <span class="keyword">get</span>() <span class="keyword">const</span> &#123; <span class="keyword">return</span> heldPtr; &#125;</div><div class="line">...</div><div class="line"><span class="keyword">private</span>: <span class="comment">// built-in pointer held</span></div><div class="line">T *heldPtr; <span class="comment">// by the SmartPtr</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们在成员初始化列表中用SmartPtr<u>中包含的类型为U<em>的指针来初始化SmartPtr<t>中的类型为T</t></em>的数据成员。这只有在能够从U<em>指针到T</em>指针进行隐式转换的情况下才能通过编译，这也正是我们所需要的。实际结果是现在SmartPtr<t>有了一个泛化拷贝构造函数，只有传递的参数为兼容类型时才能够通过编译。</t></u></p>
+<h2 id="3-成员函数模板对赋值的支持"><a href="#3-成员函数模板对赋值的支持" class="headerlink" title="3. 成员函数模板对赋值的支持"></a>3. 成员函数模板对赋值的支持</h2><p>成员函数模板的使用不仅仅限定在构造函数上。它们的另外一个普通的角色是对赋值的支持。例如，tr1的shared_ptr（<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>）支持用所有兼容的内建指针来对其进行构造，可以用tr1::shared_ptr，auto_ptr和tr1::weak_ptr（Item 54）来进行构造，对赋值也同样使用，但是tr1::weak_ptr例外。下面是从tr1的说明中摘录下来的tr1::shared_ptr的实现，可以看到在声明模板参数的时候它倾向于使用class而不是typename。（<a href="http://www.cnblogs.com/harlanc/p/6661228.html" title="Item 42" target="_blank" rel="external">Item 42</a>中描述的，在这个上下文中它们的意义相同。）</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">template&lt;class T&gt; class shared_ptr &#123;</div><div class="line">public:</div><div class="line"></div><div class="line">template&lt;class Y&gt;                              // construct from</div><div class="line"></div><div class="line">explicit shared_ptr(Y * p);                   // any compatible</div><div class="line"></div><div class="line">template&lt;class Y&gt;                              // built-in pointer,</div><div class="line"></div><div class="line">shared_ptr(shared_ptr&lt;Y&gt; const&amp; r); // shared_ptr,</div><div class="line">template&lt;class Y&gt; // weak_ptr, or</div><div class="line"></div><div class="line">explicit shared_ptr(weak_ptr&lt;Y&gt; const&amp; r);    // auto_ptr</div><div class="line"></div><div class="line">template&lt;class Y&gt;                                          </div><div class="line"></div><div class="line">explicit shared_ptr(auto_ptr&lt;Y&gt;&amp; r);             </div><div class="line"></div><div class="line">template&lt;class Y&gt; // assign from</div><div class="line">shared_ptr&amp; operator=(shared_ptr&lt;Y&gt; const&amp; r); // any compatible</div><div class="line">template&lt;class Y&gt; // shared_ptr or</div><div class="line">shared_ptr&amp; operator=(auto_ptr&lt;Y&gt;&amp; r); // auto_ptr</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>所有的这些构造函数都是explicit的，除了泛化拷贝构造函数。这就意味着从shared_ptr的一种类型隐式转换到shared_ptr的另一种类型是允许的，但是内建类型指针和其他的智能指针类型到shared_ptr的隐式转换是禁止的。（显示的转换是可以的（例如通过使用cast））。同样有趣的是传递给tr1::shared_ptr构造函数和赋值运算符的auto_ptr没有被声明为const，但是tr1::shared_ptr和tr1::weak_ptr的传递却声明为const了。这是因为auto_ptr被拷贝的时候已经被修改了（Item 13）。</p>
+<h2 id="4-成员函数模板会生成默认拷贝构造函数"><a href="#4-成员函数模板会生成默认拷贝构造函数" class="headerlink" title="4. 成员函数模板会生成默认拷贝构造函数"></a>4. 成员函数模板会生成默认拷贝构造函数</h2><p>成员函数模板是美好的东西，但是它们没有修改语言的基本规则。<a href="http://www.cnblogs.com/harlanc/p/6390731.html" title="Item 5" target="_blank" rel="external">Item 5</a>解释了编译器会自动生成的4个成员函数中的两个函数为拷贝构造函数和拷贝赋值运算符。Tr1::shared_ptr声明了一个泛化拷贝构造函数，很清楚的是如果类型T和类型Y是相同的，泛化拷贝构造函数就会被实例化成一个“普通”的拷贝构造函数。那么编译器会为tr1::shared_ptr生成一个拷贝构造函数么？或者说用相同类型的tr1::shared_ptr构造另外一个tr1::shared_ptr的时候，编译器会实例化泛化拷贝构造函数么？</p>
+<p>正如我所说的，成员模板没有修改语言的规则。“如果你需要一个拷贝构造函数而你没有自己声明，编译器会为你生成一个”这条规则也是其中之一。在一个类中声明一个泛化拷贝构造函数（一个member template）不会阻止编译器生成它们自己的拷贝构造函数（non-template），所以如果你想控制拷贝构造函数的所有方面，你必须同时声明一个泛化拷贝构造函数和“普通的”构造函数。对于赋值同样适用。下面是tr1::shared_ptr的定义：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">template&lt;class T&gt; class shared_ptr &#123;</div><div class="line">public:</div><div class="line">shared_ptr(shared_ptr const&amp; r);       // copy constructor</div><div class="line"></div><div class="line">template&lt;class Y&gt;                        // generalized</div><div class="line"></div><div class="line">shared_ptr(shared_ptr&lt;Y&gt; const&amp; r);       // copy constructor</div><div class="line"></div><div class="line">shared_ptr&amp; operator=(shared_ptr const&amp; r);            // copy assignment</div><div class="line"></div><div class="line">template&lt;class Y&gt;                                     // generalized</div><div class="line"></div><div class="line">shared_ptr&amp; operator=(shared_ptr&lt;Y&gt; const&amp; r); // copy assignment</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><ul>
+<li>使用成员函数模板来生成接受所有兼容类型的函数。</li>
+<li>如果你为泛化拷贝构造函数和泛化赋值运算符声明成员模板，你同样需要声明普通的拷贝构造函数和拷贝赋值运算符。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/07/2017-04-07_22_01_读书笔记_effective_c++_Item_44__将与模板参数无关的代码抽离出来/" rel="next" title="读书笔记 effective c++ Item 44  将与模板参数无关的代码抽离出来">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 44  将与模板参数无关的代码抽离出来
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/11/2017-04-11_08_38_读书笔记_effective_c++_Item_46_如果想进行类型转换，在模板内部定义非成员函数/" rel="prev" title="读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数">
+                读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-问题分析——如何实现智能指针的隐式转换"><span class="nav-number">1.1.</span> <span class="nav-text">1. 问题分析——如何实现智能指针的隐式转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-使用成员函数模板——泛化拷贝构造函数进行隐式转换"><span class="nav-number">1.2.</span> <span class="nav-text">2. 使用成员函数模板——泛化拷贝构造函数进行隐式转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-隐式转换不需要explicit"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 隐式转换不需要explicit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-将不符合要求的模板实例化函数剔除掉"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 将不符合要求的模板实例化函数剔除掉</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-成员函数模板对赋值的支持"><span class="nav-number">1.3.</span> <span class="nav-text">3. 成员函数模板对赋值的支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-成员函数模板会生成默认拷贝构造函数"><span class="nav-number">1.4.</span> <span class="nav-text">4. 成员函数模板会生成默认拷贝构造函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-number">1.5.</span> <span class="nav-text">5. 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

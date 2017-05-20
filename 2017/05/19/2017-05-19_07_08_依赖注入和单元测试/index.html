@@ -1,0 +1,900 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="软件工程,单元测试," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Inj">
+<meta name="keywords" content="软件工程,单元测试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="依赖注入和单元测试">
+<meta property="og:url" content="http://yoursite.com/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Inj">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518224926666-1842361008.jpg">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518225528775-2016525207.jpg">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.986Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="依赖注入和单元测试">
+<meta name="twitter:description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Inj">
+<meta name="twitter:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518224926666-1842361008.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/"/>
+
+
+
+
+
+  <title>依赖注入和单元测试 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">依赖注入和单元测试</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-19T07:08:00+08:00">
+                2017-05-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/" class="leancloud_visitors" data-flag-title="依赖注入和单元测试">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="http://www.cnblogs.com/harlanc/p/6838155.html" title="上一篇" target="_blank" rel="external">上一篇</a>博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接：</p>
+<p><a href="http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html" target="_blank" rel="external">http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html</a> </p>
+<p>近些年来对于依赖注入（Dependency Inj<br><a id="more"></a><br>ction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听说过Spring框架（Spring Framework）,就是所谓的依赖注入容器，在你的印象里面依赖注入和Spring是等同的。但这个想法是错误的，依赖注入是一个很简单的概念，它可以被应用到任何地方，除了依赖注入容器之外，它同样能够被应用到单元测试中。这篇文章我们讨论一下几点：</p>
+<ul>
+<li>什么是依赖注入</li>
+<li>如何实现一个友好的依赖注入类</li>
+<li>为什么依赖注入可以使单元测试更加简单</li>
+</ul>
+<p>Ladies and gentlemen,开动你的引擎！</p>
+<h2 id="1-一辆简单的car"><a href="#1-一辆简单的car" class="headerlink" title="1. 一辆简单的car"></a>1. 一辆简单的car</h2><p><img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518224926666-1842361008.jpg" alt=""></p>
+<p>首先我们考虑一个简单的例子，这里我们使用engine 类和car 类。为了更加清楚的描述问题，我们将类和接口都置空。每辆car会有一个engine，我们想给car装备上著名的MooseEngine。</p>
+<p>Engine类如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">Engine</span> &#123;</div><div class="line">&#125;</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SlowEngine</span> <span class="title">implements</span> <span class="title">Engine</span> &#123;</div><div class="line">&#125;</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FastEngine</span> <span class="title">implements</span> <span class="title">Engine</span> &#123;</div><div class="line">&#125;</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MooseEngine</span> <span class="title">implements</span> <span class="title">Engine</span> &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后我们可以得到一个car类：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Car</span> &#123;</div><div class="line"><span class="keyword">private</span> MooseEngine engine;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这是一辆非常棒的汽车，但是即使有其他种类的引擎上市，我们也不能装备这些引擎了。我们说这里的car类和MooseEngine类是紧耦合的（tightly coupled）。虽然MooseEngine很棒，但是如果我们想把它换成别的引擎呢？</p>
+<h2 id="2-接口编程"><a href="#2-接口编程" class="headerlink" title="2. 接口编程"></a>2. 接口编程</h2><p> 你可能已经注意到了MooseEngine实现了Engine接口。其它引擎也实现了同样的接口。我们可以想一想，当我们设计我们的Car类时，我们想让一辆“car”装备一个“engine”。所以我们重新实现一个Car类，这次我们使用Engine接口：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Car</span> &#123;</div><div class="line"><span class="keyword">private</span> Engine engine;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>接口编程是依赖注入中的一个很重要的概念。我听到了你的尖叫，“等一下，你在这里使用接口，具现类（<em>concrete class</em>）该怎么办？你在哪里设置（set）引擎？我想在我的汽车中装备MooseEngine”。我们可以按下面的方式来设置它：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Car</span> &#123;</div><div class="line"><span class="keyword">private</span> Engine engine = <span class="keyword">new</span> MooseEngine();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>但这就是有用的么？它看上去和第一个例子没有多大区别。我们的car仍然同MooseEngine是紧耦合的。那么，我们该如何设置(set或者说注入(inject))我们的汽车引擎呢？</p>
+<h2 id="3-依赖注入介绍"><a href="#3-依赖注入介绍" class="headerlink" title="3. 依赖注入介绍"></a>3. 依赖注入介绍</h2><p>就像依赖注入这个名字一样，依赖注入就是注入依赖，或者简单的说，设置不同实例之间的关系。一些人将它同好莱坞的一条规矩关联了起来,“不要给我打掉话，我打给你。”我更喜欢叫它“bugger”法则：“我不关心你是谁，按我说的做。”在我们的第一个例子中，Car依赖的是Engine的具现类MooseEngine。当一个类A依赖于另外一个类B的时候，类Ｂ的实现直接在类Ａ中设置，我们说Ａ紧耦合于B。第二个例子中，我们决定使用接口来代替 具现类MooseEngine，这样就使得Car类更加灵活。并且我们决定不去定义engine的具现类实现。换句话说，我们使Car类变为松耦合(loosely coupled)的了。Car不再依赖于任何引擎的具现类了。那么在哪里指定我们需要使用哪个引擎呢？依赖注入该登场了。我们不在Car类中设置具现化的Engine类，而是从外面注入。这又该如何实现呢？ </p>
+<h3 id="3-1-使用构造函数来注入依赖"><a href="#3-1-使用构造函数来注入依赖" class="headerlink" title="3.1 使用构造函数来注入依赖"></a>3.1 使用构造函数来注入依赖</h3><p>设置依赖的一种方法是把依赖类的具体实现传递给构造函数。Car类将会变成下面这个样子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Car</span> &#123;</div><div class="line"><span class="keyword">private</span> Engine engine;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">Car</span>(<span class="params">Engine engine</span>) </span>&#123;</div><div class="line"><span class="keyword">this</span>.engine = engine;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后我们就可以用任何种类的engine来创建Car了。例如，一个car使用MooseEngine，另外一个使用crappy SlowEngine:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span> &#123;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>) </span>&#123;</div><div class="line">Car myGreatCar = <span class="keyword">new</span> Car(<span class="keyword">new</span> MooseEngine());</div><div class="line">Car hisCrappyCar = <span class="keyword">new</span> Car(<span class="keyword">new</span> SlowEngine());</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="3-2-使用setter来注入依赖"><a href="#3-2-使用setter来注入依赖" class="headerlink" title="3.2 使用setter来注入依赖"></a>3.2 使用setter来注入依赖</h3><p>另外一种设置依赖的普通方法就使用setter方法。当需要注入很多依赖的时候，建议使用setter方法而不是构造函数。我们的car类将会被实现成下面的样子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Car</span> &#123;</div><div class="line"><span class="keyword">private</span> Engine engine;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEngine</span>(<span class="params">Engine engine</span>) </span>&#123;</div><div class="line"><span class="keyword">this</span>.engine = engine;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>它和基于构造函数的依赖注入非常类似，于是我们可以用下面的方法来实现上面同样的cars：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span> &#123;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>) </span>&#123;</div><div class="line">Car myGreatCar = <span class="keyword">new</span> Car();</div><div class="line">myGreatCar.setEngine(<span class="keyword">new</span> MooseEngine());</div><div class="line">Car hisCrappyCar = <span class="keyword">new</span> Car();</div><div class="line">hisCrappyCar.setEngine(<span class="keyword">new</span> SlowEngine());</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="4-在单元测试中使用依赖注入"><a href="#4-在单元测试中使用依赖注入" class="headerlink" title="4. 在单元测试中使用依赖注入"></a>4. 在单元测试中使用依赖注入</h2><p><img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518225528775-2016525207.jpg" alt=""></p>
+<p>如果你将Car类的第一个例子同使用setter依赖注入的例子进行比较，你可能认为后者使用了额外的步骤来实现Car类的依赖注入。这没错，你必须实现一个setter方法。但是当你在做单元测试的时候，你会感觉到这些额外的工作都是值得的。如果你对单元测试不熟悉，推荐你看一下这个帖子<a href="http://www.cnblogs.com/harlanc/p/6838155.html" target="_blank" rel="external">单元测试有毒</a> 。我们的Car的例子太简单了，并没有把依赖注入对单元测试的重要性体现的很好。因此我们不再使用这个例子，我们使用前面已经讲述过的关于篝火故事的例子，特别是在<a href="http://www.cnblogs.com/harlanc/p/6838155.html#_label4" target="_blank" rel="external">在单元测试中使用mock</a>中的部分。我们有一个servlet类，通过使用远端EJB来在农场中”注册”动物：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FarmServlet</span> <span class="title">extends</span> <span class="title">ActionServlet</span> &#123;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAction</span>(<span class="params"> ServletData servletData </span>) throws Exception </span>&#123;</div><div class="line">String species = servletData.getParameter(<span class="string">"species"</span>);</div><div class="line">String buildingID = servletData.getParameter(<span class="string">"buildingID"</span>);</div><div class="line"><span class="keyword">if</span> ( Str.usable( species ) &amp;&amp; Str.usable( buildingID ) ) &#123;</div><div class="line">FarmEJBRemote remote = FarmEJBUtil.getHome().create();</div><div class="line">                       remote.addAnimal( species , buildingID );</div><div class="line">               &#125;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>你已经注意到了FarmServlet被紧耦合到了FarmEJBRemote实例中，通过调用“FarmEJBUtil.getHome().create()”来取回实例值。这么做会非常难做单元测试。当作单元测试的时候，我们不想使用任何数据库。我们也不想访问EJB服务器。因为这不仅会使单元测试很难进行而且会使其变慢。所以为了能够顺利的为FarmServlet类做单元测试，最好使其变成松耦合的。为了清除FarmServlet和FarmEJBRemote之间的紧依赖关系，我们可以使用基于setter的依赖注入：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FarmServlet</span> <span class="title">extends</span> <span class="title">ActionServlet</span> &#123;</div><div class="line"><span class="keyword">private</span> FarmEJBRemote remote;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setRemote</span>(<span class="params">FarmEJBRemote remote</span>) </span>&#123;</div><div class="line"><span class="keyword">this</span>.remote = remote;</div><div class="line">        &#125;  </div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAction</span>(<span class="params"> ServletData servletData </span>) throws Exception </span>&#123;</div><div class="line">String species = servletData.getParameter(<span class="string">"species"</span>);</div><div class="line">String buildingID = servletData.getParameter(<span class="string">"buildingID"</span>);</div><div class="line"><span class="keyword">if</span> ( Str.usable( species ) &amp;&amp; Str.usable( buildingID ) ) &#123;</div><div class="line">                       remote.addAnimal( species , buildingID );</div><div class="line">               &#125;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在真实的部署包中，我们确保通过调用“FarmEJBUtil.getHome().create()”而创建的一个FarmServlet远端成员实例会被注入。在我们的单元测试中，我们使用一个虚拟的mock类来模拟FarmEJBRemote。换句话说，我们通过使用mock类来实现FarmEJBRemote:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">MockFarmEJBRemote</span> <span class="title">implements</span> <span class="title">FarmEJBRemote</span> &#123;</div><div class="line"><span class="keyword">private</span> String species = <span class="literal">null</span>;</div><div class="line"><span class="keyword">private</span> String buildingID = <span class="literal">null</span>;</div><div class="line"><span class="keyword">private</span> <span class="keyword">int</span> nbCalls = <span class="number">0</span>;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addAnimal</span>(<span class="params"> String species , String buildingID </span>)</span></div><div class="line">        &#123;</div><div class="line"><span class="keyword">this</span>.species = species ;</div><div class="line"><span class="keyword">this</span>.buildingID = buildingID ;</div><div class="line"><span class="keyword">this</span>.nbCalls++;</div><div class="line">        &#125;</div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getSpecies</span>(<span class="params"></span>) </span>&#123;</div><div class="line"><span class="keyword">return</span> species;</div><div class="line">        &#125;</div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getBuildingID</span>(<span class="params"></span>) </span>&#123;</div><div class="line"><span class="keyword">return</span> buildingID;</div><div class="line">        &#125;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNbCalls</span>(<span class="params"></span>) </span>&#123;</div><div class="line"><span class="keyword">return</span> nbCalls;</div><div class="line">        &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TestFarmServlet</span> <span class="title">extends</span> <span class="title">TestCase</span> &#123;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAddAnimal</span>(<span class="params"></span>) throws Exception </span>&#123;</div><div class="line"><span class="comment">// Our mock acting like a FarmEJBRemote</span></div><div class="line">MockFarmEJBRemote mockRemote = <span class="keyword">new</span> MockFarmEJBRemote();</div><div class="line"><span class="comment">// Our servlet. We set our mock to its remote dependency</span></div><div class="line">FarmServlet servlet = <span class="keyword">new</span> FarmServlet();</div><div class="line">               servlet.setRemote(mockRemote);</div><div class="line"><span class="comment">// just another mock acting like a ServletData</span></div><div class="line">MockServletData mockServletData = <span class="keyword">new</span> MockServletData(); </div><div class="line">mockServletData.getParameter_returns.put(<span class="string">"species"</span>,<span class="string">"dog"</span>);</div><div class="line">mockServletData.getParameter_returns.put(<span class="string">"buildingID"</span>,<span class="string">"27"</span>);</div><div class="line">               servlet.doAction( mockServletData );</div><div class="line">assertEquals( <span class="number">1</span> , mockRemote.getNbCalls() );</div><div class="line">assertEquals( <span class="string">"dog"</span> , mockRemote.getSpecies() );</div><div class="line">assertEquals( <span class="number">27</span> , mockRemote.getBuildingID() );</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样很容易就能测试FarmServlet了。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><ul>
+<li>使用接口而非具现类来表现依赖。</li>
+<li>避免在类中隐式的设置（set）一个依赖的<strong>具体实现</strong>。</li>
+<li>依赖的具体实现有很多种方法，包括基于构造函数的依赖注入和基于setter的依赖注入</li>
+<li>依赖注入使单元测试变的非常灵活。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/软件工程/" rel="tag"># 软件工程</a>
+          
+            <a href="/tags/单元测试/" rel="tag"># 单元测试</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/10/2017-05-10_21_13_单元测试有毒/" rel="next" title="单元测试有毒">
+                <i class="fa fa-chevron-left"></i> 单元测试有毒
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-一辆简单的car"><span class="nav-number">1.</span> <span class="nav-text">1. 一辆简单的car</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-接口编程"><span class="nav-number">2.</span> <span class="nav-text">2. 接口编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-依赖注入介绍"><span class="nav-number">3.</span> <span class="nav-text">3. 依赖注入介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-使用构造函数来注入依赖"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 使用构造函数来注入依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-使用setter来注入依赖"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 使用setter来注入依赖</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-在单元测试中使用依赖注入"><span class="nav-number">4.</span> <span class="nav-text">4. 在单元测试中使用依赖注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

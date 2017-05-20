@@ -1,0 +1,929 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. swap如此重要Swap是一个非常有趣的函数，最初作为STL的一部分来介绍，它已然变成了异常安全编程的中流砥柱（**Item 29）,也是在拷贝中应对自我赋值的一种普通机制**（Item 11）。Swap非常有用，恰当的实现swap是非常重要的，与重要性伴随而来的是一些并发症。在这个条款中，我们将探索这些并发症以及如何处理它们。 2. swap的傻瓜实现方式及缺陷2.1 swap函数的默认实">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 25 实现一个不抛出异常的swap">
+<meta property="og:url" content="http://yoursite.com/2017/03/02/2017-03-02_21_36_读书笔记_effective_c++_Item_25_实现一个不抛出异常的swap/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. swap如此重要Swap是一个非常有趣的函数，最初作为STL的一部分来介绍，它已然变成了异常安全编程的中流砥柱（**Item 29）,也是在拷贝中应对自我赋值的一种普通机制**（Item 11）。Swap非常有用，恰当的实现swap是非常重要的，与重要性伴随而来的是一些并发症。在这个条款中，我们将探索这些并发症以及如何处理它们。 2. swap的傻瓜实现方式及缺陷2.1 swap函数的默认实">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.634Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 25 实现一个不抛出异常的swap">
+<meta name="twitter:description" content="1. swap如此重要Swap是一个非常有趣的函数，最初作为STL的一部分来介绍，它已然变成了异常安全编程的中流砥柱（**Item 29）,也是在拷贝中应对自我赋值的一种普通机制**（Item 11）。Swap非常有用，恰当的实现swap是非常重要的，与重要性伴随而来的是一些并发症。在这个条款中，我们将探索这些并发症以及如何处理它们。 2. swap的傻瓜实现方式及缺陷2.1 swap函数的默认实">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/02/2017-03-02_21_36_读书笔记_effective_c++_Item_25_实现一个不抛出异常的swap/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 25 实现一个不抛出异常的swap | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/02/2017-03-02_21_36_读书笔记_effective_c++_Item_25_实现一个不抛出异常的swap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 25 实现一个不抛出异常的swap</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-02T21:36:00+08:00">
+                2017-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/02/2017-03-02_21_36_读书笔记_effective_c++_Item_25_实现一个不抛出异常的swap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/02/2017-03-02_21_36_读书笔记_effective_c++_Item_25_实现一个不抛出异常的swap/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 25 实现一个不抛出异常的swap">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-swap如此重要"><a href="#1-swap如此重要" class="headerlink" title="1. swap如此重要"></a>1. swap如此重要</h2><p>Swap是一个非常有趣的函数，最初作为STL的一部分来介绍，<strong>它已然变成了异常安全编程的中流砥柱（**</strong>Item 29<strong><strong>）,</strong></strong>也是在拷贝中应对自我赋值的一种普通机制**（<a href="http://www.cnblogs.com/harla
+&lt;!--more--&gt;
+c/p/6403929.html" title="Item 11" target="_blank" rel="external">Item 11</a>）。Swap非常有用，恰当的实现swap是非常重要的，与重要性伴随而来的是一些并发症。在这个条款中，我们将探索这些并发症以及如何处理它们。</p>
+<h2 id="2-swap的傻瓜实现方式及缺陷"><a href="#2-swap的傻瓜实现方式及缺陷" class="headerlink" title="2. swap的傻瓜实现方式及缺陷"></a>2. swap的傻瓜实现方式及缺陷</h2><h3 id="2-1-swap函数的默认实现"><a href="#2-1-swap函数的默认实现" class="headerlink" title="2.1 swap函数的默认实现"></a>2.1 swap函数的默认实现</h3><p>Swap函数就是将两个对象的值进行交换，可以通过使用标准的swap算法来实现：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">namespace</span> <span class="title">std</span> &#123;</div><div class="line"></div><div class="line">template&lt;typename T&gt; <span class="comment">// typical implementation of std::swap;</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span>(<span class="params">T&amp; a, T&amp; b</span>) <span class="comment">// swaps a’s and b’s values</span></span></div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line"><span class="function">T <span class="title">temp</span>(<span class="params">a</span>)</span>;</div><div class="line"></div><div class="line">a = b;</div><div class="line"></div><div class="line">b = temp;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>只要你的类型支持拷贝（拷贝构造函数和拷贝赋值运算符），默认的swap实现不需要你做一些特别的工作来支持它。</p>
+<h3 id="2-2-swap函数默认实现的缺陷——有可能效率低"><a href="#2-2-swap函数默认实现的缺陷——有可能效率低" class="headerlink" title="2.2 swap函数默认实现的缺陷——有可能效率低"></a>2.2 swap函数默认实现的缺陷——有可能效率低</h3><p>然而，默认的swap实现也许并没有让你激动，它包括三次拷贝：a 拷贝到temp，b拷贝到a, temp拷贝到b。对于一些类型来说，这些拷贝不是必须的，默认的swap将你从快车道拉到了慢车道。</p>
+<p>这些不需要拷贝的类型内部通常包含了指针，指针指向包含真实数据的其他类型。使用这种设计方法的一个普通的例子就是“pimpl idiom”(指向实现的指针 Item 31).举个例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">class WidgetImpl &#123; // class for Widget data;</div><div class="line"></div><div class="line">public: // details are unimportant</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">int a, b, c; // possibly lots of data —</div><div class="line"></div><div class="line">std::vector&lt;double&gt; v; // expensive to copy!</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">class Widget &#123; // class using the pimpl idiom</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">Widget(const Widget&amp; rhs);</div><div class="line"></div><div class="line">Widget&amp; operator=(const Widget&amp; rhs) // to copy a Widget, copy its</div><div class="line"></div><div class="line">&#123; // WidgetImpl object. For</div><div class="line"></div><div class="line">... // details on implementing</div><div class="line"></div><div class="line">*pImpl = *(rhs.pImpl); // operator= in general,</div><div class="line"></div><div class="line">... // see [Items 10](http://www.cnblogs.com/harlanc/p/6403918.html "Item 10"), [Item 11](http://www.cnblogs.com/harlanc/p/6403929.html "Item 11"), and [Item 12](http://www.cnblogs.com/harlanc/p/6408205.html "Item 12").</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">WidgetImpl *pImpl; // ptr to object with this</div><div class="line"></div><div class="line">&#125;; // Widget’s data</div></pre></td></tr></table></figure>
+<p>为了交换两个Widget对象的值，我们实际上唯一需要做的是交换两个pImpl指针，但是默认的swap算法没有办法能够获知这些。它不仅拷贝了三个Widget对象，还拷贝了三个WidgetImpl对象。非常没有效率，也不令人鸡冻。</p>
+<h2 id="3-如何实现一个高效的swap"><a href="#3-如何实现一个高效的swap" class="headerlink" title="3. 如何实现一个高效的swap"></a>3. 如何实现一个高效的swap</h2><h3 id="3-1-为普通类定义全特化版本swap"><a href="#3-1-为普通类定义全特化版本swap" class="headerlink" title="3.1 为普通类定义全特化版本swap"></a>3.1 为普通类定义全特化版本swap</h3><p>我们需要做的就是告诉std::swap当Widget对象被swap的时候，执行swap的方式是swap内部的pImpl指针。也就是为Widget定制一个std::swap。这是最基本的想法，看下面的代码，但是不能通过编译。。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">namespace</span> <span class="title">std</span> &#123;</div><div class="line"></div><div class="line">template&lt;&gt; <span class="comment">// this is a specialized version</span></div><div class="line"></div><div class="line"><span class="keyword">void</span> swap&lt;Widget&gt;(Widget&amp; a, <span class="comment">// of std::swap for when T is</span></div><div class="line"></div><div class="line">Widget&amp; b) <span class="comment">// Widget</span></div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">swap(a.pImpl, b.pImpl); <span class="comment">// to swap Widgets, swap their</span></div><div class="line"></div><div class="line">&#125; <span class="comment">// pImpl pointers; this won’t</span></div><div class="line"></div><div class="line">compile</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>开始的”templpate&lt;&gt;”说明这是对std::swap的模板全特化（total template specializaiton）,名字后面的”<widget>”是说明这个特化只针对T为Widget类型。换句话说，当泛化的swap模板被应用到Widget类型时，应该使用上面的实现方法。一般来说，<strong>我们不允许修改**</strong>std<strong>**命名空间的内容，但是却允许使用我们自己创建的类型对标准模板进行全特化</strong>。</widget></p>
+<p>但是这个函数不能编译通过。这是因为它尝试访问a和b中的pImpl指针，它们是private的。我们可以将我们的特化函数声明成friend，但是传统做法却是这样：在Widget中声明一个真正执行swap的public成员函数swap，让std::swap调用成员函数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">class Widget &#123; // same as above, except for the</div><div class="line"></div><div class="line">public: // addition of the swap mem func</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">void swap(Widget&amp; other)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">using std::swap; // the need for this declaration</div><div class="line"></div><div class="line">// is explained later in this Item</div><div class="line"></div><div class="line">swap(pImpl, other.pImpl); // to swap Widgets, swap their</div><div class="line"></div><div class="line">&#125; // pImpl pointers</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">namespace std &#123;</div><div class="line"></div><div class="line">template&lt;&gt; // revised specialization of</div><div class="line"></div><div class="line">void swap&lt;Widget&gt;(Widget&amp; a, // std::swap</div><div class="line"></div><div class="line">Widget&amp; b)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">a.swap(b); // to swap Widgets, call their</div><div class="line"></div><div class="line">&#125; // swap member function</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这种做法不仅编译能通过，同STL容器一致，它们都同时为swap提供了public成员函数版本和调用成员函数的std::swap版本。</p>
+<h3 id="3-2-为模板类定义偏特化版本swap"><a href="#3-2-为模板类定义偏特化版本swap" class="headerlink" title="3.2 为模板类定义偏特化版本swap"></a>3.2 为模板类定义偏特化版本swap</h3><p>然而假设Widget和WidgetImpl换成了类模版，我们就将存储在WidgetImpl中的数据类型替换成一个模板参数：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">WidgetImpl</span> &#123; ... &#125;;</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Widget</span> &#123; ... &#125;;</div></pre></td></tr></table></figure>
+<p>在Widget中实现一个swap成员函数和原来一样简单，但是std::swap的特化遇到了麻烦。下面是我们想写出来的：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">namespace</span> <span class="title">std</span> &#123;</div><div class="line"></div><div class="line">template&lt;typename T&gt;</div><div class="line"></div><div class="line"><span class="keyword">void</span> swap&lt;Widget&lt;T&gt; &gt;(Widget&lt;T&gt;&amp; a, <span class="comment">// error! illegal code!</span></div><div class="line"></div><div class="line">Widget&lt;T&gt;&amp; b)</div><div class="line"></div><div class="line">&#123; a.swap(b); &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码看上去完全合理，但却是不合法的。我们尝试偏特化（partially specialize）一个模板(std::swap),<strong>虽然允许对类模版进行偏特化，却不允许对函数模板进行偏特化</strong>。因此这段代码不能通过编译（虽然有些编译器错误的通过了编译）。</p>
+<p><strong>当你想“偏特化”一个函数模板的时候，常见的方法是添加一个重载函数</strong>。像下面这样：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">namespace</span> <span class="title">std</span> &#123;</div><div class="line"></div><div class="line">template&lt;typename T&gt; <span class="comment">// an overloading of std::swap</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span>(<span class="params">Widget&lt;T&gt;&amp; a, // (note the lack of “&lt;...&gt;” after</span></span></div><div class="line"></div><div class="line">Widget&lt;T&gt;&amp; b) <span class="comment">// “swap”), but see below for</span></div><div class="line"></div><div class="line">&#123; a.swap(b); &#125; <span class="comment">// why this isn’t valid code</span></div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>一般来说，对函数模板进行重载是可以的，但是std是一个特殊的命名空间，使用它的规则也很特殊。<strong>在**</strong>std<strong>**中进行全特化是可以的，但是添加新的模板（类，函数或其他任何东西）不可以。</strong>Std的内容完全由C++标准委员会来决定。越过这条线的程序肯定可以通过编译并且能运行，但是行为未定义。如果你想你的软件有可预测的行为，不要向std中添加新东西。</p>
+<p>那该怎么做呢？我们仍然需要一种方式来让其他人调用我们的高效的模板特化版本的swap。答案很简单。我们仍然声明一个调用成员函数swap的非成员swap，但我们不将非成员函数声明为std::swap的特化或者重载。举个例子，和 Widget相关的功能被定义在命名空间WidgetStuff中，像下面这样：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">namespace</span> <span class="title">WidgetStuff</span> &#123;</div><div class="line"></div><div class="line">... <span class="comment">// templatized WidgetImpl, etc.</span></div><div class="line"></div><div class="line">template&lt;typename T&gt; <span class="comment">// as before, including the swap</span></div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Widget</span> &#123; ... &#125;; <span class="comment">// member function</span></div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">template&lt;typename T&gt; <span class="comment">// non-member swap function;</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span>(<span class="params">Widget&lt;T&gt;&amp; a, // not part of the std namespace</span></span></div><div class="line"></div><div class="line">Widget&lt;T&gt;&amp; b)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">a.swap(b);</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在，如果在任何地方调用swap，C++ 中的名字搜寻策略（name lookup rules）将会在WidgetStuff中搜寻Widget的指定版本。这正是我们需要的。</p>
+<h2 id="4-普通类中swap的特化版本和非成员函数版本都需要提供"><a href="#4-普通类中swap的特化版本和非成员函数版本都需要提供" class="headerlink" title="4. 普通类中swap的特化版本和非成员函数版本都需要提供"></a>4. 普通类中swap的特化版本和非成员函数版本都需要提供</h2><p>这种方法对类同样有效，所以看上去我们应该在任何情况下都使用它。不幸的是，你还需要为类提供特化的std::swap（稍后解释）版本，所以如果你想在尽可能多的上下文环境中调用swap的类特定版本，你需要同时在类命名空间中定义swap的非成员函数版本和std::swap的特化版本。</p>
+<h2 id="5-调用swap时的搜寻策略"><a href="#5-调用swap时的搜寻策略" class="headerlink" title="5. 调用swap时的搜寻策略"></a>5. 调用swap时的搜寻策略</h2><p>至今为止我已经实现的都要从属于swap的作者，但从客户角度来看有一种情况值得注意。假设你正在实现一个函数模板，函数中需要对两个对象的值进行swap：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomething</span>(<span class="params">T&amp; obj1, T&amp; obj2</span>)</span></div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">swap(obj1, obj2);</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>他会调用swap的哪个版本？已存的std中的版本？可能存在也可能不存在的std中的特化版本？还是可能存在也可能不存在的，可能在一个命名空间内也可能不在一个命名空间内（肯定不应该在std中）T特定版本？你所需要的是如果有的话就调用一个T特定版本，没有的话就调用std中的普通版本。下面来实现你的需求：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line"></div><div class="line">void doSomething(T&amp; obj1, T&amp; obj2)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">using std::swap; // make std::swap available in this function</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">swap(obj1, obj2); // call the best swap for objects of type T</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当编译器看到了对swap的调用，它们会寻找swap的正确版本。C++名字搜寻策略先在全局范围内或者同一个命名空间内搜寻swap的T特定版本。（例如，如果T是命名空间WidgetStuff中的Widget，编译器会用参数依赖搜寻（argument-dependent lookup）在WidgetStuff中寻找swap）.如果没有T特定的swap版本存在，编译器会使用std中的swap版本，多亏了using std::swap使得std::swap在函数中可见。但是编译器更喜欢普通模板std::swap上的T指定特化版本，因此如果std::swap已经为T特化过了，特化版本将会调用。</p>
+<h2 id="6-调用swap时不要加std限定符"><a href="#6-调用swap时不要加std限定符" class="headerlink" title="6. 调用swap时不要加std限定符"></a>6. 调用swap时不要加std限定符</h2><p>因此调用正确的swap版本很容易。一件你需要注意的事情是不要对调用进行限定，因为这会影响c++决定调用哪个函数。举个例子，如果你像下面这样调用swap:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">std::swap(obj1, obj2); // the wrong way to call swap</div></pre></td></tr></table></figure>
+<p>你强制编译器只考虑std中的swap版本(包含所有模板特化版本)，这样就调不到在其他地方定义的更加合适的T特定版本了（如果有的话）。一些被误导的程序员确实就对swap的调用进行了这种限定，因此为你的类对std::swap进行全特化很重要:它使得被误导的程序员即使使用错误的调用方式（加std限定）也能够调用特定类型的swap版本。</p>
+<h2 id="7-实现swap步骤小结"><a href="#7-实现swap步骤小结" class="headerlink" title="7. 实现swap步骤小结"></a>7. 实现swap步骤小结</h2><p>到现在我们已经讨论了默认swap，成员函数swap，非成员函数swap以及std::swap的特化版本，并且讨论了对swap的调用，让我们总结一下：</p>
+<p>首先，如果为你的类或者类模版提供的swap默认实现版本在效率上可以满足你，你就什么都不需要做。任何人尝试对你定义类型的对象进行swap，只要调用默认版本就可以了，这会工作的很好。</p>
+<p>其次，如果swap的默认实现在效率上达不到你的要求（通常就意味着你的类或者类模板在使用同指向实现的指针（pimpl idiom）类似的变量），那么按照下面的去做：</p>
+<ol>
+<li>提供一个public 的swap成员函数，对你的类型的两个对象值可以高效的swap。原因一会解释，这个函数永远不应该抛出异常。</li>
+<li>在与你的类或模板相同的命名空间中提供一个非成员swap。让它调用你的swap成员函数版本。</li>
+<li>如果你正在实现一个类（不是一个类模版），为你的类特化std::swap。让他也调用你的swap成员函数版本。</li>
+</ol>
+<p>最后，如果你正在调用swap，确保在你的函数中include一个using声明来使得std::swap是可见的，然后调用swap时不要加std命名空间对其进行限定。</p>
+<h2 id="8-最后的警告——不要让成员函数swap抛出异常"><a href="#8-最后的警告——不要让成员函数swap抛出异常" class="headerlink" title="8. 最后的警告——不要让成员函数swap抛出异常"></a>8. 最后的警告——不要让成员函数swap抛出异常</h2><p>我最后的警告是永远不要让swap成员函数版本抛出异常。因为swap的一个最有用的地方就是帮助类（或类模版）提供强有力的异常安全保证。Item 29中有详细解释，其中的技术也是建立在swap成员函数版本不会抛出异常的假设之上的。这个约束只针对成员函数版本！而不针对非成员函数版本，因为swap的默认版本是基于拷贝构造函数和拷贝赋值运算符的，而一般情况下，这两个函数都允许抛出异常。当你实现一个swap的个性化版本，<strong>你就不单单提供了对值进行**</strong>swap<strong>**的高效方法；你同时提供了一个不会抛出异常的函数</strong>。作为通用规则，swap的这两个特性总是会在一起的，因为高效的swap通常是建立在对内建类型进行操作的基础之上的（像底层的指向实现的指针），而内建类型永远不会抛出异常。</p>
+<h2 id="9-总结"><a href="#9-总结" class="headerlink" title="9. 总结"></a>9. 总结</h2><ul>
+<li>当使用std::swap对你的自定义类型进行swap时，如果效率不够高，那么提供一个成员函数版本，并确保这个函数不会抛出异常。</li>
+<li>如果你提供了一个成员函数swap，同时提供了一个非成员swap来调用成员swap。在类（不是模板）上对std::swap进行特化。</li>
+<li>当调用swap时，使用using std::swap声明，对调用的swap不使用命名空间限定。</li>
+<li>为用户定义类型全特化std模板没有问题，但永远不要尝试像std中添加全新的东西。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/01/2017-03-01_08_14_读书笔记_effective_c++_Item_24_如果函数的所有参数都需要类型转换，将其声明成非成员函数/" rel="next" title="读书笔记 effective c++ Item 24 如果函数的所有参数都需要类型转换，将其声明成非成员函数">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 24 如果函数的所有参数都需要类型转换，将其声明成非成员函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/03/2017-03-03_19_17_读书笔记_effective_c++_Item_26_尽量推迟变量的定义/" rel="prev" title="读书笔记 effective c++ Item 26 尽量推迟变量的定义">
+                读书笔记 effective c++ Item 26 尽量推迟变量的定义 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-swap如此重要"><span class="nav-number">1.</span> <span class="nav-text">1. swap如此重要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-swap的傻瓜实现方式及缺陷"><span class="nav-number">2.</span> <span class="nav-text">2. swap的傻瓜实现方式及缺陷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-swap函数的默认实现"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 swap函数的默认实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-swap函数默认实现的缺陷——有可能效率低"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 swap函数默认实现的缺陷——有可能效率低</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-如何实现一个高效的swap"><span class="nav-number">3.</span> <span class="nav-text">3. 如何实现一个高效的swap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-为普通类定义全特化版本swap"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 为普通类定义全特化版本swap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-为模板类定义偏特化版本swap"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 为模板类定义偏特化版本swap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-普通类中swap的特化版本和非成员函数版本都需要提供"><span class="nav-number">4.</span> <span class="nav-text">4. 普通类中swap的特化版本和非成员函数版本都需要提供</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-调用swap时的搜寻策略"><span class="nav-number">5.</span> <span class="nav-text">5. 调用swap时的搜寻策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-调用swap时不要加std限定符"><span class="nav-number">6.</span> <span class="nav-text">6. 调用swap时不要加std限定符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-实现swap步骤小结"><span class="nav-number">7.</span> <span class="nav-text">7. 实现swap步骤小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-最后的警告——不要让成员函数swap抛出异常"><span class="nav-number">8.</span> <span class="nav-text">8. 最后的警告——不要让成员函数swap抛出异常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-总结"><span class="nav-number">9.</span> <span class="nav-text">9. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,921 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 什么样的接口才是好的接口C++中充斥着接口：函数接口，类接口，模板接口。每个接口都是客户同你的代码进行交互的一种方法。假设你正在面对的是一些“讲道理”的人员，这些客户尝试把工作做好，他们希望能够正确使用你的接口。在这种情况下，如果接口被误用，你的接口应该至少负一部分的责任">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 18 使接口容易被正确使用，不容易被误用">
+<meta property="og:url" content="http://yoursite.com/2017/02/23/2017-02-23_08_00_读书笔记_effective_c++_Item_18_使接口容易被正确使用，不容易被误用/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 什么样的接口才是好的接口C++中充斥着接口：函数接口，类接口，模板接口。每个接口都是客户同你的代码进行交互的一种方法。假设你正在面对的是一些“讲道理”的人员，这些客户尝试把工作做好，他们希望能够正确使用你的接口。在这种情况下，如果接口被误用，你的接口应该至少负一部分的责任">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.478Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 18 使接口容易被正确使用，不容易被误用">
+<meta name="twitter:description" content="1. 什么样的接口才是好的接口C++中充斥着接口：函数接口，类接口，模板接口。每个接口都是客户同你的代码进行交互的一种方法。假设你正在面对的是一些“讲道理”的人员，这些客户尝试把工作做好，他们希望能够正确使用你的接口。在这种情况下，如果接口被误用，你的接口应该至少负一部分的责任">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/23/2017-02-23_08_00_读书笔记_effective_c++_Item_18_使接口容易被正确使用，不容易被误用/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 18 使接口容易被正确使用，不容易被误用 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/23/2017-02-23_08_00_读书笔记_effective_c++_Item_18_使接口容易被正确使用，不容易被误用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 18 使接口容易被正确使用，不容易被误用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-23T08:00:00+08:00">
+                2017-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/23/2017-02-23_08_00_读书笔记_effective_c++_Item_18_使接口容易被正确使用，不容易被误用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/23/2017-02-23_08_00_读书笔记_effective_c++_Item_18_使接口容易被正确使用，不容易被误用/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 18 使接口容易被正确使用，不容易被误用">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-什么样的接口才是好的接口"><a href="#1-什么样的接口才是好的接口" class="headerlink" title="1. 什么样的接口才是好的接口"></a>1. 什么样的接口才是好的接口</h2><p>C++中充斥着接口：函数接口，类接口，模板接口。每个接口都是客户同你的代码进行交互的一种方法。假设你正在面对的是一些“讲道理”的人员，这些客户尝试把工作做好，他们希望能够正确使用你的接口。在这种情况下，如果接口被误用，你的接口应该至少负一部分的责任<br><a id="more"></a><br>理想情况下，<strong>如果使用一个接口没有做到客户希望做到的，代码应该不能通过编译；如果代码通过了编译，那么它就能做到客户想要的</strong>。</p>
+<h2 id="2-编写好的接口的方法列举"><a href="#2-编写好的接口的方法列举" class="headerlink" title="2. 编写好的接口的方法列举"></a>2. 编写好的接口的方法列举</h2><h3 id="2-1-使接口不容易被误用——通过引入新的类型"><a href="#2-1-使接口不容易被误用——通过引入新的类型" class="headerlink" title="2.1 使接口不容易被误用——通过引入新的类型"></a>2.1 使接口不容易被误用——通过引入新的类型</h3><p>开发出容易被正确使用不容易被误用的接口需要你考虑客户可能出现的所有类型的错误。举个例子，假设你正在为一个表示日期的类设计一个构造函数：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Date</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line">Date(<span class="keyword">int</span> month, <span class="keyword">int</span> day, <span class="keyword">int</span> year);</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>乍一看，这个接口可能看上去去合理的，但是客户很容易犯至少两种错误。</p>
+<p>第一，<strong>他们可能搞错参数的传递顺序</strong>：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function">Date <span class="title">d</span>(<span class="params"><span class="number">30</span>, <span class="number">3</span>, <span class="number">1995</span></span>)</span>; <span class="comment">// Oops! Should be “3, 30” , not “30, 3”</span></div></pre></td></tr></table></figure>
+<p> 第二，<strong>他们可能传递一个无效的月份或者天数</strong>(day number)：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function">Date <span class="title">d</span>(<span class="params"><span class="number">3</span>, <span class="number">40</span>, <span class="number">1995</span></span>)</span>; <span class="comment">// Oops! Should be “3, 30” , not “3, 40”</span></div></pre></td></tr></table></figure>
+<p>（最后一个例子看上去很病态，但是不要忘了在键盘上，数字4和3是挨着的，将3错打成4这样的错误不是不常见。）</p>
+<p>通过引入新的类型，许多客户错误就能被避免。确实，类型系统（type system）是你阻止不合要求的代码编译通过的主要盟友。在这种情况下，我们可以引入简单的包装类型来区分天，月和年，然后在Date构造函数中使用这些类型：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> Day&#123;                           </div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">Day</span>(<span class="params"><span class="keyword">int</span> d</span>): <span class="title">val</span>(<span class="params">d</span>) </span>&#123;&#125;                              </div><div class="line"><span class="keyword">int</span> val;                                  </div><div class="line">&#125;;                                            </div><div class="line"><span class="keyword">struct</span> Month &#123;                        </div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">Month</span>(<span class="params"><span class="keyword">int</span> m</span>): <span class="title">val</span>(<span class="params">m</span>) </span>&#123;&#125;                </div><div class="line"> <span class="keyword">int</span> val;                  </div><div class="line"> &#125;;  </div><div class="line"><span class="keyword">struct</span> Year &#123;          </div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">Year</span>(<span class="params"><span class="keyword">int</span> y</span>): <span class="title">val</span>(<span class="params">y</span>)</span>&#123;&#125;</div><div class="line"> <span class="keyword">int</span> val;</div><div class="line"> &#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Date</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line">Date(<span class="keyword">const</span> Month&amp; m, <span class="keyword">const</span> Day&amp; d, <span class="keyword">const</span> Year&amp; y);</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="function">Date <span class="title">d</span>(<span class="params"><span class="number">30</span>, <span class="number">3</span>, <span class="number">1995</span></span>)</span>; <span class="comment">// error! wrong types</span></div><div class="line"><span class="function">Date <span class="title">d</span>(<span class="params">Day(<span class="number">30</span></span>), <span class="title">Month</span>(<span class="params"><span class="number">3</span></span>), <span class="title">Year</span>(<span class="params"><span class="number">1995</span></span>))</span>; <span class="comment">// error! wrong types</span></div><div class="line"><span class="function">Date <span class="title">d</span>(<span class="params">Month(<span class="number">3</span></span>), <span class="title">Day</span>(<span class="params"><span class="number">30</span></span>), <span class="title">Year</span>(<span class="params"><span class="number">1995</span></span>))</span>; <span class="comment">// okay, types are correct</span></div></pre></td></tr></table></figure>
+<p>将Day,Month和Year数据封装在羽翼丰满的类中比上面简单的使用struct要更好(Item 22)，但是使用struct就足以证明，明智的引入新类型可以很好的阻止接口被误用的问题。</p>
+<p>一旦正确的类型准备好了，就能够合理的约束这些类型的值。举个例子，只有12个月份应该能够通过Month类型反映出来。一种方法是使用一个枚举类型来表示月份，但是枚举不是我们喜欢的类型安全的类型。例如，枚举可以像int一样使用（<a href="http://www.cnblogs.com/harlanc/p/6376536.html" title="Item 2" target="_blank" rel="external">Item 2</a>）。一个更加安全的解决方案是预先将所有有效的月份都定义出来。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Month</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">static</span> Month <span class="title">Jan</span>(<span class="params"></span>) </span>&#123; <span class="keyword">return</span> Month(<span class="number">1</span>); &#125; <span class="comment">// functions returning all valid</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">static</span> Month <span class="title">Feb</span>(<span class="params"></span>) </span>&#123; <span class="keyword">return</span> Month(<span class="number">2</span>); &#125; <span class="comment">// Month values; see below for</span></div><div class="line"></div><div class="line">... <span class="comment">// why these are functions, not</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">static</span> Month <span class="title">Dec</span>(<span class="params"></span>) </span>&#123; <span class="keyword">return</span> Month(<span class="number">12</span>); &#125; <span class="comment">// objects</span></div><div class="line"></div><div class="line">... <span class="comment">// other member functions</span></div><div class="line"></div><div class="line"><span class="keyword">private</span>:</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">Month</span>(<span class="params"><span class="keyword">int</span> m</span>)</span>; <span class="comment">// prevent creation of new</span></div><div class="line"></div><div class="line"><span class="comment">// Month values</span></div><div class="line"></div><div class="line">... <span class="comment">// month-specific data</span></div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function">Date <span class="title">d</span>(<span class="params">Month::Mar(</span>), <span class="title">Day</span>(<span class="params"><span class="number">30</span></span>), <span class="title">Year</span>(<span class="params"><span class="number">1995</span></span>))</span>;</div></pre></td></tr></table></figure>
+<p>如果使用函数代替对象来表示指定月份值会让你觉的奇怪的话，可能是因为你忘记了非本地static对象的初始化是有问题的（见 <a href="http://www.cnblogs.com/harlanc/p/6389927.html" title="Item 4" target="_blank" rel="external">Item 4</a>）。</p>
+<h3 id="2-2-使接口不容易被误用——对类型的操作进行限定"><a href="#2-2-使接口不容易被误用——对类型的操作进行限定" class="headerlink" title="2.2 使接口不容易被误用——对类型的操作进行限定"></a>2.2 使接口不容易被误用——对类型的操作进行限定</h3><p>另外一种防止类似错误的方法是对类型能够做什么进行限制。进行限制的一般方法是添加const。举个例子，<a href="http://www.cnblogs.com/harlanc/p/6384546.html" title="Item 3" target="_blank" rel="external">Item 3</a>解释了对于用户自定义的类型，把operator*的返回类型加上const能够防止下面错误的发生：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (a * b = c) ... <span class="comment">// oops, meant to do a comparison!</span></div></pre></td></tr></table></figure>
+<h3 id="2-3-使接口容易被正确使用——提供行为一致的接口"><a href="#2-3-使接口容易被正确使用——提供行为一致的接口" class="headerlink" title="2.3 使接口容易被正确使用——提供行为一致的接口"></a>2.3 使接口容易被正确使用——提供行为一致的接口</h3><p>事实上，这只是“使类型容易正确使用不容易被误用”的另外一个指导方针的表现形式：除非有更好的理由，<strong>让你的自定义类型同内建类型的行为表现一致</strong>。客户已经知道像int一样的内建类型的行为是什么样子的，所以在任何合理的时候你应该努力使你的类型表现与其一致。举个例子，如果a和b是int类型，那么赋值给a*b是不合法的，所以除非有一个好的理由偏离这种行为，你应该使你的类型同样不合法。每当你不确定自定义类型的行为时，按照int来做就可以了。</p>
+<p>防止自定义类型同内建类型无端不兼容的真正原因是<strong>提供行为一致的接口</strong>。没有特征比“一致性”更能使接口容易被使用了，也没有特征比“不一致性”更加导致接口容易被误用了。STL容器的接口大体上（虽然不是完全一致）是一致的，这使得它们使用起来相当容易。举个例子，每个STL容易有一个size成员函数，用来指出容器中的对象数量。与Java相比，arrays使用length属性(property)来表示对象数量，而String使用length方法（method）来表示，List使用size方法来表示；对于.NET来说，Array有一个Length属性，而ArrayList有一个Count属性。一些开发人员认为集成开发环境（IDE）使这种不一致性不再重要，但他们错了。不一致性会将精神摩擦强加到开发人员的工作中，没有任何IDE能够将其擦除。</p>
+<h3 id="2-4-使接口不容易被误用——使用shared-ptr消除客户管理资源的责任"><a href="#2-4-使接口不容易被误用——使用shared-ptr消除客户管理资源的责任" class="headerlink" title="2.4 使接口不容易被误用——使用shared_ptr消除客户管理资源的责任"></a>2.4 使接口不容易被误用——使用shared_ptr消除客户管理资源的责任</h3><h4 id="2-4-1-让函数返回一个智能指针"><a href="#2-4-1-让函数返回一个智能指针" class="headerlink" title="2.4.1 让函数返回一个智能指针"></a>2.4.1 让函数返回一个智能指针</h4><p>一个要让客户记住做某事的接口比较容易被用错，因为客户有可能会忘记做。举个例子，<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>中引入一个工厂函数，在一个Investment继承体系中返回指向动态分配内存的指针：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Investment* createInvestment(); <span class="comment">// from Item 13; parameters omitted</span></div><div class="line"></div><div class="line"><span class="comment">// for simplicity</span></div></pre></td></tr></table></figure>
+<p>为了防止资源泄漏，createInvesment返回的指针最后必须被delete，但是这为至少两类客户错误的出现创造了机会：delete指针失败，多次delete同一个指针。</p>
+<p><a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item 13</a>展示了客户如何将createInvestment的返回值存入像auto_ptr或者tr1::shared_ptr一样的智能指针中，这样就将delete的责任交给智能指针。但是如果客户忘记使用智能指针该怎么办？在许多情况下，更好的接口是要先发制人，<strong>让函数首先返回一个智能指针</strong>：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">std::tr1::shared_ptr&lt;Investment&gt; createInvestment();</div></pre></td></tr></table></figure>
+<p>这就强制客户将返回值保存在tr1::shared_ptr中，从而完全消除了忘记delete不再被使用的底层Investment对象的可能性。</p>
+<h4 id="2-4-2-返回绑定删除器的智能指针"><a href="#2-4-2-返回绑定删除器的智能指针" class="headerlink" title="2.4.2 返回绑定删除器的智能指针"></a>2.4.2 返回绑定删除器的智能指针</h4><p>事实上，对于一个接口设计者来说，返回tr1::shared_ptr能够避免许多其他的有关资源释放的客户错误，因为<a href="http://www.cnblogs.com/harlanc/p/6414789.html" title="Item 14" target="_blank" rel="external">Item 14</a>中解释道，在创建智能指针时，tr1::shared_ptr允许将一个资源释放函数——释放器(deleter)——绑定到智能指针上。</p>
+<p>假设客户从createInvestment得到一个Investment<em>指针，我们通过将这个指针传递给一个叫做getRidOfInvestment的函数来释放资源而不是直接使用delete。这样的接口开启了另外一类客户错误的大门：客户可能会使用错误的资源析构机制（用delete而不是用提供的getRidOfInvestment接口）。createInvestment的实现者可以先发制人，<strong>返回一个**</strong>tr1::shared_ptr<strong><strong>，并将getRidOfInvestment</strong></strong>绑定为删除器*</em>。</p>
+<p>Tr1::shared_ptr提供了一个有两个参数的构造函数：需要被管理的指针和当引用计数为0时需要被调用的删除器。这就提供了一个创建用getRidOfInvestment作为删除器的空tr1::shared_ptr的方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">std::tr1::shared_ptr&lt;Investment&gt; // attempt to create a null</div><div class="line"></div><div class="line">pInv(0, getRidOfInvestment); // shared_ptr with a custom deleter;</div><div class="line"></div><div class="line">// this won’t compile</div></pre></td></tr></table></figure>
+<p>上面不是有效的c++，tr1::shared_ptr构造函数的第一个参数必须为指针，但是0不是指针。虽然它可以转换成指针，但是在这个例子中不够好；tr1::shared_ptr坚持使用真实的指针。一个cast就能解决问题：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">std::tr1::shared_ptr&lt;Investment&gt; // create a null shared_ptr with</div><div class="line"></div><div class="line">pInv( static_cast&lt;Investment*&gt;(0), // getRidOfInvestment as its</div><div class="line"></div><div class="line">getRidOfInvestment); // deleter; see Item 27 for info on</div><div class="line"></div><div class="line">// static_cast</div></pre></td></tr></table></figure>
+<p>这意味着实现一个createInvestment的代码如下（返回值为绑定了getRidOfInvestment作为删除器的tr1::shared_ptr）：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">std::tr1::shared_ptr&lt;Investment&gt; createInvestment()</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;Investment&gt; retVal(static_cast&lt;Investment*&gt;(0),</div><div class="line"></div><div class="line">getRidOfInvestment);</div><div class="line"></div><div class="line">... // make retVal point to the</div><div class="line"></div><div class="line">// correct object</div><div class="line"></div><div class="line">return retVal;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当然，如果在创建一个retVal之前就能够决定一个原生指针是不是由reVal来管理，将原生指针直接传递给retVal的构造函数比先将retVal初始化为null然后做一个赋值操作要好。为什么请看 Item 26。</p>
+<h3 id="2-5-使用智能指针消除交叉-DLL错误"><a href="#2-5-使用智能指针消除交叉-DLL错误" class="headerlink" title="2.5 使用智能指针消除交叉-DLL错误"></a>2.5 使用智能指针消除交叉-DLL错误</h3><p>Tr1::shared_ptr的一个特别好的性质是它可以用它的删除器来消除另外一个客户错误——交叉（cross）-DLL错误。当一个对象在一个DLL中使用new被创建，但是在另外一个DLL中被delete时这个问题就会出现。在许多平台中，这样的交叉-DLL new/delete对会导致运行时错误。使用tr1::shared_ptr可以避免这种错误，因为它使用的默认的删除器来自创建tr1::shared_ptr的DLL。这就意味着，例如，如果Stock是一个继承自Investment的类，createInvestment实现如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">std::tr1::shared_ptr&lt;Investment&gt; createInvestment()</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">return std::tr1::shared_ptr&lt;Investment&gt;(new Stock);</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>返回的tr1::shared_ptr可以在DLL之间被传递而不用考虑cross-DLL问题。在Stock的引用计数为0的时候，指向Stock的tr1::shared_ptr指针会追踪哪个DLL的删除器被用来释放资源。</p>
+<h2 id="3-使用智能指针的代价"><a href="#3-使用智能指针的代价" class="headerlink" title="3.使用智能指针的代价"></a>3.使用智能指针的代价</h2><p>这个Item不是关于tr1::shared_ptr的——它是关于“使接口容易被正确使用不容易被误用”这个议题的——但是使用tr1::shared_ptr是一个如此容易的消除客户错误的方法，所以值得将使用它的代价做一个概述。Tr1::shared_ptr的最一般的实现来自Boost（Item 55）。Boost中的shared_ptr占用内存是原生指针的两倍，为bookkeeping（引用计数）和deleter-specific（专属删除器） 数据分配动态内存，调用删除器的时候使用虚函数，当在一个应用中修改引用计数时，如果它认为自己是多线程的，会引发线程同步开销。（你可以通过定义一个预处理符号来disable多线程支持）一句话，<strong>它比原生指针占用内存多，比原生指针慢，并且使用了辅助的动态内存</strong>。但是在许多应用中，这些额外的运行时开销是不明显的，但是客户错误的消除对每个人来说都是显而易见的。</p>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4.总结"></a>4.总结</h2><ul>
+<li>好的接口容易被正确使用不容易被误用，你应该使所有的接口满足这两个特征。</li>
+<li>接口被正确使用的方法包括接口的一致性和同内建类型的行为兼容。</li>
+<li>接口不容易被误用的方法包括，创建新的类型，对类型上的操作进行限制，约束对象值，去除客户管理资源的责任。</li>
+<li>Tr1::shared_ptr支持个性化删除器。这避免了交叉-DLL问题，可以被用来自动unlock互斥器(<a href="http://www.cnblogs.com/harlanc/p/6414789.html" title="Item 14" target="_blank" rel="external">Item 14</a>)等等。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/22/2017-02-22_08_05_读书笔记_effective_c++_Item_17_使用单独语句将new出来的对象放入智能指针/" rel="next" title="读书笔记 effective c++ Item 17 使用单独语句将new出来的对象放入智能指针">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 17 使用单独语句将new出来的对象放入智能指针
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/24/2017-02-24_07_51_读书笔记_effective_c++_Item_19_像设计类型（type）一样设计类/" rel="prev" title="读书笔记 effective c++ Item 19 像设计类型（type）一样设计类">
+                读书笔记 effective c++ Item 19 像设计类型（type）一样设计类 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-什么样的接口才是好的接口"><span class="nav-number">1.</span> <span class="nav-text">1. 什么样的接口才是好的接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-编写好的接口的方法列举"><span class="nav-number">2.</span> <span class="nav-text">2. 编写好的接口的方法列举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-使接口不容易被误用——通过引入新的类型"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 使接口不容易被误用——通过引入新的类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-使接口不容易被误用——对类型的操作进行限定"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 使接口不容易被误用——对类型的操作进行限定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-使接口容易被正确使用——提供行为一致的接口"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 使接口容易被正确使用——提供行为一致的接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-使接口不容易被误用——使用shared-ptr消除客户管理资源的责任"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 使接口不容易被误用——使用shared_ptr消除客户管理资源的责任</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-1-让函数返回一个智能指针"><span class="nav-number">2.4.1.</span> <span class="nav-text">2.4.1 让函数返回一个智能指针</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-2-返回绑定删除器的智能指针"><span class="nav-number">2.4.2.</span> <span class="nav-text">2.4.2 返回绑定删除器的智能指针</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-使用智能指针消除交叉-DLL错误"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 使用智能指针消除交叉-DLL错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-使用智能指针的代价"><span class="nav-number">3.</span> <span class="nav-text">3.使用智能指针的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-总结"><span class="nav-number">4.</span> <span class="nav-text">4.总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

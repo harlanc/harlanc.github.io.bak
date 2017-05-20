@@ -1,0 +1,895 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1.默认构造函数介绍在设计良好的面向对象系统中，会将对象的内部进行封装，只有两个函数可以拷贝对象：拷贝构造函数和拷贝赋值运算符。我们把这两个函数统一叫做拷贝函数。从Item5中，我们得知，如果需要的话编译器会为你生成这两个拷贝函数，并且编译器生成的版本能够精确的做到你想做的：它们拷贝了">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 12 拷贝对象的所有部分">
+<meta property="og:url" content="http://yoursite.com/2017/02/17/2017-02-17_07_42_读书笔记_effective_c++_Item_12_拷贝对象的所有部分/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1.默认构造函数介绍在设计良好的面向对象系统中，会将对象的内部进行封装，只有两个函数可以拷贝对象：拷贝构造函数和拷贝赋值运算符。我们把这两个函数统一叫做拷贝函数。从Item5中，我们得知，如果需要的话编译器会为你生成这两个拷贝函数，并且编译器生成的版本能够精确的做到你想做的：它们拷贝了">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.247Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 12 拷贝对象的所有部分">
+<meta name="twitter:description" content="1.默认构造函数介绍在设计良好的面向对象系统中，会将对象的内部进行封装，只有两个函数可以拷贝对象：拷贝构造函数和拷贝赋值运算符。我们把这两个函数统一叫做拷贝函数。从Item5中，我们得知，如果需要的话编译器会为你生成这两个拷贝函数，并且编译器生成的版本能够精确的做到你想做的：它们拷贝了">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/17/2017-02-17_07_42_读书笔记_effective_c++_Item_12_拷贝对象的所有部分/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 12 拷贝对象的所有部分 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/17/2017-02-17_07_42_读书笔记_effective_c++_Item_12_拷贝对象的所有部分/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 12 拷贝对象的所有部分</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-17T07:42:00+08:00">
+                2017-02-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/17/2017-02-17_07_42_读书笔记_effective_c++_Item_12_拷贝对象的所有部分/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/17/2017-02-17_07_42_读书笔记_effective_c++_Item_12_拷贝对象的所有部分/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 12 拷贝对象的所有部分">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-默认构造函数介绍"><a href="#1-默认构造函数介绍" class="headerlink" title="1.默认构造函数介绍"></a>1.默认构造函数介绍</h2><p>在设计良好的面向对象系统中，会将对象的内部进行封装，只有两个函数可以拷贝对象：<strong>拷贝构造函数和拷贝赋值运算符</strong>。我们把这两个函数统一叫做拷贝函数。从Item5中，我们得知，如果需要的话编译器会为你生成这两个拷贝函数，并且编译器生成的版本能够精确的做到你想做的：它们拷贝了<br><a id="more"></a><br>象的所有数据。</p>
+<h2 id="2-自己实现构造函数有可能出现问题"><a href="#2-自己实现构造函数有可能出现问题" class="headerlink" title="2.自己实现构造函数有可能出现问题"></a>2.自己实现构造函数有可能出现问题</h2><p>当你声明自己的拷贝函数的时候，你就会向编译器表示，你对编译器生成版本的拷贝函数有些地方不是很喜欢。你的这种做法会让编译器以一种奇怪的方式进行报复：<strong>如果你自己实现的拷贝函数出现了问题，编译器不会告诉你</strong>。</p>
+<h3 id="2-1-问题出现场景一"><a href="#2-1-问题出现场景一" class="headerlink" title="2.1 问题出现场景一"></a>2.1 问题出现场景一</h3><p>考虑一个表示消费者的类，类中的拷贝函数已经被手动实现了，所以调用它们会被记入日志：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">void logCall(const std::string&amp; funcName); // make a log entry</div><div class="line"></div><div class="line">class Customer &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">Customer(const Customer&amp; rhs);</div><div class="line"></div><div class="line">Customer&amp; operator=(const Customer&amp; rhs);</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">std::string name;</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">Customer::Customer(const Customer&amp; rhs)</div><div class="line"></div><div class="line">: name(rhs.name) // copy rhs’s data</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">logCall("Customer copy constructor");</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">Customer&amp; Customer::operator=(const Customer&amp; rhs)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">logCall("Customer copy assignment operator");</div><div class="line"></div><div class="line">name = rhs.name; // copy rhs’s data</div><div class="line"></div><div class="line">return *this; // see Item 10</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里的一切看上去都是好的，也确实如此，直到另外一个数据成员加到Customer类中：、</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class Date &#123; ... &#125;; // for dates in time</div><div class="line"></div><div class="line">class Customer &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">... // as before</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">std::string name;</div><div class="line"></div><div class="line">Date lastTransaction;</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这时候，当前的拷贝函数就会执行一个<strong>部分拷贝，</strong>它们拷贝了Customer的name成员变量，却没有拷贝lastTransaction.但大多数编译器会对这种实现默不发声，甚至一个警告级别的信息也不会发出来（看Item 53）。编译器对你自己写的拷贝函数进行了报复。你拒绝使用它们提供的拷贝函数，于是它们不会告诉你代码是否是完整的。结论很明显：如果你向类中添加一个数据成员，你需要确保同时对拷贝函数进行更新。（你同时需要更新类中所有的构造函数（Item4和Item45）和任何非标准形式的operator=(Item 10给出了一个例子)），如果你忘记了，编译器不会提醒你。</p>
+<h3 id="2-2-更加阴险的方式-场景二"><a href="#2-2-更加阴险的方式-场景二" class="headerlink" title="2.2 更加阴险的方式-场景二"></a>2.2 更加阴险的方式-场景二</h3><p>使这个问题出现的最阴险的方式是通过继承。看下面的例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">class PriorityCustomer: public Customer &#123; // a derived class</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">PriorityCustomer(const PriorityCustomer&amp; rhs);</div><div class="line"></div><div class="line">PriorityCustomer&amp; operator=(const PriorityCustomer&amp; rhs);</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">int priority;</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">PriorityCustomer::PriorityCustomer(const PriorityCustomer&amp; rhs)</div><div class="line"></div><div class="line">: priority(rhs.priority)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">logCall("PriorityCustomer copy constructor");</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">PriorityCustomer&amp;</div><div class="line"></div><div class="line">PriorityCustomer::operator=(const PriorityCustomer&amp; rhs)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">logCall("PriorityCustomer copy assignment operator");</div><div class="line"></div><div class="line">priority = rhs.priority;</div><div class="line"></div><div class="line">return *this;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>PriorityCustomer的拷贝函数看上去拷贝了类中的所有东西，但请再看一遍。是的，它们拷贝了PriorityCustomer的所有数据成员，但是PriorityCustomer的每个对象同时包含了从Customer继承过来的数据成员，这部分数据没有被拷贝！PriorityCustomer的拷贝构造函数没有指定传到基类构造函数的参数（也就是说没有在成员初始化列表中列出Customer），所以PriorityCustomer对象的Customer部分会被Customer的无参构造函数进行初始化。（肯定会有一个，不然编译会出错。）这个构造函数会为name 和 lastTransaction执行一个默认初始化。</p>
+<p>对于PriorityCustomer的拷贝构造运算符来说情形有些不同。它并没有以任何方式去尝试修改基类的数据成员，因此它们可以保持不变。</p>
+<h2 id="3-如何才能避免上面的问题"><a href="#3-如何才能避免上面的问题" class="headerlink" title="3.如何才能避免上面的问题"></a>3.如何才能避免上面的问题</h2><p>在任何时候你自己去为一个派生类实现拷贝构造函数的时候，你必须注意需要同时拷贝基类部分。这些部分当然有可能是Private的(见Item22)，所以你不能直接访问它们。但是，派生类的拷贝函数必须调用对应的基类构造函数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">PriorityCustomer::PriorityCustomer(const PriorityCustomer&amp; rhs)</div><div class="line"></div><div class="line">: Customer(rhs), // invoke base class copy ctor</div><div class="line"></div><div class="line">priority(rhs.priority)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">logCall("PriorityCustomer copy constructor");</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">PriorityCustomer&amp;</div><div class="line"></div><div class="line">PriorityCustomer::operator=(const PriorityCustomer&amp; rhs)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">logCall("PriorityCustomer copy assignment operator");</div><div class="line"></div><div class="line">Customer::operator=(rhs); // assign base class parts</div><div class="line"></div><div class="line">priority = rhs.priority;</div><div class="line"></div><div class="line">return *this;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在这个条款的标题中，“拷贝所有部分”的意思现在应该明了了。当你实现一个拷贝函数的时候，确保<strong>（**</strong>1<strong><strong>）拷贝所有本地的数据成员。（2</strong></strong>）同时调用所有基类的合适的拷贝函数**。</p>
+<h2 id="4-如何才能解决构造函数中的代码重复问题"><a href="#4-如何才能解决构造函数中的代码重复问题" class="headerlink" title="4.如何才能解决构造函数中的代码重复问题"></a>4.如何才能解决构造函数中的代码重复问题</h2><p>在实际应用中，这两个拷贝函数通常有着类似的函数体，这会让你尝试通过一个函数调用另一个函数以达到避免代码重复的目的。你的这种想避免代码重复的愿望是值得赞赏的，但<strong>为了达到避免代码重复</strong>，<strong>用一个拷贝函数调用另外一个是错误的方法。</strong></p>
+<h3 id="4-1-用赋值运算符调用拷贝构造函数-错误！"><a href="#4-1-用赋值运算符调用拷贝构造函数-错误！" class="headerlink" title="4.1 用赋值运算符调用拷贝构造函数-错误！"></a>4.1 用赋值运算符调用拷贝构造函数-错误！</h3><p>用拷贝赋值运算符来调用拷贝构造函数是没有意义的，因为你正在尝试构建一个已经存在的对象。这是荒谬的，也没有这样的语法。看上去有一些能够到达你要求的语法，但实际上不是。有一些语法确实能够做到，但在一些情况下会破坏你的对象。所以我不会向你展示这些语法的任何部分。你不想通过拷贝赋值运算符去调用拷贝构造函数，接受这个想法就可以了。</p>
+<h3 id="4-2-用拷贝构造函数调用赋值运算符-错误！"><a href="#4-2-用拷贝构造函数调用赋值运算符-错误！" class="headerlink" title="4.2 用拷贝构造函数调用赋值运算符-错误！"></a>4.2 用拷贝构造函数调用赋值运算符-错误！</h3><p>相反，使用拷贝函数调用拷贝赋值运算符也同样是没有意义的。一个拷贝构造函数是初始化新的对象的，但是一个赋值运算符只能够应用在已经被初始化的对象上面。在一个对象上通过构造函数来执行赋值就意味着，你正在对一个未初始化的对象做某些事情，但这件事情对初始化的对象才有意义。没有意义，不要去尝试！</p>
+<h3 id="4-3-正确的做法-将相同代码提炼成第三个函数"><a href="#4-3-正确的做法-将相同代码提炼成第三个函数" class="headerlink" title="4.3 正确的做法-将相同代码提炼成第三个函数"></a>4.3 正确的做法-将相同代码提炼成第三个函数</h3><p>想反，如果你发现你的拷贝构造函数和拷贝赋值运算符有着看上去类似的函数体，通过创建可以同时被两个构造函数调用的第三个成员函数来消除代码重复。这样的函数应该被声明为Private并且通常叫做Init.这个策略是安全的，可以达到消除重复的目的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/15/2017-02-15_23_48_读书笔记_effective_c++_Item_11_在operator=中处理自我赋值/" rel="next" title="读书笔记 effective c++ Item 11 在operator=中处理自我赋值">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 11 在operator=中处理自我赋值
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/18/2017-02-18_07_56_读书笔记_effective_c++_Item_13_用对象来管理资源/" rel="prev" title="读书笔记 effective c++ Item 13 用对象来管理资源">
+                读书笔记 effective c++ Item 13 用对象来管理资源 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-默认构造函数介绍"><span class="nav-number">1.</span> <span class="nav-text">1.默认构造函数介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-自己实现构造函数有可能出现问题"><span class="nav-number">2.</span> <span class="nav-text">2.自己实现构造函数有可能出现问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-问题出现场景一"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 问题出现场景一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-更加阴险的方式-场景二"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 更加阴险的方式-场景二</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-如何才能避免上面的问题"><span class="nav-number">3.</span> <span class="nav-text">3.如何才能避免上面的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-如何才能解决构造函数中的代码重复问题"><span class="nav-number">4.</span> <span class="nav-text">4.如何才能解决构造函数中的代码重复问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-用赋值运算符调用拷贝构造函数-错误！"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 用赋值运算符调用拷贝构造函数-错误！</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-用拷贝构造函数调用赋值运算符-错误！"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 用拷贝构造函数调用赋值运算符-错误！</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-正确的做法-将相同代码提炼成第三个函数"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 正确的做法-将相同代码提炼成第三个函数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

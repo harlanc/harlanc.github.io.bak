@@ -1,0 +1,918 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="你正在寻找一个高质量的，开源的，与平台和编译器无关的程序库的集合？看一下Boost吧。想加入一个由雄心勃勃的，充满天赋的正致力于最高水平的程序库设计和实现工作的C++程序员们组成的团体么？看一下Boost吧。想了解C++将来可能会是什么样子的？看一下Boost吧。 Boost是一个C++开发人员组">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 55 让你自己熟悉Boost">
+<meta property="og:url" content="http://yoursite.com/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="你正在寻找一个高质量的，开源的，与平台和编译器无关的程序库的集合？看一下Boost吧。想加入一个由雄心勃勃的，充满天赋的正致力于最高水平的程序库设计和实现工作的C++程序员们组成的团体么？看一下Boost吧。想了解C++将来可能会是什么样子的？看一下Boost吧。 Boost是一个C++开发人员组">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.704Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 55 让你自己熟悉Boost">
+<meta name="twitter:description" content="你正在寻找一个高质量的，开源的，与平台和编译器无关的程序库的集合？看一下Boost吧。想加入一个由雄心勃勃的，充满天赋的正致力于最高水平的程序库设计和实现工作的C++程序员们组成的团体么？看一下Boost吧。想了解C++将来可能会是什么样子的？看一下Boost吧。 Boost是一个C++开发人员组">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 55 让你自己熟悉Boost | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 55 让你自己熟悉Boost</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T07:43:00+08:00">
+                2017-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 55 让你自己熟悉Boost">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>你正在寻找一个高质量的，开源的，与平台和编译器无关的程序库的集合？看一下Boost吧。想加入一个由雄心勃勃的，充满天赋的正致力于最高水平的程序库设计和实现工作的C++程序员们组成的团体么？看一下Boost吧。想了解C++将来可能会是什么样子的？看一下Boost吧。</p>
+<p>Boost是一个C++开发人员组<br><a id="more"></a><br>的团体，也是供免费下载的C++程序库的集合。网址是<a href="http://boost.org/" target="_blank" rel="external">http://boost.org</a>。</p>
+<h2 id="1-Boost的两大优势"><a href="#1-Boost的两大优势" class="headerlink" title="1. Boost的两大优势"></a>1. Boost的两大优势</h2><p>当然，有许多C++组织和网站，但是Boost有两点是其它组织不能与之媲美的。首先，它和C++标注委员会有着紧密的关系，并且对C++标准委员会有影响力。Boost是由C++标准委员会成员创立的，所以Boost和委员会成员之间有很大的重叠。此外，Boost的其中一个目标是为能够加入标准C++的功能提供一个实验场地。这种关系的一个结果就是由TR1引入到C++中的14个新的程序库中，有多于2/3的程序库是基于Boost的工作成果。</p>
+<h2 id="2-Boost库的收录流程"><a href="#2-Boost库的收录流程" class="headerlink" title="2. Boost库的收录流程"></a>2. Boost库的收录流程</h2><p>Boost的第二个特殊的特征就是接受程序库的过程。它是在同行评审的基础之上进行的。如果你想向Boost贡献一个程序库，你先向Boost开发人员发送邮件，让他们评估程序库的重要性，然后开始对你工作进行初步的审查。这就开始了一个循环流程，网站将其总结为“讨论，精炼，重发。重复这个流程直到委员会满意为止。”</p>
+<p>最后，你决定你的程序库已经准备好正常的提交了。审查经理确认你的程序库满足了Boost的最低需求。例如，必须在至少两个编译器上编译通过（为了确保可移植性），你也必须确保这个程序库在可接受的license下能够被使用（例如，程序库必须允许在商业和非商业的使用中是免费的。）然后Boost委员会就能获得你提交的程序库了，他们会进行官方的审查。在审查期间，志愿者会仔细检查你的程序库材料（例如，源码，设计文档，使用说明文档等等），并且会考虑如下问题：</p>
+<ul>
+<li>设计和实现有多好？</li>
+<li>在不同编译器和操作系统上是可移植的么？</li>
+<li>程序库对于受众群体——也就是使用这个程序库处理问题的人们——是否有用？</li>
+<li>文档是否清晰，完整，精确？</li>
+</ul>
+<p>这些注释会发送到Boost邮件列表中，所以审查人员和其他人能够看到，并可以对其它人的评论做出反馈。在审查的最后，审查经理决定你的程序库是否被接受，有条件的接受或者被拒绝。</p>
+<p>同行评审可以将实现的不好的程序库排除在外，也同样能够帮助程序库的作者，教他们如何对工业强度的，跨平台的程序库进行设计，实现和撰写文档。许多程序库在被声明其有价值并被接受之前，需要不止一次的官方评审。</p>
+<p>Boost包含了大量的程序库，更多的是在大家贡献的基础上进行添加的。一些程序库也会时不时的被移除掉，因为这些功能被更新的程序库取代了，它们提供了更棒的功能或者更好的设计（例如，更加灵活或者更加高效。）</p>
+<h2 id="3-Boost库有大有小"><a href="#3-Boost库有大有小" class="headerlink" title="3. Boost库有大有小"></a>3. Boost库有大有小</h2><p>Boost程序库在大小和范围上有很大不同。一个极端是程序库只在概念上需要几行代码（但是如果支持错误处理和增加可移植性会需要更长的代码。）有一个这样的程序库叫做Conversion,它提供了更加安全或者说更加方便的cast操作。例如，它的numeric_cast函数，如果从一个数值类型转换到另外一个数值类型的时候导致内存溢出或者类似的问题，异常就会抛出；lexical_cast使得把支持operator&lt;&lt;的任何类型转换成string成为可能，这对诊断和记录日志是非常有帮助的。另外一个极端是程序库提供了非常广泛的功能，整本书都用来介绍它们。这样的程序库包含Boost Graph Library(支持使用任意的图表结构来进行编程)，还有Boost MPL Library(“元编程库”)。</p>
+<h2 id="4-Boost库的分类"><a href="#4-Boost库的分类" class="headerlink" title="4. Boost库的分类"></a>4. Boost库的分类</h2><p>Boost程序库处理了一系列的主题，它们被分成一些种类。这些种类包括：</p>
+<ul>
+<li>字符串和文本处理，包括类型安全的能够像printf一样进行格式化，正则表达式（这是在TR1中提供的类似的功能的基础）tokenizing和解析。</li>
+<li>容器，包括固定大小的数组，它有一个类似STL的接口（见<a href="http://www.cnblogs.com/harlanc/p/6753366.html" title="Item 54" target="_blank" rel="external">Item 54</a>），容量可变的bitset和多维数组。</li>
+<li>函数对象和高级编程，包括被当作TR1中功能基础的一些程序库。一个有趣的程序库是Lambda程序库，使得创建函数对象非常简单，你甚至不太可能意识到你在做什么：</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">using namespace boost::lambda;       // make boost::lambda</div><div class="line">// functionality visible</div><div class="line"></div><div class="line">std::vector&lt;int&gt; v;</div><div class="line">...</div><div class="line">std::for_each(v.begin(), v.end(),         // for each element x in</div><div class="line"></div><div class="line">std::cout &lt;&lt; _1 * 2 + 10 &lt;&lt; "\n"); // v, print x*2+10;</div><div class="line">// “_1” is the Lambda</div><div class="line">// library’s placeholder</div><div class="line">// for the current element</div></pre></td></tr></table></figure>
+<ul>
+<li>泛型编程，包含了大量的traits class。（见 <a href="http://www.cnblogs.com/harlanc/p/6702242.html" title="Item 47" target="_blank" rel="external">Item<br>47</a>）</li>
+<li>模板元编程（见<a href="http://www.cnblogs.com/harlanc/p/6714004.html" title="Item 48" target="_blank" rel="external">Item 48</a>），包括为编译时断言提供的程序库，还有Boost MPL 程序库。MPL支持编译时实体的像STL一样的数据结构，例如types:</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">// create a list-like compile-time container of three types (float,</div><div class="line">// double, and long double) and call the container “floats”</div><div class="line">typedef boost::mpl::list&lt;float, double, long double&gt; floats;</div><div class="line">// create a new compile-time list of types consisting of the types in</div><div class="line">// “floats” plus “int” inserted at the front; call the new container “types”</div><div class="line">typedef boost::mpl::push_front&lt;floats, int&gt;::type types;</div></pre></td></tr></table></figure>
+<p>这种类型的容器（被人熟知的是typelist，虽然它们也可以基于一个mpl::vector或者mpl::list）为一系列强大和重要的TMP应用打开了大门。</p>
+<ul>
+<li>数学和数字，包括为有理数提供的库；八元数和四元数；最大公约数和最小公倍数的计算；还有随机数（虽然这是另外一个影响TR1中的相关功能的库。）</li>
+<li>正确性和测试，包括为形式化隐式模板接口提供的程序库（<a href="http://www.cnblogs.com/harlanc/p/6649086.html" title="Item 41" target="_blank" rel="external">Item 41</a>）和使测试先行更加容易的程序库。</li>
+<li>数据结构，包括为类型安全的union提供的程序库，还有实现了TR1中相对应功能的tuple库。</li>
+<li>内存，包括为高性能的固定大小的内存分配器提供的Pool库（见<a href="http://www.cnblogs.com/harlanc/p/6731455.html" title="Item 50" target="_blank" rel="external">Item<br>50</a>）；一些列的智能指针（<a href="http://www.cnblogs.com/harlanc/p/6412222.html" title="Item 13" target="_blank" rel="external">Item<br>13</a>），包括但不限于TR1中的智能指针。一个这样的非TR1智能指针为scoped_array，一个像auto_ptr一样的为动态分配数组提供的智能指针；<a href="http://www.cnblogs.com/harlanc/p/6680216.html" title="Item 44" target="_blank" rel="external">Item<br>44</a>提供了一个实例。</li>
+<li>杂项，包括为CRC校验提供的库，日期和时间操作的库，在文件系统上移动的库。</li>
+</ul>
+<p>记住，这只是Boost中的一部分程序库。并没有把所有的都列出来。</p>
+<p>Boost提供的库可以做很多事情，但是不能做所有事情。例如，没有为GUI开发提供的库，也没有同数据库进行通信的库。至少现在没有。但是当你读到这本书的时候可能就有了。了解它们的唯一方式就是核实。我建议你现在就做：<a href="http://boost.org/" target="_blank" rel="external">http://boost.org</a>。即使你没有发现你想要的，你肯定能够发现一些有趣的东西。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><ul>
+<li>Boost是一个社区和网站，它为开发人员提供了免费的，开源的，经过同行评审的C++程序库。Boost对C++标准有影响力。</li>
+<li>Boost提供了许多TR1组件的实现，但也提供了许多其它的程序库。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/23/2017-04-23_18_21_读书笔记_effective_c++_Item_54_让你自己熟悉包括TR1在内的标准库/" rel="next" title="读书笔记 effective c++ Item 54 让你自己熟悉包括TR1在内的标准库">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 54 让你自己熟悉包括TR1在内的标准库
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/25/2017-04-25_07_46_effective_c++_思维导图/" rel="prev" title="effective c++ 思维导图">
+                effective c++ 思维导图 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Boost的两大优势"><span class="nav-number">1.</span> <span class="nav-text">1. Boost的两大优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Boost库的收录流程"><span class="nav-number">2.</span> <span class="nav-text">2. Boost库的收录流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Boost库有大有小"><span class="nav-number">3.</span> <span class="nav-text">3. Boost库有大有小</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Boost库的分类"><span class="nav-number">4.</span> <span class="nav-text">4. Boost库的分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-总结"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

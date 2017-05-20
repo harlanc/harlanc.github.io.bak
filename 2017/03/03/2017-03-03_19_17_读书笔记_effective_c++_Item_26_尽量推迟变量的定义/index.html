@@ -1,0 +1,900 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 定义变量会引发构造和析构开销每当你定义一种类型的变量时：当控制流到达变量的定义点时，你引入了调用构造函数的开销，当离开变量的作用域之后，你引入了调用析构函数的开销。对未使用到的变量同样会产生开销，因此对这种定义要尽可能的避免。 2. 普通函数中的变量定义推迟2">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 26 尽量推迟变量的定义">
+<meta property="og:url" content="http://yoursite.com/2017/03/03/2017-03-03_19_17_读书笔记_effective_c++_Item_26_尽量推迟变量的定义/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 定义变量会引发构造和析构开销每当你定义一种类型的变量时：当控制流到达变量的定义点时，你引入了调用构造函数的开销，当离开变量的作用域之后，你引入了调用析构函数的开销。对未使用到的变量同样会产生开销，因此对这种定义要尽可能的避免。 2. 普通函数中的变量定义推迟2">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.663Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 26 尽量推迟变量的定义">
+<meta name="twitter:description" content="1. 定义变量会引发构造和析构开销每当你定义一种类型的变量时：当控制流到达变量的定义点时，你引入了调用构造函数的开销，当离开变量的作用域之后，你引入了调用析构函数的开销。对未使用到的变量同样会产生开销，因此对这种定义要尽可能的避免。 2. 普通函数中的变量定义推迟2">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/03/2017-03-03_19_17_读书笔记_effective_c++_Item_26_尽量推迟变量的定义/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 26 尽量推迟变量的定义 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/03/2017-03-03_19_17_读书笔记_effective_c++_Item_26_尽量推迟变量的定义/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 26 尽量推迟变量的定义</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-03T19:17:00+08:00">
+                2017-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/03/2017-03-03_19_17_读书笔记_effective_c++_Item_26_尽量推迟变量的定义/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/03/2017-03-03_19_17_读书笔记_effective_c++_Item_26_尽量推迟变量的定义/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 26 尽量推迟变量的定义">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-定义变量会引发构造和析构开销"><a href="#1-定义变量会引发构造和析构开销" class="headerlink" title="1. 定义变量会引发构造和析构开销"></a>1. 定义变量会引发构造和析构开销</h2><p>每当你定义一种类型的变量时：当控制流到达变量的定义点时，你引入了调用构造函数的开销，当离开变量的作用域之后，你引入了调用析构函数的开销。对未使用到的变量同样会产生开销，因此对这种定义要尽可能的避免。</p>
+<h2 id="2-普通函数中的变量定义推迟"><a href="#2-普通函数中的变量定义推迟" class="headerlink" title="2. 普通函数中的变量定义推迟"></a>2. 普通函数中的变量定义推迟</h2><h3 id="2"><a href="#2" class="headerlink" title="2"></a>2</h3><a id="more"></a>
+<p>1 变量有可能不会被使用到的例子</p>
+<p>你可能会想你永远不会定义未使用的变量，你可能要再考虑考虑。看下面的函数，此函数返回password的加密版本，提供的password需要足够长。如果password太短，函数会抛出一个logic_error类型的异常，此异常被定义在标准C++库中（Item 54）:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">// this function defines the variable "encrypted" too soon</div><div class="line"></div><div class="line">std::string encryptPassword(const std::string&amp; password)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">using namespace std;</div><div class="line"></div><div class="line">string encrypted;</div><div class="line"></div><div class="line">if (password.length() &lt; MinimumPasswordLength) &#123;</div><div class="line"></div><div class="line">throw logic_error("Password is too short");</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">... // do whatever is necessary to place an</div><div class="line"></div><div class="line">// encrypted version of password in encrypted</div><div class="line"></div><div class="line">return encrypted;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>对象encrypted不是完全不会被用到，但是如果抛出了异常它就肯定不会被用到。这就是说，如果encryptPassword抛出了异常，你不会用到encrypted，但是你同样会为encrypted的构造函数和析构函数买单。因此，最好推迟encrypted的定义直到你认为你会使用它：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">// this function postpones encrypted’s definition until it’s truly necessary</div><div class="line"></div><div class="line">std::string encryptPassword(const std::string&amp; password)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">using namespace std;</div><div class="line"></div><div class="line">if (password.length() &lt; MinimumPasswordLength) &#123;</div><div class="line"></div><div class="line">throw logic_error("Password is too short");</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">string encrypted;</div><div class="line"></div><div class="line">... // do whatever is necessary to place an</div><div class="line"></div><div class="line">// encrypted version of password in encrypted</div><div class="line"></div><div class="line">return encrypted;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="2-2-推迟变量定义的一种方法"><a href="#2-2-推迟变量定义的一种方法" class="headerlink" title="2.2 推迟变量定义的一种方法"></a>2.2 推迟变量定义的一种方法</h3><p>上面的代码看起来还是不够紧凑，因为encrypted定义时没有带任何初始化参数。也就意味着默认构造函数会被调用。在许多情况下，你对一个对象做的第一件事就是给它提供一些值，这通常通过赋值来进行。<a href="http://www.cnblogs.com/harlanc/p/6389927.html" title="Item 4" target="_blank" rel="external">Item 4</a>解释了为什么<strong>默认构造一个对象紧接着对其进行赋值要比用一个值对其初始化效率要低</strong>。其中的分析在这里同样适用。举个例子，假设encryptPassword函数的最困难的部分在下面的函数中执行：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">encrypt</span>(<span class="params">std::<span class="keyword">string</span>&amp; s</span>)</span>; <span class="comment">// encrypts s in place</span></div></pre></td></tr></table></figure>
+<p>然后encryptPassword可以像下面这样实现，虽然这可能不是最好的方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">// this function postpones encrypted’s definition until</div><div class="line"></div><div class="line">// it’s necessary, but it’s still needlessly inefficient</div><div class="line"></div><div class="line">std::string encryptPassword(const std::string&amp; password)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">... // import std and check length as above</div><div class="line"></div><div class="line">string encrypted; // default-construct encrypted</div><div class="line"></div><div class="line">encrypted = password; // assign to encrypted</div><div class="line"></div><div class="line">encrypt(encrypted);</div><div class="line"></div><div class="line">return encrypted;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="2-2-推迟变量定义的更好方法"><a href="#2-2-推迟变量定义的更好方法" class="headerlink" title="2.2 推迟变量定义的更好方法"></a>2.2 推迟变量定义的更好方法</h3><p>一个更好的方法是用password来初始化encypted，这样就跳过了无意义的和可能昂贵的默认构造函数：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">// finally, the best way to define and initialize encrypted</div><div class="line"></div><div class="line">std::string encryptPassword(const std::string&amp; password)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">... // import std and check length</div><div class="line"></div><div class="line">string encrypted(password); // define and initialize via copy</div><div class="line"></div><div class="line">// constructor</div><div class="line"></div><div class="line">encrypt(encrypted);</div><div class="line"></div><div class="line">return encrypted;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="2-3-推迟变量定义的真正含义"><a href="#2-3-推迟变量定义的真正含义" class="headerlink" title="2.3 推迟变量定义的真正含义"></a>2.3 推迟变量定义的真正含义</h3><p>这个建议是这个条款的标题中的“尽量推迟”的真正含义。<strong>你不但要将变量的定义推迟到你必须使用的时候，你同样应该尝试将定义推迟到你获得变量的初始化值的时候</strong>。这么做，你就能避免不必要的构造和析构，也避免了不必要的默认构造函数。并且，<strong>通过在意义已经明确的上下文中对变量进行初始化，你也帮助指明了使用此变量的意图</strong>。</p>
+<h2 id="3-如何处理循环中的变量定义"><a href="#3-如何处理循环中的变量定义" class="headerlink" title="3. 如何处理循环中的变量定义"></a>3. 如何处理循环中的变量定义</h2><p>这时候你该想了：循环该怎么处理呢？如果一个变量只在一个循环中被使用，是将将变量定义在循环外，每次循环迭代为其赋值好呢？还是将其定义在循环内部好呢？也即是下面的结构哪个好？</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Approach A: define outside loop </span></div><div class="line"></div><div class="line">Widget w;</div><div class="line"></div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123; </div><div class="line"></div><div class="line">w = some <span class="keyword">value</span> dependent <span class="keyword">on</span> i; </div><div class="line"></div><div class="line">... </div><div class="line"></div><div class="line">&#125; </div><div class="line"></div><div class="line"><span class="comment">// Approach B: define inside loop</span></div><div class="line"></div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</div><div class="line"></div><div class="line"><span class="function">Widget <span class="title">w</span>(<span class="params">some <span class="keyword">value</span> dependent oni</span>)</span>;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里我用一个Widget类型的对象来替换string类型的对象，以避免对执行构造函数，析构函数或者赋值运算符的开销有任何偏见。</p>
+<p>对于Widget来说，两种方法的开销如下：</p>
+<ul>
+<li>方法一： 1个构造函数+1个析构函数+n个赋值运算</li>
+<li>方法二：n个构造函数和n个析构函数</li>
+</ul>
+<p>如果赋值运算的开销比一对构造函数/析构函数要小，方法A更加高效。尤其是在n很大的时候。否则，方法B要更高效。并且方法A比方法B使变量w在更大的范围内可见，这一点违反了程序的可理解性和可操作性。因此，除非你遇到下面两点：（1）赋值比构造/析构开销要小（2）你正在处理对性能敏感的代码。否则你应该默认使用方法B。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/02/2017-03-02_21_36_读书笔记_effective_c++_Item_25_实现一个不抛出异常的swap/" rel="next" title="读书笔记 effective c++ Item 25 实现一个不抛出异常的swap">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 25 实现一个不抛出异常的swap
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/04/2017-03-04_10_20_读书笔记_effective_c++_Item_27_尽量少使用转型（casting）/" rel="prev" title="读书笔记 effective c++ Item 27 尽量少使用转型（casting）">
+                读书笔记 effective c++ Item 27 尽量少使用转型（casting） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-定义变量会引发构造和析构开销"><span class="nav-number">1.</span> <span class="nav-text">1. 定义变量会引发构造和析构开销</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-普通函数中的变量定义推迟"><span class="nav-number">2.</span> <span class="nav-text">2. 普通函数中的变量定义推迟</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2"><span class="nav-number">2.1.</span> <span class="nav-text">2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-推迟变量定义的一种方法"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 推迟变量定义的一种方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-推迟变量定义的更好方法"><span class="nav-number">2.3.</span> <span class="nav-text">2.2 推迟变量定义的更好方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-推迟变量定义的真正含义"><span class="nav-number">2.4.</span> <span class="nav-text">2.3 推迟变量定义的真正含义</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-如何处理循环中的变量定义"><span class="nav-number">3.</span> <span class="nav-text">3. 如何处理循环中的变量定义</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

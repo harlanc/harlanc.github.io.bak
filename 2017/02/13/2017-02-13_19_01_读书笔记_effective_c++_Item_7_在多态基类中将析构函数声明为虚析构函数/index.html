@@ -1,0 +1,908 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 继承体系中关于对象释放遇到的问题描述1.1 手动释放关于时间记录有很多种方法，因此为不同的计时方法创建一个TimeKeeper基类和一些派生类就再合理不过了： 1234567891011121314151617181920 class TimeKeepe&amp;lt;!--more--&amp;gt; &amp;#123; public: TimeKeeper(); ~TimeKeeper(); ... &amp;#12">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 7 在多态基类中将析构函数声明为虚析构函数">
+<meta property="og:url" content="http://yoursite.com/2017/02/13/2017-02-13_19_01_读书笔记_effective_c++_Item_7_在多态基类中将析构函数声明为虚析构函数/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 继承体系中关于对象释放遇到的问题描述1.1 手动释放关于时间记录有很多种方法，因此为不同的计时方法创建一个TimeKeeper基类和一些派生类就再合理不过了： 1234567891011121314151617181920 class TimeKeepe&amp;lt;!--more--&amp;gt; &amp;#123; public: TimeKeeper(); ~TimeKeeper(); ... &amp;#12">
+<meta property="og:updated_time" content="2017-05-20T10:40:47.583Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 7 在多态基类中将析构函数声明为虚析构函数">
+<meta name="twitter:description" content="1. 继承体系中关于对象释放遇到的问题描述1.1 手动释放关于时间记录有很多种方法，因此为不同的计时方法创建一个TimeKeeper基类和一些派生类就再合理不过了： 1234567891011121314151617181920 class TimeKeepe&amp;lt;!--more--&amp;gt; &amp;#123; public: TimeKeeper(); ~TimeKeeper(); ... &amp;#12">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/13/2017-02-13_19_01_读书笔记_effective_c++_Item_7_在多态基类中将析构函数声明为虚析构函数/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 7 在多态基类中将析构函数声明为虚析构函数 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/13/2017-02-13_19_01_读书笔记_effective_c++_Item_7_在多态基类中将析构函数声明为虚析构函数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 7 在多态基类中将析构函数声明为虚析构函数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-13T19:01:00+08:00">
+                2017-02-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/13/2017-02-13_19_01_读书笔记_effective_c++_Item_7_在多态基类中将析构函数声明为虚析构函数/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/13/2017-02-13_19_01_读书笔记_effective_c++_Item_7_在多态基类中将析构函数声明为虚析构函数/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 7 在多态基类中将析构函数声明为虚析构函数">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-继承体系中关于对象释放遇到的问题描述"><a href="#1-继承体系中关于对象释放遇到的问题描述" class="headerlink" title="1. 继承体系中关于对象释放遇到的问题描述"></a>1. 继承体系中关于对象释放遇到的问题描述</h2><h3 id="1-1-手动释放"><a href="#1-1-手动释放" class="headerlink" title="1.1 手动释放"></a>1.1 手动释放</h3><p>关于时间记录有很多种方法，因此为不同的计时方法创建一个TimeKeeper基类和一些派生类就再合理不过了：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"> class TimeKeepe</div><div class="line">&lt;!--more--&gt;</div><div class="line"> &#123;</div><div class="line"></div><div class="line"> public:</div><div class="line"></div><div class="line"> TimeKeeper();</div><div class="line"></div><div class="line"> ~TimeKeeper();</div><div class="line"></div><div class="line"> ...</div><div class="line"></div><div class="line"> &#125;;</div><div class="line"></div><div class="line"> class AtomicClock: public TimeKeeper &#123; ... &#125;;</div><div class="line"></div><div class="line"> class WaterClock: public TimeKeeper &#123; ... &#125;;</div><div class="line"></div><div class="line"> class WristWatch: public TimeKeeper &#123; ... &#125;;</div><div class="line"></div></pre></td></tr></table></figure>
+<p>许多客户端只想访问时间而不想知道关于时间计算的细节，所以可以创建一个工厂方法，这个工厂方法返回一个指向新创建的派生类对象的基类指针，这个指针用来指向一个计时对象：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">TimeKeeper* getTimeKeeper(); <span class="comment">// returns a pointer to a dynamic-</span></div><div class="line"></div><div class="line">                                                         <span class="comment">// ally allocated object of a class</span></div><div class="line"></div><div class="line">                                                          <span class="comment">// derived from TimeKeeper</span></div></pre></td></tr></table></figure>
+<p>为了和工厂方法的约定保持一致，getTimeKeeper返回一个堆上的对象，因此为了避免泄露内存和其他资源，每个返回的对象被合理的释放掉(deleted)是很重要的：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">TimeKeeper *ptk = getTimeKeeper(); <span class="comment">// get dynamically allocated object</span></div><div class="line"></div><div class="line"><span class="comment">// from TimeKeeper hierarchy</span></div><div class="line"></div><div class="line">... <span class="comment">// use it</span></div><div class="line"></div><div class="line">delete ptk; <span class="comment">// release it to avoid resource leak</span></div></pre></td></tr></table></figure>
+<p>Item13中解释到依赖客户执行deletion比较容易出错，在Item18中解释了如何改变工厂函数的接口来预防一般的客户端错误，但是这些关注点在这里都是次要的，因为在这个条款中，我们为上面的代码提出一个更基本的弱点：即使客户端把一切都做对了，根本没有方法去知道程序如何运转。</p>
+<h3 id="1-2非虚析构函数引入的问题"><a href="#1-2非虚析构函数引入的问题" class="headerlink" title="1.2非虚析构函数引入的问题"></a>1.2非虚析构函数引入的问题</h3><p>问题在于getTimeKeeper返回一个指向派生类对象的指针(AtomicClock),这个对象通过一个基类指针(一个TimeKeeper<em>指针)来进行释放（delete），基类中(TimeKeeper)有一个非虚析构函数。这是造成灾难的一个因素，因为c++指出：<em>*通过一个基类的指针来释放一个派生类的对象，如果基类的析构函数是非虚的，那么结果未定义</em></em>。在运行时有可能发生以下状况：对象的派生类部分永远不会被释放掉。如果对getTimeKeeper的调用恰巧返回一个指向AtomicClock对象的指针，对象的AtomicClock部分（也就是在AtomicClock类中声明的数据成员）可能不会被释放掉，AtomicClock类的析构函数也不会被执行。然而，基类部分（也就是TimeKeeper部分）是会被释放掉的，这会导致产生一个古怪的“部分被释放的”对象。这是使资源泄露，破坏数据结构和在debugger上花费大把时间的绝佳方法。</p>
+<h2 id="2-如何解决问题-声明虚析构函数"><a href="#2-如何解决问题-声明虚析构函数" class="headerlink" title="2.如何解决问题-声明虚析构函数"></a>2.如何解决问题-声明虚析构函数</h2><p><strong>消除这个问题很简单：为基类提供一个虚析构函数</strong>。这时如果delete一个派生类对象将会做到你想要的。它会释放掉整个对象，包括派生类的所有部分：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">TimeKeeper</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line">TimeKeeper();</div><div class="line"></div><div class="line"><span class="keyword">virtual</span> ~TimeKeeper();</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">TimeKeeper *ptk = getTimeKeeper();</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">delete ptk; <span class="comment">// now behaves correctly</span></div></pre></td></tr></table></figure>
+<p>基类中(TimeKeeper)除了析构函数外一般情况下会包含虚函数，<strong>因为虚函数存在的目的是为了函数在派生类中的定制化实现（**</strong>Item34<strong>**）</strong>。举个例子，TimeKeeper会有一个虚函数，getCurrentTime,这个函数在不同的派生类中会有不同的实现。<strong>任何有虚函数的类应该肯定有一个虚析构函数。</strong></p>
+<hr>
+<h2 id="3-不要在不当作基类的类中声明虚析构函数"><a href="#3-不要在不当作基类的类中声明虚析构函数" class="headerlink" title="3.不要在不当作基类的类中声明虚析构函数"></a>3.不要在不当作基类的类中声明虚析构函数</h2><hr>
+<p><strong>如果类中不包含虚函数，这通常表明它不会被用作基类，如果并没有打算将一个类作为一个基类，将析构函数声明为虚是一个坏的想法。</strong>考虑一个表示二维空间的点的类：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Point</span> &#123; <span class="comment">// a 2D point</span></div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line">Point(<span class="keyword">int</span> xCoord, <span class="keyword">int</span> yCoord);</div><div class="line"></div><div class="line">~Point();</div><div class="line"></div><div class="line"><span class="keyword">private</span>:</div><div class="line"></div><div class="line"><span class="keyword">int</span> x, y;</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>如果int占用32Bits,那么一个Point对象可被放入一个64-bit的缓存器中。并且，这个Point对象可以以一个”64-bit quantity”传给用其他语言编写的函数，例如c语言和Fortran。如果将Point的析构函数声明成虚的，状况就会发生变化。</p>
+<p>虚函数的实现需要对象带一些信息，根据这些信息在运行时能够决定对象的哪个虚函数会被触发。这些信息表现为一个被叫做vptr(virtual table pointer)指针的形式。我们把指向一个函数指针数组的vptr指针叫做vtbl(virtual table)；每个有虚函数的类都有一个关联的vtbl.当虚函数在一个对象上被触发，实际调用的函数是由对象的vtbl中的vptr来决定的，在vtbl中会查找到合适的函数指针。</p>
+<p>关于虚函数是如何实现的细节并不重要。重要的是如果Point类中包含一个虚函数，这个类型的对象会在占用空间上有所增加：在32位机器中，空间会从64bits(两个int)增加到96bits；在64位机器中，空间会从64bits增加到128bits,因为64位机器上的指针在空间上占用64bits.Point额外增加了一个vptr而致使内存空间增加50-100%。Point将不能在放进64bits的缓存中。并且，c++中的Point也不再同其他语言(如C语言)中声明的对象有类似的结构了，因为其他语言没有vptr,因此你不再能够向(从)其他语言编写的函数中传进(传出)指针了,除非你对vptr进行明确的补偿，这属于实现细节，代码因此也不能够被移植了。</p>
+<p>因此，无缘无故的将所有析构函数声明成虚函数同永远不将其声明为虚函数犯了一样的错误。事实上，许多人将上面的情形其总结如下：<strong>在类中声明虚析构函数当且仅当类中至少包含一个虚函数。</strong></p>
+<h2 id="4-不要继承析构函数为非虚的类"><a href="#4-不要继承析构函数为非虚的类" class="headerlink" title="4.不要继承析构函数为非虚的类"></a>4.不要继承析构函数为非虚的类</h2><p>在虚函数完全缺席的情况下，非虚析构函数的问题同样会导致只释放部分内存的问题。举个例子，标准string类型不包含虚函数，但是一些被误导的程序员有时会将其当作基类：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">SpecialString</span>: <span class="title">public</span> <span class="title">std</span>::<span class="title">string</span> &#123; <span class="comment">// bad idea! std::string has a</span></div><div class="line"></div><div class="line">... <span class="comment">// non-virtual destructor</span></div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>乍一看这么实现也许无伤大雅，但是如果在一个应用中的某个地方，你以某种方式将指向SpecialString的指针转换成指向string的指针，然后你在string指针上使用delete，你马上会被转到未定义行为的领地：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">SpecialString *pss =new SpecialString("Impending Doom");</div><div class="line"></div><div class="line">std::string *ps;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">ps = pss; // SpecialString* ⇒ std::string*</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">delete ps; // undefined! In practice,</div><div class="line"></div><div class="line">// *ps’s SpecialString resources</div><div class="line"></div><div class="line">// will be leaked, because the</div><div class="line"></div><div class="line">// SpecialString destructor won’t</div><div class="line"></div><div class="line">// be called</div></pre></td></tr></table></figure>
+<p>同样的分析适用于任何缺少虚析构函数的类，包含所有的STL容器类型（例如 vector,list set,tr1::unordered_map(Item54)）。如果你曾经受到诱惑，从一个标准容器类或其他没有虚析构函数的类中继承，你需要抵抗这种诱惑！（不幸的是，c++没有提供不能继承的机制，java中有final类，c#中有sealed类）。</p>
+<h2 id="5-纯虚析构函数"><a href="#5-纯虚析构函数" class="headerlink" title="5.纯虚析构函数"></a>5.纯虚析构函数</h2><p>偶尔情况下为类提供一个纯虚析构函数是很方便的。有纯虚函数的类是一个抽象类，其不能够被实例化。然而有时候，你想将一个类变成一个抽象类，但是没有任何纯虚函数。该怎么办？因为一个抽象类将来会被用作基类，并且基类应该有一个虚析构函数，同时一个纯虚函数产生一个抽象类，所以解决方案很简单：<strong>在你想要其变成抽象的类中声明一个纯虚析构函数</strong>。看下面的例子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">AWOV</span> &#123; <span class="comment">// AWOV = “Abstract w/o Virtuals”</span></div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line"><span class="keyword">virtual</span> ~AWOV() = <span class="number">0</span>; <span class="comment">// declare pure virtual destructor</span></div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这个类有一个纯虚函数，所以它是抽象类。因为它有一个虚析构函数，所以你不必担心因为析构函数出现的问题。这里有个窍门，<strong>你必须为纯虚函数提供一份定义</strong>：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">AWOV::~AWOV() &#123;&#125; // definition of pure virtual dtor</div></pre></td></tr></table></figure>
+<p>析构函数工作的方法是最底部的派生类先被调用，然后析构函数的每一个基类会被依次调用。编译器会从派生类的析构函数中生成一个对~AWOV的调用，因此你必须确保为这个函数提供一个函数体。如果不提供会有链接错误。</p>
+<h2 id="6-其他一些需要注意的地方"><a href="#6-其他一些需要注意的地方" class="headerlink" title="6.其他一些需要注意的地方"></a>6.其他一些需要注意的地方</h2><p> <strong>为基类提供虚析构函数的法则只适用于多态基类</strong>，多态基类也就是将基类设计成允许通过基类接口来操作派生类型的类。TImeKeeper是一个多态基类，因为我们想能够操作AtomicClokc和WaterClock对象，在即使只有TimeKeeper指针指向这些派生类对象的情况下。</p>
+<p><strong>并不是所有的基类都被设计成能够使用多态</strong>。举个例子，标准string类型还有STL容器类型并没有被设计成基类，更不用说多态了。<strong>一些类被设计成当基类使用，但是没有被设计成使用多态</strong>。举个例子，Item6中的UnCopyable和来自标准库中的input_iterator_tag（Item47）,这样的类没有被设计成通过基类接口操作派生类。因此，也不需要虚析构函数。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/13/2017-02-13_09_03_读书笔记_effective_c++_Item_6_如果你不想使用编译器自动生成的函数，你需要明确拒绝/" rel="next" title="读书笔记 effective c++ Item 6 如果你不想使用编译器自动生成的函数，你需要明确拒绝">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 6 如果你不想使用编译器自动生成的函数，你需要明确拒绝
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/14/2017-02-14_07_34_读书笔记_effective_c++_Item_8_不要让异常(exceptions)离开析构函数/" rel="prev" title="读书笔记 effective c++ Item 8 不要让异常(exceptions)离开析构函数">
+                读书笔记 effective c++ Item 8 不要让异常(exceptions)离开析构函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-继承体系中关于对象释放遇到的问题描述"><span class="nav-number">1.</span> <span class="nav-text">1. 继承体系中关于对象释放遇到的问题描述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-手动释放"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 手动释放</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2非虚析构函数引入的问题"><span class="nav-number">1.2.</span> <span class="nav-text">1.2非虚析构函数引入的问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-如何解决问题-声明虚析构函数"><span class="nav-number">2.</span> <span class="nav-text">2.如何解决问题-声明虚析构函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-不要在不当作基类的类中声明虚析构函数"><span class="nav-number">3.</span> <span class="nav-text">3.不要在不当作基类的类中声明虚析构函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-不要继承析构函数为非虚的类"><span class="nav-number">4.</span> <span class="nav-text">4.不要继承析构函数为非虚的类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-纯虚析构函数"><span class="nav-number">5.</span> <span class="nav-text">5.纯虚析构函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-其他一些需要注意的地方"><span class="nav-number">6.</span> <span class="nav-text">6.其他一些需要注意的地方</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

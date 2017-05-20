@@ -1,0 +1,908 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1.不要手动释放从函数返回的堆资源假设你正在处理一个模拟Investment的程序库，不同的Investmetn类型从Investment基类继承而来， 12345 class Investment &amp;#123; ... &amp;#125;; // root class&amp;lt;!--more--&amp;gt;of hierarchy of // investment types 进一步假设这个程序库通过一个工">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 13 用对象来管理资源">
+<meta property="og:url" content="http://yoursite.com/2017/02/18/2017-02-18_07_56_读书笔记_effective_c++_Item_13_用对象来管理资源/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1.不要手动释放从函数返回的堆资源假设你正在处理一个模拟Investment的程序库，不同的Investmetn类型从Investment基类继承而来， 12345 class Investment &amp;#123; ... &amp;#125;; // root class&amp;lt;!--more--&amp;gt;of hierarchy of // investment types 进一步假设这个程序库通过一个工">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.264Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 13 用对象来管理资源">
+<meta name="twitter:description" content="1.不要手动释放从函数返回的堆资源假设你正在处理一个模拟Investment的程序库，不同的Investmetn类型从Investment基类继承而来， 12345 class Investment &amp;#123; ... &amp;#125;; // root class&amp;lt;!--more--&amp;gt;of hierarchy of // investment types 进一步假设这个程序库通过一个工">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/18/2017-02-18_07_56_读书笔记_effective_c++_Item_13_用对象来管理资源/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 13 用对象来管理资源 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/18/2017-02-18_07_56_读书笔记_effective_c++_Item_13_用对象来管理资源/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 13 用对象来管理资源</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-18T07:56:00+08:00">
+                2017-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/18/2017-02-18_07_56_读书笔记_effective_c++_Item_13_用对象来管理资源/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/18/2017-02-18_07_56_读书笔记_effective_c++_Item_13_用对象来管理资源/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 13 用对象来管理资源">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-不要手动释放从函数返回的堆资源"><a href="#1-不要手动释放从函数返回的堆资源" class="headerlink" title="1.不要手动释放从函数返回的堆资源"></a>1.不要手动释放从函数返回的堆资源</h2><p>假设你正在处理一个模拟Investment的程序库，不同的Investmetn类型从Investment基类继承而来，</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">class</span> <span class="title">Investment</span> &#123; ... &#125;; <span class="comment">// root class</span></div><div class="line">&lt;!--more--&gt;</div><div class="line">of hierarchy of</div><div class="line"></div><div class="line"> <span class="comment">// investment types</span></div></pre></td></tr></table></figure>
+<p>进一步假设这个程序库通过一个工厂函数(Item 7)来给我们提供特定Investment对象：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">Investment* createInvestment(); <span class="comment">// return ptr to dynamically allocated</span></div><div class="line"></div><div class="line"><span class="comment">// object in the Investment hierarchy;</span></div><div class="line"></div><div class="line"><span class="comment">// the caller must delete it</span></div><div class="line"></div><div class="line"><span class="comment">// (parameters omitted for simplicity)</span></div></pre></td></tr></table></figure>
+<p>正如注释所表述的，当createInvesment返回的对象不再被使用时，调用者有责任将此对象释放掉。我们用函数f来履行这个职责：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span>(<span class="params"></span>)</span></div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">Investment *pInv = createInvestment(); <span class="comment">// call factory function</span></div><div class="line"></div><div class="line">... <span class="comment">// use pInv</span></div><div class="line"></div><div class="line">delete pInv; <span class="comment">// release object</span></div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法看上去挺好，但是在一些情况下释放从createInvestment得来的对象有可能会失败。在函数的”…”部分中有可能会出现过早的reture语句，如果这个return被执行了，那么最后的delete语句永远不会被执行到；如果createInvesment和delete在一个循环中，break和goto语句会使循环过早退出，delete也不会被执行到；最后在…中的一些语句有可能会抛出异常，如果这样的话，控制流程会再次不能执行到delete。不管delete是怎么被跳过去的，不仅会泄露Invesment对象所使用的内存，也会泄露Investment对象所拥有的任何资源。</p>
+<p>当然，小心的编程可以防止这类错误的发生，但是你应该想到随着时间的推移代码有可能发生变化。在软件的维护过程中，一些人可能在没有完全领会这个函数的资源管理策略的情况下为其添加一个return或者continue语句。更糟糕的是，f函数的”…”部分有可能调用一个从来没有抛出异常的函数，但这个函数被“改善”后，它抛出异常了。所以依赖f来到达delete语句通常是不可行的。</p>
+<h2 id="2-通过对象来管理需要手动释放的资源"><a href="#2-通过对象来管理需要手动释放的资源" class="headerlink" title="2.通过对象来管理需要手动释放的资源"></a>2.通过对象来管理需要手动释放的资源</h2><p>为了确保从createInvestment返回的资源总是被释放，我们需要将资源放到一个对象中，当离开函数f的时候，对象的析构函数会自动释放对象拥有的资源。事实上，我们已经说出了这个条款一半的内容：<strong>通过将资源放入对象中，我们可以依赖**</strong>c++<strong>**的析构函数自动调用机制来确保资源被释放</strong>。（另一半一会就会讲到）</p>
+<h3 id="2-1-使用auto-ptr来管理资源"><a href="#2-1-使用auto-ptr来管理资源" class="headerlink" title="2.1 使用auto_ptr来管理资源"></a>2.1 使用auto_ptr来管理资源</h3><p>许多资源是被动态的分配在堆上的，它们被用在一个单独的块或者函数中，当控制流离开块或者函数时，这些资源应该被释放。标准库中的auto_ptr正是为这种情况量身定做的。Auto_ptr是一个指针（智能指针）一样的对象，它的析构函数会自动为其指向的对象调用delete函数。下面演示如何使用auto_ptr来防止可能出现的资源泄露：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">void f()</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">std::auto_ptr&lt;Investment&gt; pInv(createInvestment()); // call factory</div><div class="line"></div><div class="line">// function</div><div class="line"></div><div class="line">... // use pInv as</div><div class="line"></div><div class="line">// before</div><div class="line"></div><div class="line">&#125; // automatically</div><div class="line"></div><div class="line">// delete pInv via</div><div class="line"></div><div class="line">// auto_ptr’s dtor</div></pre></td></tr></table></figure>
+<h3 id="2-2-用对象管理资源的两个关键点"><a href="#2-2-用对象管理资源的两个关键点" class="headerlink" title="2.2 用对象管理资源的两个关键点"></a>2.2 用对象管理资源的两个关键点</h3><p>这个简单的例子指出了使用对象管理资源的两个关键点：</p>
+<ul>
+<li><strong>获取资源后应该立即将其转交给资源管理对象</strong>。从上面的例子看出，使用createInvestment返回的资源来初始化对其进行管理的auto_ptr指针。事实上，用对象来管理资源的想法通常被叫做”资源获取的时候就是初始化的时候”(Resource Acquisition Is Initialization RAII）,因为将资源获取和资源管理对象的初始化放在同一个语句中是非常常见的。有时用获取的资源给资源管理对象赋值而不是初始化，但是不管哪种方法，都是在资源获取到之后马上将控制权转交给资源管理对象。</li>
+<li><strong>资源管理对象使用它们的析构函数来确保资源被释放</strong>。因为不管控制流是怎么离开块或函数的，对象销毁的时候析构函数会被自动调用（例如当一个对象超出了作用域），资源因此能够被正确释放。释放资源时抛出异常会使问题变的棘手，这个问题在Item8中讨论了，我们不再担心这种问题。</li>
+</ul>
+<p>因为 当auto_ptr被销毁时会自动delete它所指向的资源，所以有没有多个auto_ptr指向通一个对象是很重要的。如果有多个，对象会被多次delete,这就会导致出现未定义行为。为了防止这样的问题出现，auto_ptrs有一个与众不同的性质：<strong>被拷贝的指针（通过拷贝构造函数或者拷贝赋值运算符）会被置为**</strong>null<strong>**，进行拷贝的指针将拥有资源的所有权</strong>。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">std::auto_ptr&lt;Investment&gt; // pInv1 points to the</div><div class="line"></div><div class="line">pInv1(createInvestment()); // object returned from</div><div class="line"></div><div class="line">// createInvestment</div><div class="line"></div><div class="line">std::auto_ptr&lt;Investment&gt; pInv2(pInv1); // pInv2 now points to the</div><div class="line"></div><div class="line">// object; pInv1 is now null</div><div class="line"></div><div class="line">pInv1 = pInv2; // now pInv1 points to the</div><div class="line"></div><div class="line">// object, and pInv2 is null</div></pre></td></tr></table></figure>
+<h3 id="2-3-用shared-ptr来管理资源"><a href="#2-3-用shared-ptr来管理资源" class="headerlink" title="2.3 用shared_ptr来管理资源"></a>2.3 用shared_ptr来管理资源</h3><p>奇特的拷贝行为，加上“不能有超过一个的auto_ptr指向被auto_ptr管理的资源”，这两种特性使得auto_ptrs不是管理所有动态分配资源的最好方法。举个例子，STL容器需要”正常的”拷贝行为，因此就不能将容器放入auto_ptr中。</p>
+<p>Auto_ptr的一种替代方法是使用“引用计数的智能指针”（reference-counting smart pointer RCSP）.RCSP是一种能够跟踪有多少对象指向同个一特定资源的指针，资源只有在没有指针指向的情况下才能被释放。因此，RCSP提供的行为同垃圾回收机制类似。和垃圾回收机制不同的是，RCSP不会制止循环引用（例如，两个都不被使用的对象却指向彼此，看上去在被使用一样。）</p>
+<p>TR1的tr1::shared_ptr(看Item54)是是一个RCSP,所以你可以这么实现f:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">void f()</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;Investment&gt;</div><div class="line"></div><div class="line">pInv(createInvestment()); // call factory function</div><div class="line"></div><div class="line">... // use pInv as before</div><div class="line"></div><div class="line">&#125; // automatically delete</div><div class="line"></div><div class="line">// pInv via shared_ptr’s dtor</div></pre></td></tr></table></figure>
+<p>这段代码看上去同使用auto_ptr大致相同，但是拷贝shared_ptrs的行为更加自然：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">void f()</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;Investment&gt; // pInv1 points to the</div><div class="line"></div><div class="line">pInv1(createInvestment()); // object returned from</div><div class="line"></div><div class="line">// createInvestment</div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;Investment&gt; // both pInv1 and pInv2 now</div><div class="line">pInv2(pInv1); // point to the object</div><div class="line">pInv1 = pInv2; // ditto — nothing has</div><div class="line">// changed</div><div class="line">...</div><div class="line">&#125; // pInv1 and pInv2 are</div><div class="line">// destroyed, and the</div><div class="line">// object they point to is</div><div class="line">// automatically deleted</div></pre></td></tr></table></figure>
+<p>因为拷贝tr1::shared_ptrs的工作方式是你所想要的，它们可以被用在像STL容器和其他上下文中，在这里auto_ptr的古怪的拷贝方式不再合适。</p>
+<h3 id="2-4-不要将auto-ptr和shared-ptr用于动态分配数组"><a href="#2-4-不要将auto-ptr和shared-ptr用于动态分配数组" class="headerlink" title="2.4 不要将auto_ptr和shared_ptr用于动态分配数组"></a>2.4 不要将auto_ptr和shared_ptr用于动态分配数组</h3><p>不要被误导。这个条款不是用来介绍关于auto_ptr,tr1::shared_ptr或者其它类型的智能指针。这个条款讲述的是用对象管理资源的重要性。使用Auto_ptr和tr1::shared_ptr只是举个例子。（关于tr1::shared_ptr的更多内容，查看Item14 18和54）</p>
+<p>Auto_ptr和tr1::shared_ptr的析构函数中使用的是delete而不是delete[]。（Item16 描述了区别）这意味着在auto_ptr或者tr1::shared_ptr中存放动态分配的数组不是一个好方法，令人遗憾的是，这种用法可以通过编译：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">std::auto_ptr&lt;std::string&gt; // bad idea! the wrong</div><div class="line"></div><div class="line">aps(new std::string[10]); // delete form will be used</div><div class="line"></div><div class="line">std::tr1::shared_ptr&lt;int&gt; spi(new int[1024]); // same problem</div></pre></td></tr></table></figure>
+<p>你会惊奇的发现c++中没有用于动态分配数组的类似auto_ptr或者tr1::shared_ptr的东西，TR1中也没有。因为vector和string基本可以替代动态分配数组了。如果你仍然认为存在用于动态分配数组的类似于auto_ptr和tr1::shared_ptr的类是好的，可以看一下Boost（Item 55）.你会非常高兴的发现boost::scoped_array和boost::shared_array类提供了你正在寻找的。</p>
+<h2 id="3-其他问题"><a href="#3-其他问题" class="headerlink" title="3.其他问题"></a>3.其他问题</h2><p>这个条款中，使用对象管理资源的指导方针意味着如果你自己手动释放资源（例如使用delete而不是一个资源管理类），你的做法就是错误的。 预装的资源管理类，像auto_ptr和tr1::shared_ptr使遵守这个条款变的更加容易，但有时候当你使用一个资源的时候你会发现这些预制的类没有做到你想要的。这种情况下，你就需要编写你自己的资源管理类了。这也不是非常难的，但确实有一些微妙的地方需要你考虑。这些注意点将要在Item14和Item15种进行讨论。</p>
+<p>最后，我必须指出createInvestment的原生指针返回类型是资源泄露的导火索，因为调用者很容易就会忘记调用delete(即使使用auto_ptr和tr1::shared_ptr来执行delete，它们仍然需要记得将createInvestment的返回值放入智能指针对象中)。对付这个问题需要调用createInvestment的修订版本，这个问题会在Item18中进行讨论。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/17/2017-02-17_07_42_读书笔记_effective_c++_Item_12_拷贝对象的所有部分/" rel="next" title="读书笔记 effective c++ Item 12 拷贝对象的所有部分">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 12 拷贝对象的所有部分
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/19/2017-02-19_09_32_读书笔记_effective_c++_Item_14_对资源管理类的拷贝行为要谨慎/" rel="prev" title="读书笔记 effective c++ Item 14 对资源管理类的拷贝行为要谨慎">
+                读书笔记 effective c++ Item 14 对资源管理类的拷贝行为要谨慎 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-不要手动释放从函数返回的堆资源"><span class="nav-number">1.</span> <span class="nav-text">1.不要手动释放从函数返回的堆资源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-通过对象来管理需要手动释放的资源"><span class="nav-number">2.</span> <span class="nav-text">2.通过对象来管理需要手动释放的资源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-使用auto-ptr来管理资源"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 使用auto_ptr来管理资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-用对象管理资源的两个关键点"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 用对象管理资源的两个关键点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-用shared-ptr来管理资源"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 用shared_ptr来管理资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-不要将auto-ptr和shared-ptr用于动态分配数组"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 不要将auto_ptr和shared_ptr用于动态分配数组</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-其他问题"><span class="nav-number">3.</span> <span class="nav-text">3.其他问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,900 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Item 50中解释了在什么情况下你可能想实现自己版本的operator new和operator delete，但是没有解释当你实现的时候需要遵守的约定。遵守这些规则">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 51 实现new和delete的时候要遵守约定">
+<meta property="og:url" content="http://yoursite.com/2017/04/21/2017-04-21_08_01_读书笔记_effective_c++_Item_51_实现new和delete的时候要遵守约定/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="Item 50中解释了在什么情况下你可能想实现自己版本的operator new和operator delete，但是没有解释当你实现的时候需要遵守的约定。遵守这些规则">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.440Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 51 实现new和delete的时候要遵守约定">
+<meta name="twitter:description" content="Item 50中解释了在什么情况下你可能想实现自己版本的operator new和operator delete，但是没有解释当你实现的时候需要遵守的约定。遵守这些规则">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/21/2017-04-21_08_01_读书笔记_effective_c++_Item_51_实现new和delete的时候要遵守约定/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 51 实现new和delete的时候要遵守约定 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/21/2017-04-21_08_01_读书笔记_effective_c++_Item_51_实现new和delete的时候要遵守约定/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 51 实现new和delete的时候要遵守约定</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-21T08:01:00+08:00">
+                2017-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/21/2017-04-21_08_01_读书笔记_effective_c++_Item_51_实现new和delete的时候要遵守约定/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/21/2017-04-21_08_01_读书笔记_effective_c++_Item_51_实现new和delete的时候要遵守约定/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 51 实现new和delete的时候要遵守约定">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="http://www.cnblogs.com/harlanc/p/6731455.html" title="Item 50" target="_blank" rel="external">Item 50</a>中解释了在什么情况下你可能想实现自己版本的operator new和operator delete，但是没有解释当你实现的时候需要遵守的约定。遵守这些规则<br><a id="more"></a><br>不是很困难，但是它们其中有一些并不直观，所以知道这些规则是什么很重要。</p>
+<h2 id="1-定义operator-new的约定"><a href="#1-定义operator-new的约定" class="headerlink" title="1. 定义operator new的约定"></a>1. 定义operator new的约定</h2><h3 id="1-1-约定列举"><a href="#1-1-约定列举" class="headerlink" title="1.1 约定列举"></a>1.1 约定列举</h3><p>我们以operator new开始。实现一个一致的operator new需要有<strong>正确的返回值</strong>，在没有足够内存的时候<strong>调用**</strong>new-handling<strong>**函数</strong>（见<a href="http://www.cnblogs.com/harlanc/p/6721163.html" title="Item 49" target="_blank" rel="external">Item 49</a>）,并且做好准备<strong>处理没有内存可分配的情况</strong>。你也想避免无端的隐藏“正常”版本的new，但这是一个类接口的问题而不是实现需求问题；它会在Item 52中进行处理。</p>
+<p>Operator new的返回值部分很简单，因为operator new事实上会尝试多次分配内存，在内次分配失败之后都会调用new-handling函数。这里的假设是new-handling函数可能会做一些事情来释放一些内存。只有在指向new-handling函数的指针为null的情况下，operator new才会抛出异常。</p>
+<p>好奇的是，C++即使在请求0个byte的时候也需要operator new返回一个合法的指针。（这个听上去很奇怪的要求简化了语言中的某些事情。）这就是基本情况，一个非成员operator new的伪代码会是像下面这个样子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">void* operator new(std::size_t size) throw(std::bad_alloc)</div><div class="line">&#123; // your operator new might</div><div class="line"></div><div class="line">using namespace std;             // take additional params</div><div class="line"></div><div class="line">if (size == 0) &#123;          // handle 0-byte requests</div><div class="line"></div><div class="line">size = 1; // by treating them as</div><div class="line">&#125; // 1-byte requests</div><div class="line">while (true) &#123;</div><div class="line">attempt to allocate size bytes;</div><div class="line"></div><div class="line">if (the allocation was successful)</div><div class="line">return (a pointer to the memory);</div><div class="line">// allocation was unsuccessful; find out what the</div><div class="line">// current new-handling function is (see below)</div><div class="line">new_handler globalHandler = set_new_handler(0);</div><div class="line">set_new_handler(globalHandler);</div><div class="line">if (globalHandler) (*globalHandler)();</div><div class="line">else throw std::bad_alloc();</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>把请求0个byte当作请求1一个byte来进行处理的诡计看上去让人厌恶，但这是简单的实现并且合法，而且能够工作，无论如何，你对0个byte的请求会有多频繁呢？</p>
+<p>对于伪代码中将new-handling函数指针设为null，然后迅速的将其复原的地方，你可能看上去比较怀疑。不幸的是，没有其他方法直接获得new-handling函数的指针，所以你必须调用set_new_handler来发现这个函数是什么。看上去粗糙但却是有效的，起码对于单线程来说是有效的。在多线程环境中，你可能需要某种类型的锁来安全的操作new-handling函数背后的（全局）数据结构。</p>
+<p>在<a href="http://www.cnblogs.com/harlanc/p/6721163.html" title="Item 49" target="_blank" rel="external">Item 49</a>中讨论过了，在operator new中包含一个无限循环，上面的代码中将其展示了出来；“while(true)”就 表示一个无限循环。跳出循环的唯一方法是成功的分配内存或者让new-handling函数做到Item 49中描述的事情中的其中一件：<strong>有更多的内存可供分配，安装一个不同的**</strong>new-handler<strong><strong>，卸载</strong></strong>new-handler<strong><strong>，抛出一个异常，这个异常要么继承自</strong></strong>bad_alloc<strong>**要么源于失败返回</strong>。现在你应该清楚为什么new-handler必须做到这些事情中的一件的了，如果做不到，operator new中的循环永远不会终止。</p>
+<h3 id="1-2-由继承导致的问题"><a href="#1-2-由继承导致的问题" class="headerlink" title="1.2 由继承导致的问题"></a>1.2 由继承导致的问题</h3><p>许多人没有意识到operator new成员函数是要被派生类继承的。这可能会导致一些有趣的并发症。在上面的operator new的伪代码中，注意函数尝试分配size个bytes。这再合理不过了，因为这是传递到函数中的参数。然而，正如<a href="http://www.cnblogs.com/harlanc/p/6731455.html" title="Item 50" target="_blank" rel="external">Item 50</a>中解释的，实现一个自定义内存管理器的最一般的原因就是为<strong>特定类的对象</strong>进行内存分配优化，而不是为类或者它的任何派生类。也即是，我们为类X提供了一个operaor new，这个函数的行为是为大小正好为sizeof(X)的对象进行调整，即不大也不小。然而由于继承的存在，可能发生通过调用基类中的operator new来为派生类对象分配内存：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Base</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="keyword">static</span> <span class="keyword">void</span>* <span class="function"><span class="keyword">operator</span> <span class="title">new</span>(<span class="params">std::size_t size</span>) <span class="title">throw</span>(<span class="params">std::bad_alloc</span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Derived</span>: <span class="title">public</span> <span class="title">Base</span> <span class="comment">// Derived doesn’t declare</span></div><div class="line">&#123; ... &#125;; <span class="comment">// operator new</span></div><div class="line"></div><div class="line">Derived *p = <span class="keyword">new</span> Derived;                             <span class="comment">// calls Base::operator new!</span></div></pre></td></tr></table></figure>
+<p>如果基类中的operator new设计没有处理这种情况，处理它的最好的方法将对“错误”数量内存的请求丢弃掉，而是转而使用标准operator new来处理,就像下面这样：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">void* Base::operator new(std::size_t size) throw(std::bad_alloc)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">if (size != sizeof(Base)) // if size is “wrong,”</div><div class="line">return ::operator new(size); // have standard operator</div><div class="line">// new handle the request</div><div class="line">... // otherwise handle</div><div class="line">// the request here</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>“等一下”我听见你大叫，“你忘记检查病态但是可能发生的情况，也就是size为0的情况了！”事实上，我没有忘记。测试仍然在那里，只不过是将测试并入size同sizeof(size)的测试之中了。C++用神秘的方式进行工作，其中之一的方式就是规定所有独立对象的大小不能为0（见<a href="http://www.cnblogs.com/harlanc/p/6636917.html" title="Item 39" target="_blank" rel="external">Item 39</a>）。根据定义，sizeof(Base)永远不会为0，所以如果size为0，内存请求将由::operator new来处理，它会以一种合理的方式来处理这个请求。</p>
+<h3 id="1-3-定义operator-new-的约定"><a href="#1-3-定义operator-new-的约定" class="headerlink" title="1.3 定义operator new[]的约定"></a>1.3 定义operator new[]的约定</h3><p>如果你想在一个类中控制数组的内存分配，你需要实现operator new的数组形式，operator new[]。（这个函数通常被叫做“array new”，因为很难确定“operator new[]”该如何发音）。如果你决定实现operator new[],记住所有你正在做的是分配一大块原生内存——你不能对不存在于数组中的对象做任何事情。事实上，你甚至不能确定数组将会有多少对象。<strong>首先</strong>，你不会知道每个对象有多大。毕竟，很有可能通过继承来调用基类的operator new[]去为派生类对象数组分配内存，派生类对象通常比基类对象要大。因此，你不能假设在Base::operator new[]内部被放入数组的对象的大小为sizeof(Base)，这就意味着你不能假设数组中对象的数量为(请求的字节数)/sizeof(Base)。<strong>第二</strong>，传递给operator new[]的参数size_t有可能比填入对象的内存更多，因为正如<a href="http://www.cnblogs.com/harlanc/p/6422351.html" title="Item 16" target="_blank" rel="external">Item 16</a>中解释的，动态分配的数组有可能包含额外的空间来存放数组元素的数量。</p>
+<h2 id="2-定义operator-delete的约定"><a href="#2-定义operator-delete的约定" class="headerlink" title="2. 定义operator delete的约定"></a>2. 定义operator delete的约定</h2><p>当实现operator new的时候需要遵守的约定就这么多。对于operator delete,事情更加简单。所有你需要记住的是<strong>C++总是保证delete null指针是安全的</strong>，所以你需要遵守这个规定。下面是实现非成员 operator delete的伪代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="keyword">operator</span> <span class="title">delete</span>(<span class="params"><span class="keyword">void</span> *rawMemory</span>) <span class="title">throw</span>(<span class="params"></span>)</span></div><div class="line">&#123;</div><div class="line"><span class="keyword">if</span> (rawMemory == <span class="number">0</span>) <span class="keyword">return</span>; <span class="comment">// do nothing if the null</span></div><div class="line"><span class="comment">// pointer is being deleted</span></div><div class="line">deallocate the memory pointed to <span class="keyword">by</span> rawMemory;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个函数的成员函数版本也是简单的，但是你需要确保检查正在被delete的对象的size。假设你的属于类的operator new将对错误数量内存的请求转发给了::operator new，你同样得将对“错误大小”的delete请求转发给::operator delete:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">class Base &#123; // same as before, but now</div><div class="line">public: // operator delete is declared</div><div class="line">static void* operator new(std::size_t size) throw(std::bad_alloc);</div><div class="line">static void operator delete(void *rawMemory, std::size_t size) throw();</div><div class="line">...</div><div class="line">&#125;;</div><div class="line">void Base::operator delete(void *rawMemory, std::size_t size) throw()</div><div class="line">&#123;</div><div class="line"></div><div class="line">if (rawMemory == 0) return; // check for null pointer</div><div class="line"></div><div class="line">if (size != sizeof(Base)) &#123; // if size is “wrong,”</div><div class="line"></div><div class="line">::operator delete(rawMemory); // have standard operator</div><div class="line"></div><div class="line">return;                                                                           // delete handle the request</div><div class="line"></div><div class="line">&#125;                                                                                    </div><div class="line"></div><div class="line">deallocate the memory pointed to by rawMemory;      </div><div class="line"></div><div class="line">return;                                                                          </div><div class="line"></div><div class="line">&#125;        </div></pre></td></tr></table></figure>
+<p> 有趣的是，如果要被delete的对象派生自于一个没有虚析构函数的基类，那么传递给operator delete的size_t值有可能是不正确的。这就有了足够的理由来把你的基类中的析构函数声明为虚函数，但是<a href="http://www.cnblogs.com/harlanc/p/6395052.html" title="Item 7" target="_blank" rel="external">Item 7</a>中描述了第二个可能更好的原因。现在你需要注意的是如果你在基类中忽略了虚析构函数，operator delete函数的工作就有可能不正确。</p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><ul>
+<li>operator new应该包含一个无限循环来尝试分配内存，如果不能满足对内存的请求应该调用new-handler,应该处理对0个byte的请求。类的特定版本应该处理比预期更大的内存块的请求。</li>
+<li>operator delete中传递的指针如果是null，应该什么都不做。类特定版本需要处理比预期要大的内存块。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/19/2017-04-19_08_00_读书笔记_effective_c++_Item_50_了解何时替换new和delete_是有意义的/" rel="next" title="读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/22/2017-04-22_12_59_读书笔记_effective_c++_Item_52_如果你实现了placement_new,你也要实现placement_delete/" rel="prev" title="读书笔记 effective c++ Item 52 如果你实现了placement new,你也要实现placement delete">
+                读书笔记 effective c++ Item 52 如果你实现了placement new,你也要实现placement delete <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-定义operator-new的约定"><span class="nav-number">1.</span> <span class="nav-text">1. 定义operator new的约定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-约定列举"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 约定列举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-由继承导致的问题"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 由继承导致的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-定义operator-new-的约定"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 定义operator new[]的约定</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-定义operator-delete的约定"><span class="nav-number">2.</span> <span class="nav-text">2. 定义operator delete的约定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-总结"><span class="nav-number">3.</span> <span class="nav-text">3. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

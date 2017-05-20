@@ -1,0 +1,899 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="我们首先看一下为什么数据成员不应该是public的，然后我们将会看到应用在public数据成员上的论证同样适用于protected成员。最后够得出结论：数据成员应该是private的。 1. 为什么数据成员不能是public的?为什么数据成员不能够是public的？ #">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 22 将数据成员声明成private">
+<meta property="og:url" content="http://yoursite.com/2017/02/27/2017-02-27_08_03_读书笔记_effective_c++_Item_22_将数据成员声明成private/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="我们首先看一下为什么数据成员不应该是public的，然后我们将会看到应用在public数据成员上的论证同样适用于protected成员。最后够得出结论：数据成员应该是private的。 1. 为什么数据成员不能是public的?为什么数据成员不能够是public的？ #">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.563Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 22 将数据成员声明成private">
+<meta name="twitter:description" content="我们首先看一下为什么数据成员不应该是public的，然后我们将会看到应用在public数据成员上的论证同样适用于protected成员。最后够得出结论：数据成员应该是private的。 1. 为什么数据成员不能是public的?为什么数据成员不能够是public的？ #">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/27/2017-02-27_08_03_读书笔记_effective_c++_Item_22_将数据成员声明成private/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 22 将数据成员声明成private | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/27/2017-02-27_08_03_读书笔记_effective_c++_Item_22_将数据成员声明成private/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 22 将数据成员声明成private</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-27T08:03:00+08:00">
+                2017-02-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/27/2017-02-27_08_03_读书笔记_effective_c++_Item_22_将数据成员声明成private/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/27/2017-02-27_08_03_读书笔记_effective_c++_Item_22_将数据成员声明成private/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 22 将数据成员声明成private">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我们首先看一下为什么数据成员不应该是public的，然后我们将会看到应用在public数据成员上的论证同样适用于protected成员。最后够得出结论：数据成员应该是private的。</p>
+<h2 id="1-为什么数据成员不能是public的"><a href="#1-为什么数据成员不能是public的" class="headerlink" title="1. 为什么数据成员不能是public的?"></a>1. 为什么数据成员不能是public的?</h2><p>为什么数据成员不能够是public的？</p>
+<p>#<br><a id="more"></a></p>
+<h1 id="2-1-一致性"><a href="#2-1-一致性" class="headerlink" title="2.1 一致性"></a>2.1 一致性</h1><p>让我们从句法的一致性开始（<a href="http://www.cnblogs.com/harlanc/p/6431766.html" title="Item 18" target="_blank" rel="external">Item 18</a>）。如果数据成员不是Public的，那么客户访问对象的唯一方法就是通过成员函数。如果所有的公共接口都是函数，客户就不必记住访问一个类的成员时是否使用括号了。这方便了客户的使用。</p>
+<h3 id="2-2-对数据成员访问的精确控制"><a href="#2-2-对数据成员访问的精确控制" class="headerlink" title="2.2 对数据成员访问的精确控制"></a>2.2 对数据成员访问的精确控制</h3><p>如果一致性没有让你信服，那么使用函数可以使你对数据成员的访问有更加精确的控制呢？如果你将数据成员声明成public的，每个人对其都有读写权限，但是如果你使用函数来对值进行获取（get）或者设置(set)，你就可以实现不可访问（no access），只读访问(read only)和读写(read-write)访问。如果你需要，你甚至可以实现只写(write-only)访问:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">AccessLevels</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getReadOnly</span>(<span class="params"></span>) <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> readOnly; &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">setReadWrite</span>(<span class="params"><span class="keyword">int</span> <span class="keyword">value</span></span>) </span>&#123; readWrite = <span class="keyword">value</span>; &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getReadWrite</span>(<span class="params"></span>) <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> readWrite; &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">setWriteOnly</span>(<span class="params"><span class="keyword">int</span> <span class="keyword">value</span></span>) </span>&#123; writeOnly = <span class="keyword">value</span>; &#125;</div><div class="line"></div><div class="line"><span class="keyword">private</span>:</div><div class="line"></div><div class="line"><span class="keyword">int</span> noAccess; <span class="comment">// no access to this int</span></div><div class="line"></div><div class="line"><span class="keyword">int</span> readOnly; <span class="comment">// read-only access to this int</span></div><div class="line"></div><div class="line"><span class="keyword">int</span> readWrite; <span class="comment">// read-write access to this int</span></div><div class="line"></div><div class="line"><span class="keyword">int</span> writeOnly; <span class="comment">// write-only access to this int</span></div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这种细粒度的访问控制是很重要的，因为许多数据成员应该被隐藏起来。很少情况下需要所有的数据成员都有一个getter和一个setter。</p>
+<h3 id="2-3-封装"><a href="#2-3-封装" class="headerlink" title="2.3 封装"></a>2.3 封装</h3><p>仍然没有说服力？该是使出杀手锏的时候了：<strong>封装</strong>。如果你通过一个函数来实现对一个数据成员的访问，日后你可能会用计算来替代数据成员，使用你的类的任何客户不会觉察出类的变化。</p>
+<p>举个例子，假设你在实现一个应用，自动化设备使用这个应用来记录通过车辆的速度。当每辆车通过的时候，速度被计算出来，然后将结果保存在一个数据集中，这个数据集记录了迄今为止收集的所有速度数据：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">SpeedDataCollection</span> &#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">addValue</span>(<span class="params"><span class="keyword">int</span> speed</span>)</span>; <span class="comment">// add a new data value</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">double</span> <span class="title">averageSoFar</span>(<span class="params"></span>) <span class="keyword">const</span></span>; <span class="comment">// return average speed</span></div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>现在考虑成员函数averageSoFar的实现。一种实现的方法是在类中定义一个数据成员，用来表示迄今为止所有速度数据的平均值。当averageSoFar被调用的时候，它只是返回这个数据成员的值。另外一种方法是在每次调用averageSoFar的时候重新计算平均值，这可以通过检查数据集中的每个数据值来做到。</p>
+<p>第一种方法使得每个SpeedDataCollection对象变大，因为你必须为保存平均速度，累积总量以及数据点数量的数据成员分配空间。然而，averageSoFar可以被很高效的实现出来；它只是一个返回平均速度的内联函数（见Item 30）。相反，在请求的时候才计算平均值会使得averageSoFar运行非常缓慢，但是每个SpeedDataCollection对象会比较小。</p>
+<p>谁能确定哪个才是更好的呢？在一台内存吃紧的机器上，并且应用中对平均值的需要不是很频繁，每次计算平均值可能会是一个更好的选择。在一个对平均值需求频繁的应用中，速度很重要，但内存充足，你可能更喜欢将平均速度保存为数据成员。这里的重要一点是通过一个成员函数来访问平均值(也就是将其封装起来)，你可以在这些不同实现之间来回切换，客户端至多只需要重新编译就可以了。（通过Item31中描述的技术，你甚至可以不用重新编译）</p>
+<p>将数据成员隐藏在函数接口后边可以灵活的提供不同种类的实现。举个例子，它可以使下面这些实现变得很简单：当数据成员被读或者写的时候通知其它对象；验证类的不变性和函数的先置和后置条件；在多线程环境中执行同步等等。从其它语言（像Delphi和C#）转到C++的程序员将会识别出来C++的这种功能同其它语言中的“属性”是等同的，但是需要额外加一对括号。</p>
+<p>封装比它起初看起来要重要。如果你对客户隐藏你的数据成员（也就是封装它们），你就能够确保类能一直维持不变性，因为只有成员函数能够影响它们。进一步来说，你保留了日后对实现决策进行变动的权利。如果你没有将这些决策隐藏起来，你将会很快发现即使你拥有一个类的源码，但是你修改public成员的能力是及其受限的，因为如果修改public成员，太多的客户代码会被破坏。Public意味这没有封装，更实际的讲，未封装意味这不能变化，特别对被广泛使用的类更是如此。因此对广泛使用的类最需要进行封装，因为它们最能受益于将一个实现替换为一个更好的实现。</p>
+<h2 id="2-为什么数据成员不能是protected的？"><a href="#2-为什么数据成员不能是protected的？" class="headerlink" title="2. 为什么数据成员不能是protected的？"></a>2. 为什么数据成员不能是protected的？</h2><p>上面的论证对于protected数据成员来说是类似的。事实上，它们是完全相同的，虽然一开始看上去不是这样。在论证数据成员不能为public时，句法一致性和细粒度访问控制这两个原因同样适用于protected成员，但是封装呢？protected数据成员不是有比public数据成员更好的封装性么？令人感到吃惊的回答是，它们不是。</p>
+<p>Item 23解释了封装性同一些东西发生变化引起的代码可能被破坏的数量成反比。一个数据成员的封装型，同数据成员发生变化引起的代码可能被破坏的数量成反比，举个例子，如果数据成员从类中移除。（可能被一个计算代替，正如在averageSoFar中实现的）。</p>
+<p>假设我们有一个public数据成员，我们将其删除。有多少代码会被破坏？所有使用它的客户代码将被破坏，一般情况下这应该是个未知的数量。Public数据成员因此完全没有被封装。但是假设我们有一个protected数据成员，我们将其删除。现在会有多少代码被破坏呢？所有使用它的派生类，同样的，这也是未知数量的代码。Protected数据成员同public数据成员一样也没有被封装，因为在两种情况中，如果数据成员被修改，都有未知数量的客户代码会被破坏。这是违反直观的，但是一个经验丰富的库实现人员会告诉你，这就是真的。一旦你将一个数据成员声明成public或者protected并且客户开始使用它，很难改变数据成员的任何东西。因为一旦修改了，太多的代码会被重新实现，重新测试，重新编辑文档，重新编译。从封装的角度来说，真的只有两种访问级别：private（提供了封装）和其它的（没有提供封装）。</p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><ul>
+<li>将数据成员声明为private。它为客户提供了对数据句法一致的访问，给予细粒度的访问控制，允许执行类的不变性，为类的作者提供实现的灵活性。</li>
+<li>Protected没有比public更具封装型。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/26/2017-02-26_19_06_读书笔记_effective_c++_Item_21_当你必须返回一个对象的时候，不要尝试返回引用/" rel="next" title="读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 21 当你必须返回一个对象的时候，不要尝试返回引用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/28/2017-02-28_08_31_读书笔记_effective_c++_Item_23_宁可使用非成员非友元函数函数也不使用成员函数/" rel="prev" title="读书笔记 effective c++ Item 23 宁可使用非成员非友元函数函数也不使用成员函数">
+                读书笔记 effective c++ Item 23 宁可使用非成员非友元函数函数也不使用成员函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-为什么数据成员不能是public的"><span class="nav-number">1.</span> <span class="nav-text">1. 为什么数据成员不能是public的?</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1-一致性"><span class="nav-number"></span> <span class="nav-text">2.1 一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-对数据成员访问的精确控制"><span class="nav-number">0.1.</span> <span class="nav-text">2.2 对数据成员访问的精确控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-封装"><span class="nav-number">0.2.</span> <span class="nav-text">2.3 封装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-为什么数据成员不能是protected的？"><span class="nav-number">1.</span> <span class="nav-text">2. 为什么数据成员不能是protected的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-总结"><span class="nav-number">2.</span> <span class="nav-text">3. 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,902 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1.自我赋值是如何发生的当一个对象委派给自己的时候，自我赋值就会发生： 123456789 class Widget &amp;#123; ... &amp;#125;; Widget w; ... w = w; // assignment to&amp;lt;!--more--&amp;gt;self、 这看上去是愚蠢的，但这是合法的，所以请放心，客户端是可以这么做的。此外，自身赋值也并不总是很容易的能够被辨别出来。举个例子：">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 11 在operator=中处理自我赋值">
+<meta property="og:url" content="http://yoursite.com/2017/02/15/2017-02-15_23_48_读书笔记_effective_c++_Item_11_在operator=中处理自我赋值/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1.自我赋值是如何发生的当一个对象委派给自己的时候，自我赋值就会发生： 123456789 class Widget &amp;#123; ... &amp;#125;; Widget w; ... w = w; // assignment to&amp;lt;!--more--&amp;gt;self、 这看上去是愚蠢的，但这是合法的，所以请放心，客户端是可以这么做的。此外，自身赋值也并不总是很容易的能够被辨别出来。举个例子：">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.225Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 11 在operator=中处理自我赋值">
+<meta name="twitter:description" content="1.自我赋值是如何发生的当一个对象委派给自己的时候，自我赋值就会发生： 123456789 class Widget &amp;#123; ... &amp;#125;; Widget w; ... w = w; // assignment to&amp;lt;!--more--&amp;gt;self、 这看上去是愚蠢的，但这是合法的，所以请放心，客户端是可以这么做的。此外，自身赋值也并不总是很容易的能够被辨别出来。举个例子：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/15/2017-02-15_23_48_读书笔记_effective_c++_Item_11_在operator=中处理自我赋值/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 11 在operator=中处理自我赋值 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/15/2017-02-15_23_48_读书笔记_effective_c++_Item_11_在operator=中处理自我赋值/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 11 在operator=中处理自我赋值</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-15T23:48:00+08:00">
+                2017-02-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/15/2017-02-15_23_48_读书笔记_effective_c++_Item_11_在operator=中处理自我赋值/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/15/2017-02-15_23_48_读书笔记_effective_c++_Item_11_在operator=中处理自我赋值/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 11 在operator=中处理自我赋值">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-自我赋值是如何发生的"><a href="#1-自我赋值是如何发生的" class="headerlink" title="1.自我赋值是如何发生的"></a>1.自我赋值是如何发生的</h2><p>当一个对象委派给自己的时候，自我赋值就会发生：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">class</span> <span class="title">Widget</span> &#123; ... &#125;;</div><div class="line"></div><div class="line"> Widget w;</div><div class="line"></div><div class="line"> ...</div><div class="line"></div><div class="line"> w = w; <span class="comment">// assignment to</span></div><div class="line">&lt;!--more--&gt;</div><div class="line">self、</div></pre></td></tr></table></figure>
+<p>这看上去是愚蠢的，但这是合法的，所以请放心，客户端是可以这么做的。此外，自身赋值也并不总是很容易的能够被辨别出来。举个例子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">a[i] = a[j]; <span class="comment">// potential assignment to self</span></div></pre></td></tr></table></figure>
+<p>上面的代码在ｉ和ｊ相等的情况下就是自我赋值，同样的，看下面的例子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">*px = *py; <span class="comment">// potential assignment to self</span></div></pre></td></tr></table></figure>
+<p>如果px和py恰巧指向同一个东西，那么上面的语句就是自身赋值。这些并不怎么明显的自我赋值是使用别名的结果：<strong>也就是使用不止一种方法来指向同一个对象</strong>。一般情况下，当我们操作指向不同同类型对象的引用和指针时，需要考虑这些不同的对象是否是同一个对象。事实上，如果两个对象来自同一个继承体系，这两个对象甚至不必声明为同类型的，因为基类的指针或者引用可以指向派生类对象：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Base</span> &#123; ... &#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Derived</span>: <span class="title">public</span> <span class="title">Base</span> &#123; ... &#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomething</span>(<span class="params"><span class="keyword">const</span> Base&amp; rb, // rb and *pd might actually be</span></span></div><div class="line"></div><div class="line">Derived* pd); <span class="comment">// the same object</span></div></pre></td></tr></table></figure>
+<h2 id="2-处理不好自我赋值会使你掉入陷阱"><a href="#2-处理不好自我赋值会使你掉入陷阱" class="headerlink" title="2.处理不好自我赋值会使你掉入陷阱"></a>2.处理不好自我赋值会使你掉入陷阱</h2><p>如果你遵循Item13和Item14的建议，你就会使用对象来管理资源，并且你也能够确信对资源进行管理的对象在进行拷贝时会运行的很好。在这种情况下，你的赋值运算符有可能就是自我赋值安全的，而不用去特定的考虑这件事情。如果你尝试自己来管理资源（如果你自己写一个资源管理类这是必须做的），你可能会掉入一个陷阱：<strong>在用完某个资源之前，资源突然被释放掉了</strong>。举个例子，假设你创建了一个类来管理一个原生指针，这个指针指向动态分配的bitmap对象：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Bitmap</span> &#123; ... &#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">Widget</span> &#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"><span class="keyword">private</span>:</div><div class="line"></div><div class="line">Bitmap *pb; <span class="comment">// ptr to a heap-allocated object</span></div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>下面是operator=的一个实现，从表面上看是合理的，但因为自我赋值的存在，实际上它是不安全的。（它也不是异常安全的，我们稍会会处理）</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Widget&amp;</div><div class="line"></div><div class="line">Widget::operator=(const Widget&amp; rhs) // unsafe impl. of operator=</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">delete pb; // stop using current bitmap</div><div class="line"></div><div class="line">pb = new Bitmap(*rhs.pb); // start using a copy of rhs’s bitmap</div><div class="line"></div><div class="line">return *this; // see Item 10</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>自我赋值的问题出现在operator=内部，*this（赋值目标）和rhs可能是同一个对象。如果这是真的，delete不仅会为当前对象销毁bitmap,也同样会为ths销毁bitmap。在函数的结尾，Widget对象本不应该通过自我赋值有所改变，但你会发现现在它拥有的是一个指向被删除对象的指针！</p>
+<h2 id="3-处理自我赋值的方法一：鉴定测试，防止自我赋值"><a href="#3-处理自我赋值的方法一：鉴定测试，防止自我赋值" class="headerlink" title="3.处理自我赋值的方法一：鉴定测试，防止自我赋值"></a>3.处理自我赋值的方法一：鉴定测试，防止自我赋值</h2><h3 id="3-1-实现代码"><a href="#3-1-实现代码" class="headerlink" title="3.1 实现代码"></a>3.1 实现代码</h3><p>防止这个错误的传统方法是<strong>在**</strong>operator=<strong>**函数的开始进行一个鉴定测试</strong>，看是否是一个自我赋值：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">Widget&amp; Widget::operator=(const Widget&amp; rhs)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">if (this == &amp;rhs) return *this; // identity test: if a self-assignment,</div><div class="line"></div><div class="line">// do nothing</div><div class="line"></div><div class="line">delete pb;</div><div class="line"></div><div class="line">pb = new Bitmap(*rhs.pb);</div><div class="line"></div><div class="line">return *this;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="3-2这个方法的缺陷"><a href="#3-2这个方法的缺陷" class="headerlink" title="3.2这个方法的缺陷"></a>3.2这个方法的缺陷</h3><p>这个方法是可以工作的，但是上面已经提到operator=的早先版本不仅是自我赋值不安全的，同样也是异常不安全的(exception-unsafe)，在当前版本中关于异常的麻烦会继续存在。特别的，如果”new Bitmap”语句产生一个异常（因为没有足够的内存可以分配或者因为Bitmap的拷贝构造函数抛出一个异常），Widget将会拥有一个指向被删除Bitmap对象的指针。这样的指针是有毒的，因为你不能够安全的释放它们。你甚至不能够安全的读取它们。你唯一能够做的安全的事情就是花费大量的调试的精力来找出问题出在哪里。</p>
+<h2 id="4-处理自我赋值的方法二：对语句进行排序"><a href="#4-处理自我赋值的方法二：对语句进行排序" class="headerlink" title="4.处理自我赋值的方法二：对语句进行排序"></a>4.处理自我赋值的方法二：对语句进行排序</h2><p> 让人高兴的是，使operator=变得异常安全的方法也往往能使其变得自我赋值安全。所以，我们将自我赋值 的问题忽略掉，集中精力去达到异常安全。Item29比较深入的探索了异常安全，在这个条款中，我们只需要观察：<strong>对一些语句进行仔细的排序就可以生成**</strong>exception<strong>**安全（同样能够达到自我赋值安全）的代码</strong>，这就足够了。举个例子，我们只需要注意在对pb指向对象的拷贝完成之前不要将pb释放:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Widget&amp; Widget::operator=(const Widget&amp; rhs)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">Bitmap *pOrig = pb; // remember original pb</div><div class="line"></div><div class="line">pb = new Bitmap(*rhs.pb); // point pb to a copy of rhs’s bitmap</div><div class="line"></div><div class="line">delete pOrig; // delete the original pb</div><div class="line"></div><div class="line">return *this;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在，如果”new BItmap”抛出异常，pb仍然不会发生变化。在没有鉴别测试的情况下，这段代码进行了自我赋值，因为我们将源bitmap做了一份拷贝，让pb去指向拷贝的数据，然后删除源bitmap。这也许不是处理自我赋值的最有效率的方法，但这确实是可行的方法。</p>
+<p>如果你关系效率，你可以将鉴别测试的代码重新放回到函数的开始处。但是在这么做之前，问问你自己，自我赋值发生的频率会有多高，因为鉴别测试不是免费的。它会增加一些代码（obj文件也会增大），同时引入了一个流程控制的分支，两者都会使得程序运行速度变慢。Prefetching,caching和pipelining指令的效率都会降低。</p>
+<h2 id="5-处理自我赋值的方法三：copy-and-swap"><a href="#5-处理自我赋值的方法三：copy-and-swap" class="headerlink" title="5.处理自我赋值的方法三：copy and swap"></a>5.处理自我赋值的方法三：<strong>copy and swap</strong></h2><h3 id="5-1-实现方法一"><a href="#5-1-实现方法一" class="headerlink" title="5.1 实现方法一"></a>5.1 实现方法一</h3><p>我们换一种方法来对operator=中的语句进行手动排序，来同时保证自我赋值和异常安全，<strong>这种技术叫做拷贝和交换**</strong>(copy  and swap)**。这种技术与异常安全是紧密相关的，所以会在Item29中描述。然而，它也是实现operator=的一个非常普通的方法，因此值得我们来看看这种实现方法究竟是什么样子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Widget &#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">void swap(Widget&amp; rhs); // exchange *this’s and rhs’s data;</div><div class="line"></div><div class="line">... // see Item 29 for details</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">Widget&amp; Widget::operator=(const Widget&amp; rhs)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">Widget temp(rhs); // make a copy of rhs’s data</div><div class="line"></div><div class="line">swap(temp); // swap *this’s data with the copy’s</div><div class="line"></div><div class="line">return *this;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="5-2-实现方法二"><a href="#5-2-实现方法二" class="headerlink" title="5.2 实现方法二"></a>5.2 实现方法二</h3><p>利用下面的两个事实我们可以将上面的实现换一种写法，这两个事实是：（1）<strong>一个类的拷贝赋值运算符可以被声明为按值传递</strong>。(2)<strong>按值传递会对值进行拷贝</strong>。下面是另外一种写法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Widget&amp; Widget::operator=(Widget rhs) // rhs is a copy of the object</div><div class="line"></div><div class="line">&#123; // passed in — note pass by val</div><div class="line"></div><div class="line">swap(rhs); // swap *this’s data with</div><div class="line"></div><div class="line">// the copy’s</div><div class="line"></div><div class="line">return *this;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从个人观点来说，我担心这种方法为了聪明的实现而牺牲了代码的清晰度，但是通过将拷贝操作从函数体内移动到函数的参数中，编译器有时候能够产生更高效的代码，这是事实。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/15/2017-02-15_23_42_读书笔记_effective_c++_Item_10_让赋值运算符返回指向_this的引用/" rel="next" title="读书笔记 effective c++ Item 10 让赋值运算符返回指向*this的引用">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 10 让赋值运算符返回指向*this的引用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/17/2017-02-17_07_42_读书笔记_effective_c++_Item_12_拷贝对象的所有部分/" rel="prev" title="读书笔记 effective c++ Item 12 拷贝对象的所有部分">
+                读书笔记 effective c++ Item 12 拷贝对象的所有部分 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-自我赋值是如何发生的"><span class="nav-number">1.</span> <span class="nav-text">1.自我赋值是如何发生的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-处理不好自我赋值会使你掉入陷阱"><span class="nav-number">2.</span> <span class="nav-text">2.处理不好自我赋值会使你掉入陷阱</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-处理自我赋值的方法一：鉴定测试，防止自我赋值"><span class="nav-number">3.</span> <span class="nav-text">3.处理自我赋值的方法一：鉴定测试，防止自我赋值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-实现代码"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 实现代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2这个方法的缺陷"><span class="nav-number">3.2.</span> <span class="nav-text">3.2这个方法的缺陷</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-处理自我赋值的方法二：对语句进行排序"><span class="nav-number">4.</span> <span class="nav-text">4.处理自我赋值的方法二：对语句进行排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-处理自我赋值的方法三：copy-and-swap"><span class="nav-number">5.</span> <span class="nav-text">5.处理自我赋值的方法三：copy and swap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-实现方法一"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 实现方法一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-实现方法二"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 实现方法二</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

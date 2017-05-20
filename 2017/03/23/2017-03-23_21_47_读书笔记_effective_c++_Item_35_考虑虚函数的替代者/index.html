@@ -1,0 +1,941 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 突破思维——不要将思维限定在面向对象方法上你正在制作一个视频游戏，你正在为游戏中的人物设计一个类继承体系。你的游戏处在农耕时代，人类很容易受伤或者说健康度降低。因此你决定为其提供一个成员函数，healthValue，返回一个整型值来表明一个人物的健康度。因为不同的人物会用不">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 35 考虑虚函数的替代者">
+<meta property="og:url" content="http://yoursite.com/2017/03/23/2017-03-23_21_47_读书笔记_effective_c++_Item_35_考虑虚函数的替代者/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 突破思维——不要将思维限定在面向对象方法上你正在制作一个视频游戏，你正在为游戏中的人物设计一个类继承体系。你的游戏处在农耕时代，人类很容易受伤或者说健康度降低。因此你决定为其提供一个成员函数，healthValue，返回一个整型值来表明一个人物的健康度。因为不同的人物会用不">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170323215444971-1709552083.png">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.959Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 35 考虑虚函数的替代者">
+<meta name="twitter:description" content="1. 突破思维——不要将思维限定在面向对象方法上你正在制作一个视频游戏，你正在为游戏中的人物设计一个类继承体系。你的游戏处在农耕时代，人类很容易受伤或者说健康度降低。因此你决定为其提供一个成员函数，healthValue，返回一个整型值来表明一个人物的健康度。因为不同的人物会用不">
+<meta name="twitter:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170323215444971-1709552083.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/23/2017-03-23_21_47_读书笔记_effective_c++_Item_35_考虑虚函数的替代者/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 35 考虑虚函数的替代者 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/23/2017-03-23_21_47_读书笔记_effective_c++_Item_35_考虑虚函数的替代者/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 35 考虑虚函数的替代者</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-23T21:47:00+08:00">
+                2017-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/23/2017-03-23_21_47_读书笔记_effective_c++_Item_35_考虑虚函数的替代者/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/23/2017-03-23_21_47_读书笔记_effective_c++_Item_35_考虑虚函数的替代者/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 35 考虑虚函数的替代者">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><h2 id="1-突破思维——不要将思维限定在面向对象方法上"><a href="#1-突破思维——不要将思维限定在面向对象方法上" class="headerlink" title="1. 突破思维——不要将思维限定在面向对象方法上"></a>1. 突破思维——不要将思维限定在面向对象方法上</h2><p>你正在制作一个视频游戏，你正在为游戏中的人物设计一个类继承体系。你的游戏处在农耕时代，人类很容易受伤或者说健康度降低。因此你决定为其提供一个成员函数，healthValue，返回一个整型值来表明一个人物的健康度。因为不同的人物会用不<br><a id="more"></a><br>的方式来计算健康度，将healthValue声明为虚函数看上去是一个比较明显的设计方式：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">GameCharacter</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">healthValue</span>(<span class="params"></span>) <span class="keyword">const</span></span>; <span class="comment">// return character’s health rating;</span></div><div class="line"></div><div class="line">...                                               <span class="comment">// derived classes may redefine this</span></div><div class="line"></div><div class="line">&#125;;     </div></pre></td></tr></table></figure>
+<p>healthValue没有被声明为纯虚函数的事实表明了会有一个默认的算法来计算健康度（<a href="http://www.cnblogs.com/harlanc/p/6591997.html" title="Item 34" target="_blank" rel="external">Item 34</a>）。</p>
+<p>这的确是设计这个类的一个明显的方式，在某种意义上来说，这也是它的弱点。因为这个设计是如此明显，你可能不会对其他的设计方法有足够的考虑。为了让你逃离面向对象设计之路的车辙，让我们考虑一些处理这个问题的其它方法。</p>
+<h2 id="2-替换虚函数的四种设计方法"><a href="#2-替换虚函数的四种设计方法" class="headerlink" title="2. 替换虚函数的四种设计方法"></a>2. 替换虚函数的四种设计方法</h2><h3 id="2-1-通过使用非虚接口-non-virtual-interface-NVI-的模板方法模式"><a href="#2-1-通过使用非虚接口-non-virtual-interface-NVI-的模板方法模式" class="headerlink" title="2.1 通过使用非虚接口(non-virtual interface(NVI))的模板方法模式"></a>2.1 通过使用非虚接口(non-virtual interface(NVI))的模板方法模式</h3><p>一个很有意思的学派认为虚函数几乎应该总是private的。这个学派的信徒建议一个更好的设计方法是仍然将healthValue声明成public成员函数但是使其变为非虚函数，然后让它调用一个做实际工作的private虚函数，也就是,doHealthValue:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">GameCharacter</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">healthValue</span>(<span class="params"></span>) <span class="keyword">const</span> <span class="comment">// derived classes do not redefine</span></span></div><div class="line">&#123; <span class="comment">// this — see Item 36</span></div><div class="line"></div><div class="line">...                                       <span class="comment">// do “before” stuff — see below</span></div><div class="line"></div><div class="line"><span class="keyword">int</span> retVal = doHealthValue(); <span class="comment">// do the real work</span></div><div class="line"></div><div class="line">...                                       <span class="comment">// do “after” stuff — see below</span></div><div class="line"></div><div class="line"><span class="keyword">return</span> retVal;                  </div><div class="line"></div><div class="line">&#125;</div><div class="line">...</div><div class="line"><span class="keyword">private</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">doHealthValue</span>(<span class="params"></span>) <span class="keyword">const</span> <span class="comment">// derived classes may redefine this</span></span></div><div class="line">&#123;</div><div class="line">... <span class="comment">// default algorithm for calculating</span></div><div class="line">&#125; <span class="comment">// character’s health</span></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>在上面的代码中（这个条款中剩余的代码也如此），我在类定义中展示了成员函数体。正如<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item30</a>中所解释的，将其隐式的声明为inline。我使用这种方式的目的只是使你更加容易的看到接下来会发生什么。我所描述的设计和inline之间是独立的，所以不要认为在类内部定义成员函数是有特定意义的，不是如此。、</p>
+<p>客户通过public非虚成员函数调用private虚函数的基本设计方法被称作非虚接口（non-virtual interface(NVI)）用法。它是更一般的设计模式——模板方法模式（这个设计模式和C++模板没有任何关系）的一个特定表现。我把非虚函数（healthValue）叫做虚函数的一个包装。</p>
+<p>NVI用法的一个优点可以从代码注释中看出来，也就是“do before stuff”和“do after stuff”。这些注释指出了在做真正工作的虚函数之前或之后保证要被执行的代码。这意味着这个包装函数在一个虚函数被调用之前，确保了合适的上下文的创建，在这个函数调用结束后，确保了上下文被清除。举个例子，“before”工作可以包括lock a mutex，记录log，验证类变量或者检查函数先验条件是否满足要求，等等。”after”工作可能包含unlocking a mutex，验证函数的后验条件是否满足要求，重新验证类变量等等。如果你让客户直接调用虚函数，那么没有什么好的方法来做到这些。</p>
+<p>你可能意识到NVI用法涉及到在派生类中重新定义private虚函数——重新定义它们不能调用的函数！这在设计上并不矛盾。重新定义一个虚函数指定如何做某事，而调用一个虚函数指定何时做某事。这些概念是相互独立的。NVI用法允许派生类重新定义一个虚函数，这使他们可以对如何实现一个功能进行控制，但是基类保有何时调用这个函数的权利。初次看起来很奇怪，但是C++中的派生类可以重新定义继承而来的private虚函数的规则是非常明智的。</p>
+<p>对于NVI用法，虚函数并没有严格限定必须为private的。在一些类的继承体系中，一个虚函数的派生类实现需要能够触发基类中对应的部分，如果使得这种调用是合法的，虚函数就必须为protected，而不是private的。有时一个虚函数甚至必须是public的（例如，多态基类中的析构函数——<a href="http://www.cnblogs.com/harlanc/p/6395052.html" title="Item 7" target="_blank" rel="external">Item7</a>）,但是这种情况下，NVI用法就不能够被使用了。</p>
+<h3 id="2-2-通过函数指针实现的策略模式"><a href="#2-2-通过函数指针实现的策略模式" class="headerlink" title="2.2 通过函数指针实现的策略模式"></a>2.2 通过函数指针实现的策略模式</h3><p>NVI用法是public虚函数的一个很有意思的替换者，但是从设计的角度来说，有一点弄虚作假的嫌疑。毕竟，我们仍然使用了虚函数计算每个人物的健康度。一个更加引人注目的设计方法是将计算一个人物的健康度同这个人物的类型独立开来——这种计算不必作为这个人物的一部分。举个例子，我们可以使用每个人物的构造函数来为健康计算函数传递一个函数指针，然后在函数指针所指的函数中进行实际的运算：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">GameCharacter</span>;                                                                            <span class="comment">// forward declaration</span></div><div class="line"></div><div class="line"><span class="comment">// function for the default health calculation algorithm                       </span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">defaultHealthCalc</span>(<span class="params"><span class="keyword">const</span> GameCharacter&amp; gc</span>)</span>;                               </div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">GameCharacter</span> &#123;                                                                         </div><div class="line"></div><div class="line"><span class="keyword">public</span>:                                                                                                 </div><div class="line"></div><div class="line"><span class="function">typedef <span class="title">int</span> (<span class="params">*HealthCalcFunc</span>)(<span class="params"><span class="keyword">const</span> GameCharacter&amp;</span>)</span>;                     </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">GameCharacter</span>(<span class="params">HealthCalcFunc hcf = defaultHealthCalc</span>)       </span></div><div class="line"></div><div class="line">: <span class="title">healthFunc</span>(<span class="params">hcf </span>)                                                                                </div><div class="line"></div><div class="line">&#123;&#125;                                                                                                         </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">healthValue</span>(<span class="params"></span>) <span class="keyword">const</span>                                                                        </span></div><div class="line"></div><div class="line">&#123; <span class="keyword">return</span> healthFunc(*<span class="keyword">this</span>); &#125;                                                                </div><div class="line"></div><div class="line">...                                                                                                          </div><div class="line"></div><div class="line"><span class="keyword">private</span>:                                                                                                </div><div class="line"></div><div class="line">HealthCalcFunc healthFunc;                                                                </div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这个方法是另外一种普通设计模式的简单应用，也就是策略模式。同在GameCharacter继承体系中基于虚函数的方法进行对比，它能提供了一些有意思的灵活性： </p>
+<ul>
+<li><p>相同人物类型的不同实例能够拥有不同的健康度计算函数。举个例子：</p>
+<ul>
+<li><figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">EvilBadGuy</span>: <span class="title">public</span> <span class="title">GameCharacter</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">EvilBadGuy</span>(<span class="params">HealthCalcFunc hcf = defaultHealthCalc</span>)</span></div><div class="line"></div><div class="line">: <span class="title">GameCharacter</span>(<span class="params">hcf </span>)</div><div class="line"></div><div class="line">&#123; ... &#125;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">loseHealthQuickly</span>(<span class="params"><span class="keyword">const</span> GameCharacter&amp;</span>)</span>; <span class="comment">// health calculation</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">loseHealthSlowly</span>(<span class="params"><span class="keyword">const</span> GameCharacter&amp;</span>)</span>; <span class="comment">// funcs with different</span></div><div class="line"><span class="comment">// behavior</span></div><div class="line"><span class="function">EvilBadGuy <span class="title">ebg1</span>(<span class="params">loseHealthQuickly</span>)</span>; <span class="comment">// same-type charac</span></div><div class="line"><span class="function">EvilBadGuy <span class="title">ebg2</span>(<span class="params">loseHealthSlowly</span>)</span>; <span class="comment">// ters with different</span></div><div class="line"><span class="comment">// health-related</span></div><div class="line"><span class="comment">// behavior</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>特定人物的健康度计算函数能够在运行时发生变化。举个例子，GameCharacter可能提供一个成员函数，setHealthCalculator，它可以对当前的健康度计算函数进行替换。</p>
+</li>
+</ul>
+<p>此外，健康度计算函数不再是GameCharacter继承体系中的成员函数的事实意味着它不能对正在计算健康度的对象的内部数据进行特殊访问。例如，defaultHealthCalc对EvilBadGuy的非public部分没有访问权。如果一个人物的健康度计算仅仅依赖于人物的public接口，这并没有问题，但是如果精确的健康计算需要非public信息，在任何时候当你用类外的非成员非友元函数或者另外一个类的非友元函数来替换类内部的某个功能时，这都会是一个潜在的问题。这个问题在此条款接下来的部分会一直存在，因为我们将要考虑的所有其他的设计方法都涉及到对GameCharacter继承体系外部函数的使用。</p>
+<p>作为通用的方法，非成员函数能够对类的非public部分进行访问的唯一方法就是降低类的封装性。例如，类可以将非成员函数声明为友元函数，或者对隐藏起来的部分提供public访问函数。使用函数指针来替换虚函数的优点是否抵消了可能造成的GameCharacter的封装性的降低是你在每个设计中要需要确定的。</p>
+<hr>
+<h3 id="2-3-通过tr1-function实现的策略模式"><a href="#2-3-通过tr1-function实现的策略模式" class="headerlink" title="2.3 通过tr1::function实现的策略模式"></a>2.3 通过tr1::function实现的策略模式</h3><hr>
+<p>一旦你适应了模板以及它们所使用的隐式（implicit）接口(Item 41)，基于函数指针的方法看起来就非常死板了。为什么健康计算器必须是一个函数而不能用行为同函数类似的一些东西来代替（例如，一个函数对象）？如果它必须是一个函数，为什么不能是一个成员函数？为什么必须返回一个int类型而不是能够转换成Int的任意类型呢？</p>
+<p>如果我们使用tr1::funciton对象来替换函数指针的使用，这些限制就会消失。正如Item54所解释的，这些对象可以持有任何可调用实体（也就是函数指针，函数对象，或者成员函数指针），只要它们的签名同客户所需要的相互兼容。这是我们刚刚看到的设计，这次我们使用tr1::function:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class GameCharacter; // as before</div><div class="line">int defaultHealthCalc(const GameCharacter&amp; gc); // as before</div><div class="line">class GameCharacter &#123;</div><div class="line">public:</div><div class="line">// HealthCalcFunc is any callable entity that can be called with</div><div class="line">// anything compatible with a GameCharacter and that returns anything</div><div class="line">// compatible with an int; see below for details</div><div class="line">typedef std::tr1::function&lt;int (const GameCharacter&amp;)&gt; HealthCalcFunc;</div><div class="line"></div><div class="line">explicit GameCharacter(HealthCalcFunc hcf = defaultHealthCalc)</div><div class="line">: healthFunc(hcf )</div><div class="line">&#123;&#125;</div><div class="line">int healthValue() const</div><div class="line">&#123; return healthFunc(*this); &#125;</div><div class="line">...</div><div class="line">private:</div><div class="line">HealthCalcFunc healthFunc;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>正如你所看到的，HealthCalcFunc是对一个实例化tr1::function的typedef。这意味着它的行为像一个泛化函数指针类型。看看HealthCalcFunc对什么进行了typedef：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">std::tr1::function&lt;int (const GameCharacter&amp;)&gt;</div></pre></td></tr></table></figure>
+<p>这里我对这个tr1::function实例的“目标签名”（target signature）做了字体加亮。这个目标签名是“函数带了一个const GameCharacter&amp;参数，并且返回一个int类型”。这个tr1::function类型的对象可以持有任何同这个目标签名相兼容的可调用实体。相兼容的意思意味着实体的参数要么是const GameCharacter&amp;，要么可以转换成这个类型，实体的返回值要么是int，要么可以隐式转换成int。</p>
+<p>同上一个设计相比我们看到（GameCharacter持有一个函数指针），这个设计基本上是相同的。唯一的不同是GameCharacter现在持有一个tr1::function对象——一个指向函数的泛化指针。这个改动是小的，但是结果是客户现在在指定健康计算函数上有了更大的灵活性：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">short</span> <span class="title">calcHealth</span>(<span class="params"><span class="keyword">const</span> GameCharacter&amp;</span>)</span>;     <span class="comment">// health calculation</span></div><div class="line"><span class="comment">// function; note</span></div><div class="line"><span class="comment">// non-int return type</span></div><div class="line"></div><div class="line"><span class="keyword">struct</span> HealthCalculator &#123;                     <span class="comment">// class for health</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">operator</span>(<span class="params"></span>)(<span class="params"><span class="keyword">const</span> GameCharacter&amp;</span>) <span class="keyword">const</span> <span class="comment">// calculation function</span></span></div><div class="line">&#123; ... &#125; <span class="comment">// objects</span></div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">GameLevel</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">float</span> <span class="title">health</span>(<span class="params"><span class="keyword">const</span> GameCharacter&amp;</span>) <span class="keyword">const</span></span>;    <span class="comment">// health calculation</span></div><div class="line"></div><div class="line">...                                                                 <span class="comment">// mem function; note</span></div><div class="line"></div><div class="line">&#125;;                                                                 <span class="comment">// non-int return type</span></div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">EvilBadGuy</span>: <span class="title">public</span> <span class="title">GameCharacter</span> &#123; <span class="comment">// as before</span></div><div class="line"></div><div class="line">...                                                                </div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">EyeCandyCharacter</span>: <span class="title">public</span> <span class="title">GameCharacter</span> &#123; <span class="comment">// another character</span></div><div class="line">... <span class="comment">// type; assume same</span></div><div class="line"></div><div class="line">&#125;;                                                               <span class="comment">// constructor as</span></div><div class="line"><span class="comment">// EvilBadGuy</span></div><div class="line"></div><div class="line"><span class="function">EvilBadGuy <span class="title">ebg1</span>(<span class="params">calcHealth</span>)</span>;                   <span class="comment">// character using a</span></div><div class="line"><span class="comment">// health calculation</span></div><div class="line"><span class="comment">// function</span></div><div class="line"></div><div class="line"><span class="function">EyeCandyCharacter <span class="title">ecc1</span>(<span class="params">HealthCalculator(</span>))</span>;          <span class="comment">// character using a</span></div><div class="line"><span class="comment">// health calculation</span></div><div class="line"><span class="comment">// function object</span></div><div class="line"></div><div class="line">GameLevel currentLevel;</div><div class="line">...</div><div class="line"><span class="function">EvilBadGuy <span class="title">ebg2</span>(<span class="params">                                     // character <span class="keyword">using</span> a</span></span></div><div class="line"></div><div class="line">std::tr1::bind(&amp;GameLevel::health, // health calculation</div><div class="line"></div><div class="line">currentLevel,               // member function;</div><div class="line"></div><div class="line">_1)                               <span class="comment">// see below for details</span></div><div class="line"></div><div class="line">);</div></pre></td></tr></table></figure>
+<p>你会因为tr1::function的使用而感到吃惊。它一直让我很兴奋。如果你不感到兴奋，可能是因为刚开始接触ebg2的定义，并且想知道对tr1::bind的调用会发生什么。看下面的解释：</p>
+<p>我想说为了计算ebg2的健康度，应该使用GameLevel类中的健康成员函数。现在，GameLevel::health是一个带有一个参数的函数（指向GameCharacter的引用），但是它实际上有两个参数，因为它同时还有一个隐含的GameLevel参数——由this所指向的。然而GameCharacters的健康计算函数却只有一个参数：也就是需要计算健康度的GameCharacter。如果我们对ebg2的健康计算使用GameLevel::health，我们必须做一些“适配”工作，以达到只带一个参数（GameCharacter）而不是两个参数(GameCharacter和GameLevel)的目的。在这个例子中，我们想使用GameLevel对象currentLevel来为ebg2计算健康度，所以我们每次使用”bind”到currentLevel的GameLevel::health函数来计算ebg2的健康度。这也是调用tr1::bind所能做到的：它指定了ebg2的健康计算函数应该总是使用currentLevel作为GameLevel对象。</p>
+<p>我跳过了tr1::bind调用的很多细节，因为这样的细节不会有很多启发意义，并且会分散我要强调的基本观点：通过使用tr1::function而不是一个函数指针，当计算一个人物的健康度时我们可以允许客户使用任何兼容的可调用实体。这是不是很酷。</p>
+<h3 id="2-4-“典型的”策略模式"><a href="#2-4-“典型的”策略模式" class="headerlink" title="2.4 “典型的”策略模式"></a>2.4 “典型的”策略模式</h3><p> 如果你对设计模式比上面的C++之酷更有兴趣，策略模式的一个更加方便的方法是将健康计算函数声明为一个独立健康计算继承体系中的虚成员函数。最后的继承体系设计会是下面的样子：</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170323215444971-1709552083.png" alt=""></p>
+<p>如果你对UML符号不熟悉，上面的UML图说明的意思是GameCharacter是继承体系中的root类，EvilBadGuy和EyeCandyCharacter是派生类；HealthCalcFunc是root类，SlowHealthLoser和FastHealthLoser是派生类；每个GameCharacter类型都包含了一个指向HealthCalcFunc继承体系对象的指针。</p>
+<p>下面是代码的骨架：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">GameCharacter</span>;                                                                      <span class="comment">// forward declaration</span></div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">HealthCalcFunc</span> &#123;                                                                   </div><div class="line"></div><div class="line"><span class="keyword">public</span>:                                                                                            </div><div class="line"></div><div class="line">...                                                                                                    </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">calc</span>(<span class="params"><span class="keyword">const</span> GameCharacter&amp; gc</span>) <span class="keyword">const</span>                            </span></div><div class="line"></div><div class="line">&#123; ... &#125;                                                                                                </div><div class="line"></div><div class="line">...                                                                                                    </div><div class="line"></div><div class="line">&#125;;                                                                                                    </div><div class="line"></div><div class="line">HealthCalcFunc defaultHealthCalc;                                                 </div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">GameCharacter</span> &#123;                                                                    </div><div class="line"></div><div class="line"><span class="keyword">public</span>:                                                                                            </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">explicit</span> <span class="title">GameCharacter</span>(<span class="params">HealthCalcFunc *phcf = &amp;defaultHealthCalc</span>)          </span></div><div class="line"></div><div class="line">: <span class="title">pHealthCalc</span>(<span class="params">phcf</span>)                                                                        </div><div class="line"></div><div class="line">&#123;&#125;                                                                                                    </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">healthValue</span>(<span class="params"></span>) <span class="keyword">const</span>                                                                   </span></div><div class="line"></div><div class="line">&#123; <span class="keyword">return</span> pHealthCalc-&gt;calc(*<span class="keyword">this</span>); &#125;                                                </div><div class="line"></div><div class="line">...                                                                                                    </div><div class="line"></div><div class="line"><span class="keyword">private</span>:                                                                                          </div><div class="line"></div><div class="line">HealthCalcFunc *pHealthCalc;                                                        </div><div class="line"></div><div class="line">&#125;;  </div></pre></td></tr></table></figure>
+<p>很容易识别出来这是人们所熟知的”标准”策略模式的实现，它也为现存的健康计算算法的调整提供了可能性，你只需要添加一个HealthCalcFunc的派生类就可以了。</p>
+<h3 id="2-5-替换方法总结"><a href="#2-5-替换方法总结" class="headerlink" title="2.5 替换方法总结"></a>2.5 替换方法总结</h3><p>这个条款的基本建议是当为你所要解决的问题寻找一个设计方法时，考虑一下虚函数设计的替代方法。下面是我们介绍的设计方法回顾：</p>
+<ul>
+<li>使用非虚接口用法(NVI idiom)，这是模板方法设计模式（Template Method design pattern），它用public非虚成员函数来包裹更低访问权的虚函数来实现。</li>
+<li>用函数指针成员函数来替代虚函数，这是策略设计模式的分解表现形式。</li>
+<li>用tr1::function数据成员来代替虚函数，它可以使用同目标签名（signature）相兼容的任何可调用实体。这也是策略设计模式的一种形式。</li>
+<li>将一个继承体系中的虚函数替换为另外一个继承体系的虚函数。这是策略设计模式的传统实现方法。</li>
+</ul>
+<p>这并不是替换虚函数的所有设计方法，但是应该足够使你确信这些方法是确实存在的。进一步来说，它们的优缺点使你更加清楚你应该考虑使用它们。</p>
+<p>为了避免在面向对象设计的路上被卡住，你需要时不时的拉一把。有很多其他的方法。值得我们花时间去研究它们。</p>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><ul>
+<li><ul>
+<li>虚函数的替换方法包括NVI用法和策略设计模式的其他不同的形式。NVI用法本身是模板方法设计模式的一个例子。</li>
+<li>将功能从成员函数移到类外函数的一个缺点是非成员函数不能再访问类的非public成员。</li>
+<li>Tr1::function对象的行为就像一个泛化函数指针。这种对象支持同给定目标签名相兼容的所有可调用实体。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/21/2017-03-21_20_29_ISO_C++_14_重点介绍[译]/" rel="next" title="ISO C++ 14 重点介绍[译]">
+                <i class="fa fa-chevron-left"></i> ISO C++ 14 重点介绍[译]
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/24/2017-03-24_20_12_读书笔记_effective_c++_Item_36_永远不要重新定义继承而来的非虚函数/" rel="prev" title="读书笔记 effective c++ Item 36 永远不要重新定义继承而来的非虚函数">
+                读书笔记 effective c++ Item 36 永远不要重新定义继承而来的非虚函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-突破思维——不要将思维限定在面向对象方法上"><span class="nav-number">1.1.</span> <span class="nav-text">1. 突破思维——不要将思维限定在面向对象方法上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-替换虚函数的四种设计方法"><span class="nav-number">1.2.</span> <span class="nav-text">2. 替换虚函数的四种设计方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-通过使用非虚接口-non-virtual-interface-NVI-的模板方法模式"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 通过使用非虚接口(non-virtual interface(NVI))的模板方法模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-通过函数指针实现的策略模式"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 通过函数指针实现的策略模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-通过tr1-function实现的策略模式"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 通过tr1::function实现的策略模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-“典型的”策略模式"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 “典型的”策略模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-替换方法总结"><span class="nav-number">1.2.5.</span> <span class="nav-text">2.5 替换方法总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-总结"><span class="nav-number">1.3.</span> <span class="nav-text">7. 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

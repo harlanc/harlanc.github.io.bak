@@ -1,0 +1,902 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 什么是组合（composition）?组合（composition）是一种类型之间的关系，这种关系当一种类型的对象包含另外一种类型的对象时就会产生。举个例子： 123456789101112131415class Address &amp;#123; ... &amp;#125;;      // where someone livesclass PhoneNumber &amp;#123; ... &amp;#125;">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 38 通过组合(composition)为 “has-a”或者“is-implemented-in-terms-of”建模">
+<meta property="og:url" content="http://yoursite.com/2017/03/27/2017-03-27_20_36_读书笔记_effective_c++_Item_38_通过组合(composition)为_“has-a”或者“is-implemented-in-terms-of”建模/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 什么是组合（composition）?组合（composition）是一种类型之间的关系，这种关系当一种类型的对象包含另外一种类型的对象时就会产生。举个例子： 123456789101112131415class Address &amp;#123; ... &amp;#125;;      // where someone livesclass PhoneNumber &amp;#123; ... &amp;#125;">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.038Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 38 通过组合(composition)为 “has-a”或者“is-implemented-in-terms-of”建模">
+<meta name="twitter:description" content="1. 什么是组合（composition）?组合（composition）是一种类型之间的关系，这种关系当一种类型的对象包含另外一种类型的对象时就会产生。举个例子： 123456789101112131415class Address &amp;#123; ... &amp;#125;;      // where someone livesclass PhoneNumber &amp;#123; ... &amp;#125;">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/27/2017-03-27_20_36_读书笔记_effective_c++_Item_38_通过组合(composition)为_“has-a”或者“is-implemented-in-terms-of”建模/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 38 通过组合(composition)为 “has-a”或者“is-implemented-in-terms-of”建模 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/27/2017-03-27_20_36_读书笔记_effective_c++_Item_38_通过组合(composition)为_“has-a”或者“is-implemented-in-terms-of”建模/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 38 通过组合(composition)为 “has-a”或者“is-implemented-in-terms-of”建模</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-27T20:36:00+08:00">
+                2017-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/27/2017-03-27_20_36_读书笔记_effective_c++_Item_38_通过组合(composition)为_“has-a”或者“is-implemented-in-terms-of”建模/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/27/2017-03-27_20_36_读书笔记_effective_c++_Item_38_通过组合(composition)为_“has-a”或者“is-implemented-in-terms-of”建模/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 38 通过组合(composition)为 “has-a”或者“is-implemented-in-terms-of”建模">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><h2 id="1-什么是组合（composition）"><a href="#1-什么是组合（composition）" class="headerlink" title="1. 什么是组合（composition）?"></a>1. 什么是组合（composition）?</h2><p>组合（composition）是一种类型之间的关系，这种关系当一种类型的对象包含另外一种类型的对象时就会产生。举个例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class Address &#123; ... &#125;;      // where someone lives</div><div class="line"></div><div class="line">class PhoneNumber &#123; ... &#125;;</div><div class="line">class Person &#123;</div><div class="line">public:</div><div class="line">...</div><div class="line">private:</div><div class="line">std::string name;          // composed object</div><div class="line"></div><div class="line">  Address address; // ditto</div><div class="line">  PhoneNumber voiceNumber; // ditto</div><div class="line"></div><div class="line">PhoneNumber faxNumber;     // ditto</div><div class="line"></div><div class="line">&#125;;            </div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>在这个例子中，Person对象由string,Address和PhoneNumber对象组成。对于程序员来说，术语组合（composition）有很多替代词。像分层（<em>layering**）</em>,包含（ <em>containment</em>），聚合 （<em>aggregation**）</em>, 和植入（<em>embedding**）。</em></p>
+<h2 id="2-组合关系意味着什么？"><a href="#2-组合关系意味着什么？" class="headerlink" title="2. 组合关系意味着什么？"></a>2. 组合关系意味着什么？</h2><h3 id="2-1-区分-“is-a”和“has-a”"><a href="#2-1-区分-“is-a”和“has-a”" class="headerlink" title="2.1 区分 “is-a”和“has-a”"></a>2.1 区分 “is-a”和“has-a”</h3><p><a href="http://www.cnblogs.com/harlanc/p/6551155.html" title="Item 32" target="_blank" rel="external">Item 32</a>中解释了public继承意味着”is-a”。组合同样有另外一个意思。事实上，有两个意思。<strong>组合即意味着“**</strong>has-a”，也意味着“is-implemented-in-terms-of”**。这是因为你正在处理软件中的两种不同领域（domain）。你的程序中的一些对象对应着世界上的真实存在的东西，如果你要为其建模，例如，人类，车辆，视频帧等等。这样的对象是应用域（application<br>domain）的一部分。其他的对象则是纯实现层面的人工产品。例如，缓存（buffers）,互斥信号量（mutexs），搜索树（search<br>trees）等等。这种类型的对象对应着你软件里的实现域（implementation domain）。当组合关系发生在应用域中的对象之间时,它表示的是“has-a”关系。当发生在实现域中时，它表示的是“is-implemented-in-terms-of”关系。</p>
+<p>上面的Person类表示的是一种“has-a”关系。一个Person对象有一个名字，一个地址和一个语音和传真电话号码。你不能说一个人“is-a”名字或者一个人“is-a”地址。你会说一个人“has-a”名字和“has-an”地址。大多数人能够很容易区分这些，因此很少有人会混淆“is-a”和“has-a”的意思。</p>
+<h3 id="2-2-区分-“is-a”和“is-implemented-in-terms-of”"><a href="#2-2-区分-“is-a”和“is-implemented-in-terms-of”" class="headerlink" title="2.2 区分 “is-a”和“is-implemented-in-terms-of”"></a>2.2 区分 “is-a”和“is-implemented-in-terms-of”</h3><p>更麻烦的是对“is-a”和“is-implemented-in-terms-of”进行区分。举个例子，假设你需要一个类模板表示很小的对象set，也即是没有重复元素的collections。因为重用是美好的事情，你的第一直觉就是使用标准库的set模板。当有一个已经被实现好的模板时你为什么要自己手动实现一个呢？</p>
+<p>不幸的是，set的实现对于其中的每个元素都会引入三个指针的开销。因为set通常作为一个平衡搜索树来实现，这能保证将搜索，插入和删除的时间限定在对数级别（logarithmic-time）。当速度比空间重要时，这是个合理的设计，但是对于你的应用，空间比速度要更重要。所以标准库的set没有为你的应用提供正确的权衡。你需要自己实现这个模板。</p>
+<p> 重用仍然是美好的事情。作为数据结构专家，你知道实现set会有很多选择，其中一个是使用linked lists。你同样知道标准C++库有一个list模板，所以你决定重用它。</p>
+<p>特别情况下，你决定让你的初步实现的set模板继承list。也即是Set<t>将会继承list<t>。毕竟，在你的实现中，一个Set对象事实上是一个list对象。所以你将Set模板声明为如下：</t></t></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;                      // the wrong way to use list for Set</div><div class="line"></div><div class="line">class Set: public std::list&lt;T&gt; &#123; ... &#125;;     </div></pre></td></tr></table></figure>
+<p>看上去都很好，但事实上有一些地方犯了严重错误。正如Item32中解释的，如果D 是一个B，对于B来说是真的对D来说也是真的。然而，一个list对象可能会包含重复元素，所以如果值3051被插入到Set<int>两次，那么list将会包含3051的两个拷贝。相反。一个Set不可以包含重复元素，所以当3051被插入到Set<int>两次的时候，set只包含一个3051值。现在一个Set是一个List就不再为真了，因为对list对象为真的一些事情对Set对象来说不为真了。</int></int></p>
+<p>因为这两个类之间的关系不是“is-a”，public继承是为这种关系建模的错误方式。正确的方式是意识到一个Set对象可以被“implemented<br>in terms of”一个list对象：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">template&lt;class T&gt;                           // the right way to use list for Set</div><div class="line"></div><div class="line">class Set &#123;                                       </div><div class="line"></div><div class="line">public:                                            </div><div class="line"></div><div class="line">bool member(const T&amp; item) const; </div><div class="line"></div><div class="line">void insert(const T&amp; item);            </div><div class="line"></div><div class="line">void remove(const T&amp; item);         </div><div class="line"></div><div class="line">std::size_t size() const;                   </div><div class="line"></div><div class="line">private:                                          </div><div class="line"></div><div class="line">std::list&lt;T&gt; rep;              // representation for Set data</div><div class="line"></div><div class="line">&#125;;                 </div></pre></td></tr></table></figure>
+<p> Set成员函数的实现可以依赖list已经提供的功能和标准库的其他部分，所以实现上就简单直接了，前提是你对STL编程的基本知识很熟悉：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">bool Set&lt;T&gt;::member(const T&amp; item) const</div><div class="line">&#123;</div><div class="line">return std::find(rep.begin(), rep.end(), item) != rep.end();</div><div class="line">&#125;</div><div class="line">template&lt;typename T&gt;</div><div class="line">void Set&lt;T&gt;::insert(const T&amp; item)</div><div class="line">&#123;</div><div class="line">if (!member(item)) rep.push_back(item);</div><div class="line">&#125;</div><div class="line">template&lt;typename T&gt;</div><div class="line">void Set&lt;T&gt;::remove(const T&amp; item)</div><div class="line">&#123;</div><div class="line">typename std::list&lt;T&gt;::iterator it = // see Item 42 for info on</div><div class="line">std::find(rep.begin(), rep.end(), item); // “typename” here</div><div class="line">if (it != rep.end()) rep.erase(it);</div><div class="line">&#125;</div><div class="line">template&lt;typename T&gt;</div><div class="line">std::size_t Set&lt;T&gt;::size() const</div><div class="line">&#123;</div><div class="line">return rep.size();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这些函数足够简单，它们是inline函数的合理候选人，虽然我知道你想先回顾一下<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item30</a>中的讨论之后再做决定。</p>
+<p>一些人会争论为了让Set接口更好的符合<a href="http://www.cnblogs.com/harlanc/p/6431766.html" title="Item 18" target="_blank" rel="external">Item18</a>的建议，也即是设计接口的时候满足容易被正确使用不容易被误用，Set应该遵循STL容器的惯例。但是遵循这些惯例就需要为Set增加很多工作，这会导致list和Set之间的关系模糊不清。既然关系是这个条款的关键点，我们会为了更好的阐述而牺牲STL兼容性。此外，Set接口不应该使Set的无可争辩的正确行为黯然失色：这个权利是它和List之间的关系。这个关系不是”is-a”(虽然一开始看起来像)，而是”is-implemented-in-terms-of”。</p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><ul>
+<li><ul>
+<li>组合和public继承的意义完全不同</li>
+<li>在应用域中，组合意味了“has-a”，在实现域中，它意味着“is-implemented-in-terms-of”</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/25/2017-03-25_17_50_读书笔记_effective_c++_Item_37_永远不要重新定义继承而来的函数默认参数值/" rel="next" title="读书笔记 effective c++ Item 37 永远不要重新定义继承而来的函数默认参数值">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 37 永远不要重新定义继承而来的函数默认参数值
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/28/2017-03-28_21_14_读书笔记_effective_c++_Item_39_明智而谨慎的使用private继承/" rel="prev" title="读书笔记 effective c++ Item 39 明智而谨慎的使用private继承">
+                读书笔记 effective c++ Item 39 明智而谨慎的使用private继承 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-什么是组合（composition）"><span class="nav-number">1.1.</span> <span class="nav-text">1. 什么是组合（composition）?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-组合关系意味着什么？"><span class="nav-number">1.2.</span> <span class="nav-text">2. 组合关系意味着什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-区分-“is-a”和“has-a”"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 区分 “is-a”和“has-a”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-区分-“is-a”和“is-implemented-in-terms-of”"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 区分 “is-a”和“is-implemented-in-terms-of”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-总结"><span class="nav-number">1.3.</span> <span class="nav-text">3. 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

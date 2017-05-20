@@ -1,0 +1,957 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="软件工程,单元测试," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="最近想对我们的单元测试做一下总结，楼主在日常工作中写了不少单元测试，但有些概念和用法并没有刨根问题的去追寻，研究。于是把一些不清晰的概念输入到google中来寻找答案，发现了几个不错的帖子，从中学到了东西，也发现了问题，于是忍不住又翻译了一把，和大家分享，如有错误，敬请指正。 我们所做的产品测试包括了下文所说的软件测试词汇表中的大部分，也就是“单元测试”，组件测试，系统测试，集成测试，压力测试和验">
+<meta name="keywords" content="软件工程,单元测试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单元测试有毒">
+<meta property="og:url" content="http://yoursite.com/2017/05/10/2017-05-10_21_13_单元测试有毒/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="最近想对我们的单元测试做一下总结，楼主在日常工作中写了不少单元测试，但有些概念和用法并没有刨根问题的去追寻，研究。于是把一些不清晰的概念输入到google中来寻找答案，发现了几个不错的帖子，从中学到了东西，也发现了问题，于是忍不住又翻译了一把，和大家分享，如有错误，敬请指正。 我们所做的产品测试包括了下文所说的软件测试词汇表中的大部分，也就是“单元测试”，组件测试，系统测试，集成测试，压力测试和验">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170510210526113-1292119186.png">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170510210548910-246415569.png">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170510210558660-16247845.png">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="单元测试有毒">
+<meta name="twitter:description" content="最近想对我们的单元测试做一下总结，楼主在日常工作中写了不少单元测试，但有些概念和用法并没有刨根问题的去追寻，研究。于是把一些不清晰的概念输入到google中来寻找答案，发现了几个不错的帖子，从中学到了东西，也发现了问题，于是忍不住又翻译了一把，和大家分享，如有错误，敬请指正。 我们所做的产品测试包括了下文所说的软件测试词汇表中的大部分，也就是“单元测试”，组件测试，系统测试，集成测试，压力测试和验">
+<meta name="twitter:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170510210526113-1292119186.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/10/2017-05-10_21_13_单元测试有毒/"/>
+
+
+
+
+
+  <title>单元测试有毒 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/10/2017-05-10_21_13_单元测试有毒/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">单元测试有毒</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-10T21:13:00+08:00">
+                2017-05-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/05/10/2017-05-10_21_13_单元测试有毒/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/05/10/2017-05-10_21_13_单元测试有毒/" class="leancloud_visitors" data-flag-title="单元测试有毒">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近想对我们的单元测试做一下总结，楼主在日常工作中写了不少单元测试，但有些概念和用法并没有刨根问题的去追寻，研究。于是把一些不清晰的概念输入到google中来寻找答案，发现了几个不错的帖子，从中学到了东西，也发现了问题，于是忍不住又翻译了一把，和大家分享，如有错误，敬请指正。</p>
+<p>我们所做的产品测试包括了下文所说的软件测试词汇表中的大部分，也就是“单元测试”，组件测试，系统测试，集成测试，压力测试和验收测试。开发团队成员做的<br><a id="more"></a><br>者参与的是“单元测试”，集成测试。这里的单元测试我加了引号是因为看完下面的文章，我发现我们所做的单元测试并不是严格意义上的单元测试，叫功能测试比较恰当。下文所说的功能测试遇到的问题在我们的实际项目中也遇到了。希望日后有机会改进。</p>
+<p>另外这篇帖子的标题叫做evil unit testing，这里的evil是有害的意思，但是通读这篇博客，并没有讲单元测试是有害的，可能作者的意思是把功能测试当作单元测试的想法是有毒的吧。</p>
+<p>好了，原文链接：</p>
+<p><a href="http://www.javaranch.com/unit-testing.jsp" target="_blank" rel="external">http://www.javaranch.com/unit-testing.jsp</a></p>
+<h2 id="1-你做的是单元测试么？"><a href="#1-你做的是单元测试么？" class="headerlink" title="1. 你做的是单元测试么？"></a>1. 你做的是单元测试么？</h2><p>我看到过至少6个公司因为他们有“单元测试(unit test)”而满脸自豪。而我们看到的是这种“单元测试”结果会是一个麻烦。其他人讨论单元测试有多么伟大，但是它确实变得让人痛苦不堪。这种测试需要45分钟才能跑完，还有你对代码只做了一点改动，但却破坏了7个测试用例”。</p>
+<p>这些家伙用的是一堆功能测试（functional test）。他们掉入了一个流行的思维陷阱，认为只要是使用Junit来运行的测试用例，就必须是单元测试。你只需要一点点词汇量，90%的问题就都能解决。</p>
+<h2 id="2-软件测试词汇表"><a href="#2-软件测试词汇表" class="headerlink" title="2. 软件测试词汇表"></a>2. 软件测试词汇表</h2><p><img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170510210526113-1292119186.png" alt=""></p>
+<ul>
+<li><strong>单元测试（unit test**</strong>）**：</li>
+</ul>
+<p>可测试代码的最小的一部分。通常是一个单一的方法，不会使用其它方法或者类。非常快！上千个单元测试能够在10秒以内跑完！单元测试永远不会使用：</p>
+<ol>
+<li>数据库</li>
+<li>一个app服务器（或者任何类型的服务器）</li>
+<li>文件/网络 I/O或者文件系统</li>
+<li>另外的应用</li>
+<li>控制台（System.out,system.err等等）</li>
+<li>日志</li>
+<li>大多数其他类（但不包括DTO‘s，String,Integer,mock和一些其他的类）</li>
+</ol>
+<p>单元测试几乎总是回归测试套件（regression suite）的一部分。</p>
+<ul>
+<li><strong>回归测试套件（Regression Suite**</strong>）**:</li>
+</ul>
+<p>能够立刻被运行的测试用例的集合。一个例子就是放在一个特定文件夹中的能够被Junit运行的所有测试用例。一个开发人员能够在一天中把一个<strong>单元测试回归套件</strong>运行20次或者他们可能一个月跑两次<strong>功能测试回归套件</strong>。</p>
+<ul>
+<li><strong>功能测试（Functional Test**</strong>）**:</li>
+</ul>
+<p>比一个单元要大，比一个完整的组件测试要小。通常为工作在一起的的几个方法/函数/类。上百的测试用例允许运行几个小时。大部分功能测试是功能测试回归套件的一部分。通常由Junit来运行。</p>
+<ul>
+<li><strong>集成测试（Integration Test**</strong>）**:</li>
+</ul>
+<p>测试两个或者更多的组件一起工作的情况。有时候是回归套件的一部分。</p>
+<ul>
+<li><strong>组件测试（Component Test**</strong>）**:</li>
+</ul>
+<p>运行一个组件。经常由QA，经理，XP客户等等来执行。这种类别的测试不是回归套件的一部分，它不由Junit来执行。</p>
+<ul>
+<li><strong>组件验收测试（Component Acceptance Test C.A.T.**</strong>）**:</li>
+</ul>
+<p>作为正常流程的一部分，它是在众多人面前运行的一个组件测试。由大家共同决定这个组件是不是满足需求标准。</p>
+<ul>
+<li><strong>系统测试（system Test**</strong>）**：</li>
+</ul>
+<p>所有的组件在一起运行。</p>
+<ul>
+<li><strong>系统验收测试（System Acceptance Test S.A.T.**</strong>）**:</li>
+</ul>
+<p>作为正常流程的一部分，它是在众多人面前运行的一个系统测试，由大家来共同决定这个系统是不是满足需求标准。</p>
+<ul>
+<li><strong>压力测试（Stress Tests**</strong>）**:</li>
+</ul>
+<p>另外一个程序加载一个组件，一些组件或者整个系统。我曾经看到过把一些小的压力测试放到回归功能测试中来进行——这是测试并发代码的一个很聪明的做法。</p>
+<ul>
+<li><strong>Mock</strong>:</li>
+</ul>
+<p>在单元测试或者功能测试中使用的一些代码，通过使用这些代码来确保你要测试的代码不会去使用其它的产品代码（production code）。一个mock类覆盖了一个产品类中的所有public方法，它们用来插入到尝试使用产品类的地方。有时候一个mock类用来实现一个接口，它替换了用来实现同样接口的产品代码。</p>
+<ul>
+<li><strong>Shunt</strong>:</li>
+</ul>
+<p>有点像继承（extends）产品代码的mock类，只是它的意图不是覆盖所有的方法，而只是覆盖足够的代码，所以你能够测试一些产品方法，同时mock剩余的产品方法。如果你想测试一个可能会使用I/O的类它会变得尤为有用，你的shunt能够重写I/O方法同时来测试非I/O方法。</p>
+<h2 id="3-使用太多功能测试（functional-test）会有麻烦"><a href="#3-使用太多功能测试（functional-test）会有麻烦" class="headerlink" title="3. 使用太多功能测试（functional test）会有麻烦"></a>3. 使用太多功能测试（functional test）会有麻烦</h2><p>不要误解我的意思。功能测试有很大的价值。我认为一个测试良好的app将会有一个功能测试的回归套件和一个非回归功能测试的集合。通常情况下对于一磅产品代码，我都想看到两磅单元测试代码和两盎司（注：1磅=16盎司）功能测试代码。但是在太多的项目中我看到的现象是没有一丁点单元测试，却有一磅功能测试。</p>
+<p>下面的两幅图表明了一些类的使用情况。用一些功能测试来测试这些类一块工作的情况。修复一个类的bug会破坏许多功能测试。。。</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170510210548910-246415569.png" alt=""></p>
+<p>上面的情况我看到过多次。其中的一个例子是一个很小的改动破坏了47个测试用例。我们通过开会来决定这个bug是不是要被留在代码中。最后决定我们要留足够的时间来fix所有的case。几个月过去了，事情依然糟糕。。</p>
+<p>解决方法是使用单元测试来代替功能测试：</p>
+<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170510210558660-16247845.png" alt=""></p>
+<p>结果是这个工程变的更加灵活。</p>
+<h2 id="4-功能测试认知纠错"><a href="#4-功能测试认知纠错" class="headerlink" title="4. 功能测试认知纠错"></a>4. 功能测试认知纠错</h2><p>“<strong>通过只编写功能测试用例，我可以写更少的测试代码，同时测试更多的功能代码！</strong>”这是真的！但是这会以你的工程变得更加脆弱为代价。另外，如果不使用单元测试，你的应用有些地方很难被测试。同时达到最好的<strong>覆盖率和灵活性</strong>是使用功能测试和单元测试的组合，其中单元测试的比重要大，功能测试的比重要小。</p>
+<p>“<strong>我的业务逻辑是让所有的类一块工作，所以只测试一个方法是没有意义的。</strong>”我建议你单独测试所有的方法。同时我也并不建议你不使用功能测试，它们也是有价值的。</p>
+<p>“<strong>我不介意我的单元测试组件会花费几分钟来运行</strong>”但是你的团队中的其他人介意么？你的team lead介意么？你的manager呢？如果它花费几分钟而不是几秒钟，你还会在一天的时间把整个测试套件运行多次么？在什么情况下人们根本不会运行测试？</p>
+<h2 id="5-单元测试mock基础"><a href="#5-单元测试mock基础" class="headerlink" title="5. 单元测试mock基础"></a>5. 单元测试mock基础</h2><p>下面是单元测试的一个简单例子，测试各种情况却不依赖其他方法。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testLongitude</span>(<span class="params"></span>)</span></div><div class="line"></div><div class="line">    &#123;</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"111.44w"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"111.44W"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"111.44 w"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"111.44 W"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"111.44     w"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"-111.44w"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"-111.44W"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"-111.44 w"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"-111.44 W"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"-111.44"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"111.44-"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"111.44 -"</span> ) );</div><div class="line"></div><div class="line">        assertEquals( <span class="string">"-111.44"</span> , Normalize.longitude( <span class="string">"111.44west"</span> ) );</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>当然，任何人都能为上面这种情况做单元测试。但是大部分业务逻辑都使用了其它业务逻辑：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FarmServlet</span> <span class="title">extends</span> <span class="title">ActionServlet</span></div><div class="line">  &#123; </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAction</span>(<span class="params"> ServletData servletData </span>) throws Exception</span></div><div class="line">        &#123;</div><div class="line"></div><div class="line">            String species = servletData.getParameter(<span class="string">"species"</span>);</div><div class="line"></div><div class="line">            String buildingID = servletData.getParameter(<span class="string">"buildingID"</span>);</div><div class="line"></div><div class="line">            <span class="keyword">if</span> ( Str.usable( species ) &amp;&amp; Str.usable( buildingID ) )</div><div class="line"></div><div class="line">            &#123;</div><div class="line"></div><div class="line">                FarmEJBRemote remote = FarmEJBUtil.getHome().create();</div><div class="line"></div><div class="line">                remote.addAnimal( species , buildingID );</div><div class="line"></div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125; </div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>这里不仅仅调用了其他业务逻辑，还调用了应用服务器！可能还会访问网络！上千次的调用可能会花费不少于10秒的时间。另外对EJB的修改可能会破坏我对这个方法的测试！所以我们需要引入一个mock对象。</p>
+<p>首先是创建mock。如果FarmEJBRemote是一个类，我将会继承（extend）它并且重写(override)它所有的方法。但是既然它是一个接口，我会编写一个新类并实现（implement）所有方法:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MockRemote</span> <span class="title">implements</span> <span class="title">FarmEJBRemote</span></div><div class="line"></div><div class="line">    &#123;</div><div class="line"></div><div class="line">        String addAnimal_species = <span class="literal">null</span>;</div><div class="line"></div><div class="line">        String addAnimal_buildingID = <span class="literal">null</span>;</div><div class="line"></div><div class="line">        <span class="keyword">int</span> addAnimal_calls = <span class="number">0</span>;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addAnimal</span>(<span class="params"> String species , String buildingID </span>)</span></div><div class="line"></div><div class="line">        &#123;</div><div class="line"></div><div class="line">            addAnimal_species = species ;</div><div class="line"></div><div class="line">            addAnimal_buildingID = buildingID ;</div><div class="line"></div><div class="line">            addAnimal_calls++;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>这个类什么都没做，只是携带了单元测试和需要被测试代码之间要交互的数据。</p>
+<p>这个类会让你感觉不舒服么？应该是这样。在我刚接触它的时候有两件事情把我弄糊涂了：类的属性不是private的，并且命名上有下划线。如果你需要mock java.sql.connection。总共有40个方法！ 为每个方法的各个参数，返回值和计数都实现Getters和setters？嗯…稍微想一下…我们把属性声明为private是为了封装，把事情是如何做的封装在内部，于是日后我们就可以修改我们的业务逻辑代码而不用破坏决定要进入我们的内脏的其他代码（也就是要调用我们的业务逻辑的代码）。但这对于mock来说并不适用，不是么？根据定义，mock没有任何业务逻辑。进一步来说，它没有任何东西不是从其他地方拷贝过来的。所有的mock对象都能100%在build阶段生成！..所以虽然有时候我仍然觉的这么实现Mock有一点恶心，但是最后我会重拾自信，这是最好的方法了。只是闻起来会让你有些不舒服，但是效果比使用其它方法好多了。</p>
+<p>现在我需要使用mock代码来替代调用应用服务器的部分。我对需要使用mock的地方做了高亮：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FarmServlet</span> <span class="title">extends</span> <span class="title">ActionServlet</span></div><div class="line"></div><div class="line">  &#123;</div><div class="line"></div><div class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAction</span>(<span class="params"> ServletData servletData </span>) throws Exception</span></div><div class="line"></div><div class="line">      &#123;</div><div class="line"></div><div class="line">          String species = servletData.getParameter(<span class="string">"species"</span>);</div><div class="line"></div><div class="line">          String buildingID = servletData.getParameter(<span class="string">"buildingID"</span>);</div><div class="line"></div><div class="line">          <span class="keyword">if</span> ( Str.usable( species ) &amp;&amp; Str.usable( buildingID ) )</div><div class="line"></div><div class="line">          &#123;</div><div class="line"></div><div class="line">              FarmEJBRemote remote = FarmEJBUtil.getHome().create();</div><div class="line"></div><div class="line">              remote.addAnimal( species , buildingID );</div><div class="line"></div><div class="line">          &#125;</div><div class="line"></div><div class="line">      &#125;</div><div class="line"></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p> 首先，让我们把这句代码从其他猛兽中分离出来：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FarmServlet</span> <span class="title">extends</span> <span class="title">ActionServlet</span></div><div class="line"></div><div class="line">   &#123;</div><div class="line"></div><div class="line">       <span class="function"><span class="keyword">private</span> FarmEJBRemote <span class="title">getRemote</span>(<span class="params"></span>)  </span></div><div class="line">       &#123; </div><div class="line">           <span class="keyword">return</span> FarmEJBUtil.getHome().create(); </div><div class="line">       &#125;</div><div class="line"></div><div class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAction</span>(<span class="params"> ServletData servletData </span>) throws Exception</span></div><div class="line"></div><div class="line">       &#123;</div><div class="line"></div><div class="line">           String species = servletData.getParameter(<span class="string">"species"</span>);</div><div class="line"></div><div class="line">           String buildingID = servletData.getParameter(<span class="string">"buildingID"</span>);</div><div class="line"></div><div class="line">           <span class="keyword">if</span> ( Str.usable( species ) &amp;&amp; Str.usable( buildingID ) )</div><div class="line"></div><div class="line">           &#123;</div><div class="line"></div><div class="line">               FarmEJBRemote remote = getRemote();</div><div class="line"></div><div class="line">               remote.addAnimal( species , buildingID );</div><div class="line"></div><div class="line">           &#125;</div><div class="line"></div><div class="line">       &#125;</div><div class="line"></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>这有一点痛..我将会继承我的产品类然后重写getRemote()，于是我可以把mock代码混入到这个操作中了。我需要做一点点改动：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FarmServlet</span> <span class="title">extends</span> <span class="title">ActionServlet</span></div><div class="line"></div><div class="line">  &#123;</div><div class="line"></div><div class="line">      <span class="function">FarmEJBRemote <span class="title">getRemote</span>(<span class="params"></span>)</span></div><div class="line"></div><div class="line">      &#123;</div><div class="line"></div><div class="line">          <span class="keyword">return</span> FarmEJBUtil.getHome().create();</div><div class="line"></div><div class="line">      &#125;</div><div class="line"></div><div class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAction</span>(<span class="params"> ServletData servletData </span>) throws Exception</span></div><div class="line"></div><div class="line">      &#123;</div><div class="line"></div><div class="line">          String species = servletData.getParameter(<span class="string">"species"</span>);</div><div class="line"></div><div class="line">          String buildingID = servletData.getParameter(<span class="string">"buildingID"</span>);</div><div class="line"></div><div class="line">          <span class="keyword">if</span> ( Str.usable( species ) &amp;&amp; Str.usable( buildingID ) )</div><div class="line"></div><div class="line">          &#123;</div><div class="line"></div><div class="line">              FarmEJBRemote remote = getRemote();</div><div class="line"></div><div class="line">              remote.addAnimal( species , buildingID );</div><div class="line"></div><div class="line">          &#125;</div><div class="line"></div><div class="line">      &#125;</div><div class="line"></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p> 如果你是一个好的面向对象工程师，你现在应该疯了！破坏单元测试代码中的封装性是很不舒服的，但是破坏产品代码封装性的事情就不要做了！长篇大论的解释有可能帮助事态平息，我的观点是：在你的产品代码中，对类的第一次封装要永远保持警惕…但是，有时候，你可能考虑用价值20美元的可测试性来和价值1美元的封装性来做交易。为了让你减轻一点痛苦，你可以加一个注释：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FarmServlet</span> <span class="title">extends</span> <span class="title">ActionServlet</span></div><div class="line"></div><div class="line">    &#123;</div><div class="line"></div><div class="line">        <span class="comment">//exposed for unit testing purposes only!</span></div><div class="line"></div><div class="line">        <span class="function">FarmEJBRemote <span class="title">getRemote</span>(<span class="params"></span>)</span></div><div class="line"></div><div class="line">        &#123;</div><div class="line"></div><div class="line">            <span class="keyword">return</span> FarmEJBUtil.getHome().create();</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAction</span>(<span class="params"> ServletData servletData </span>) throws Exception</span></div><div class="line"></div><div class="line">        &#123;</div><div class="line"></div><div class="line">            String species = servletData.getParameter(<span class="string">"species"</span>);</div><div class="line"></div><div class="line">            String buildingID = servletData.getParameter(<span class="string">"buildingID"</span>);</div><div class="line"></div><div class="line">            <span class="keyword">if</span> ( Str.usable( species ) &amp;&amp; Str.usable( buildingID ) )</div><div class="line"></div><div class="line">            &#123;</div><div class="line"></div><div class="line">                FarmEJBRemote remote = getRemote();</div><div class="line"></div><div class="line">                remote.addAnimal( species , buildingID );</div><div class="line"></div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p> 现在我可以实现一个类来返回mock值了：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">FarmServletShunt</span> <span class="title">extends</span> <span class="title">FarmServlet</span></div><div class="line"></div><div class="line">   &#123; </div><div class="line"></div><div class="line">       FarmEJBRemote getRemote_return = <span class="literal">null</span>;</div><div class="line"></div><div class="line">       <span class="function">FarmEJBRemote <span class="title">getRemote</span>(<span class="params"></span>)</span></div><div class="line"></div><div class="line">       &#123;</div><div class="line"></div><div class="line">           <span class="keyword">return</span> getRemote_return;</div><div class="line"></div><div class="line">       &#125;</div><div class="line"></div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p> 注意一下怪异的名字：“shunt”。我不确定它是什么意思，但我认为这个词语来自电子工程/工艺，它指用一段电线来临时组装一个完整的电路。一开始听起来这个想法很愚蠢，但是过后我就慢慢习惯了。</p>
+<p>一个shunt有点像mock，一个没有重写所有方法的mock。用这种方法，你可以mock一些方法，然后测试其他的方法。一个单元测试可以由几个shunts来完成，它们重写了相同的类，每个shunt测试了类的不同部分。Shunt通常情况下为嵌套类。</p>
+<p>终场表演的时候到了！看一下单元测试代码！</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TestFarmServlet</span> <span class="title">extends</span> <span class="title">TestCase</span></div><div class="line"></div><div class="line">  &#123;</div><div class="line"></div><div class="line">      <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">FarmServletShunt</span> <span class="title">extends</span> <span class="title">FarmServlet</span></div><div class="line"></div><div class="line">      &#123;</div><div class="line"></div><div class="line">          FarmEJBRemote getRemote_return = <span class="literal">null</span>;</div><div class="line"></div><div class="line">          <span class="function">FarmEJBRemote <span class="title">getRemote</span>(<span class="params"></span>)</span></div><div class="line"></div><div class="line">          &#123;</div><div class="line"></div><div class="line">              <span class="keyword">return</span> getRemote_return;</div><div class="line"></div><div class="line">          &#125;</div><div class="line"></div><div class="line">      &#125;</div><div class="line"></div><div class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAddAnimal</span>(<span class="params"></span>) throws Exception</span></div><div class="line"></div><div class="line">      &#123;</div><div class="line"></div><div class="line">          MockRemote mockRemote = <span class="keyword">new</span> MockRemote();</div><div class="line"></div><div class="line">          FarmServletShunt shunt = <span class="keyword">new</span> FarmServletShunt();</div><div class="line"></div><div class="line">          shunt.getRemote_return = mockRemote();</div><div class="line"></div><div class="line">          <span class="comment">// just another mock to make</span></div><div class="line"></div><div class="line">          MockServletData mockServletData = <span class="keyword">new</span> MockServletData(); </div><div class="line"></div><div class="line">          mockServletData.getParameter_returns.put(<span class="string">"species"</span>,<span class="string">"dog"</span>);</div><div class="line"></div><div class="line">          mockServletData.getParameter_returns.put(<span class="string">"buildingID"</span>,<span class="string">"27"</span>);</div><div class="line"></div><div class="line">          shunt.doAction( mockServletData );</div><div class="line"></div><div class="line">          assertEquals( <span class="number">1</span> , mockRemote.addAnimal_calls );</div><div class="line"></div><div class="line">          assertEquals( <span class="string">"dog"</span> , mockRemote.addAnimal_species );</div><div class="line"></div><div class="line">          assertEquals( <span class="number">27</span> , mockRemote.addAnimal_buildingID );</div><div class="line"></div><div class="line">      &#125;</div><div class="line"></div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>基本的测试框架我们就展示完了。下面我要和大家分享一个和单元测试有关的概念——依赖注入，也是我们的单元测试中要到的，敬请期待。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/软件工程/" rel="tag"># 软件工程</a>
+          
+            <a href="/tags/单元测试/" rel="tag"># 单元测试</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/07/2017-05-07_11_44_UNIX_系统概述/" rel="next" title="UNIX 系统概述">
+                <i class="fa fa-chevron-left"></i> UNIX 系统概述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/" rel="prev" title="依赖注入和单元测试">
+                依赖注入和单元测试 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-你做的是单元测试么？"><span class="nav-number">1.</span> <span class="nav-text">1. 你做的是单元测试么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-软件测试词汇表"><span class="nav-number">2.</span> <span class="nav-text">2. 软件测试词汇表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-使用太多功能测试（functional-test）会有麻烦"><span class="nav-number">3.</span> <span class="nav-text">3. 使用太多功能测试（functional test）会有麻烦</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-功能测试认知纠错"><span class="nav-number">4.</span> <span class="nav-text">4. 功能测试认知纠错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-单元测试mock基础"><span class="nav-number">5.</span> <span class="nav-text">5. 单元测试mock基础</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

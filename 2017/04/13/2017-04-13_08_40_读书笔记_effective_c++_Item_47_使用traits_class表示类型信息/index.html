@@ -1,0 +1,933 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="STL主要由为容器，迭代器和算法创建的模板组成，但是也有一些功能模板。其中之一叫做advance。Advance将一个指定的迭代器移动指定的距离： 12345 template&amp;lt;typename IterT, typename Dis&amp;lt;!--more--&amp;gt;T&amp;gt; // move iter d units void advance(IterT&amp;amp; iter, DistT">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 47 使用traits class表示类型信息">
+<meta property="og:url" content="http://yoursite.com/2017/04/13/2017-04-13_08_40_读书笔记_effective_c++_Item_47_使用traits_class表示类型信息/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="STL主要由为容器，迭代器和算法创建的模板组成，但是也有一些功能模板。其中之一叫做advance。Advance将一个指定的迭代器移动指定的距离： 12345 template&amp;lt;typename IterT, typename Dis&amp;lt;!--more--&amp;gt;T&amp;gt; // move iter d units void advance(IterT&amp;amp; iter, DistT">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.289Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 47 使用traits class表示类型信息">
+<meta name="twitter:description" content="STL主要由为容器，迭代器和算法创建的模板组成，但是也有一些功能模板。其中之一叫做advance。Advance将一个指定的迭代器移动指定的距离： 12345 template&amp;lt;typename IterT, typename Dis&amp;lt;!--more--&amp;gt;T&amp;gt; // move iter d units void advance(IterT&amp;amp; iter, DistT">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/13/2017-04-13_08_40_读书笔记_effective_c++_Item_47_使用traits_class表示类型信息/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 47 使用traits class表示类型信息 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/13/2017-04-13_08_40_读书笔记_effective_c++_Item_47_使用traits_class表示类型信息/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 47 使用traits class表示类型信息</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-13T08:40:00+08:00">
+                2017-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/13/2017-04-13_08_40_读书笔记_effective_c++_Item_47_使用traits_class表示类型信息/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/13/2017-04-13_08_40_读书笔记_effective_c++_Item_47_使用traits_class表示类型信息/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 47 使用traits class表示类型信息">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>STL主要由为容器，迭代器和算法创建的模板组成，但是也有一些功能模板。其中之一叫做advance。Advance将一个指定的迭代器移动指定的距离：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> template&lt;typename IterT, typename Dis</div><div class="line">&lt;!--more--&gt;</div><div class="line">T&gt; <span class="comment">// move iter d units</span></div><div class="line"> <span class="function"><span class="keyword">void</span> <span class="title">advance</span>(<span class="params">IterT&amp; iter, DistT d</span>)</span>; <span class="comment">// forward; if d &lt; 0,</span></div><div class="line"> <span class="comment">// move iter backward</span></div></pre></td></tr></table></figure>
+<p>从概念上来说，advance仅仅做了iter += d，但是advance并不是用这种方式实现的，因为只有随机访问迭代器支持+=操作。其他一些更加弱的迭代器类型必须通过反复的++或者–d次来实现advance。</p>
+<h2 id="1-五种迭代器种类回顾"><a href="#1-五种迭代器种类回顾" class="headerlink" title="1. 五种迭代器种类回顾"></a>1. 五种迭代器种类回顾</h2><p>你不记得STL迭代器的种类了？没问题，我们现在做一些简单的回顾。总共有5类迭代器，对应着它们支持的五种操作。<strong>输入迭代器（**</strong>input iterator<strong>**）</strong>只能向前移动，一次只能移动一步，只能读取它们指向的内容，并且只能读一次。这种迭代器模拟的是输入文件的读指针；C++库的istream_iterator是这种迭代器的代表。<strong>输出迭代器（**</strong>output<br>iterator<strong>**）</strong>同输入迭代器类似，但是对于输出迭代器来说：它们只能向前移动，每次只能移动一步，只能对它们指向的内存进行写操作，并且只能写一次。它们模拟的是输出文件的写指针；ostream_iterator代表了这种迭代器。这是两类功能最弱的迭代器。因为输入和输出迭代器只能向前移动，只能对它们所指向的内容进行读写最多一次，它们只能为one-pass算法所使用。</p>
+<p>一个更加强大的迭代器种类由<strong>前向迭代器（**</strong>forward<br>iterator<strong>**）</strong>组成。这种迭代器能做输入和输出迭代器能做的所有事情，并且它们能对它们指向的内容进行多次的读写。这就使得它们能被multi-pass算法所使用。STL没有提供单链表，但是一些库却提供了（通常叫做slist），这种容器中的迭代器为前向迭代器。TR1中的哈希容器（Item 54）迭代器也可能是前向迭代器。</p>
+<p><strong>双向迭代器（**</strong>bidirectional<br>iterators<strong>**）</strong>和前向迭代器相比添加了向后移动的能力。为STL中的list提供的迭代器就属于这种类别，为set,multiset，map和multimap提供的迭代器也是这种类别。</p>
+<p>最强大的迭代器类别叫做<strong>随机访问迭代器（**</strong>random<br>access iterator<strong>**）</strong>。这种类型的迭代器和双向迭代器相比添加了执行“迭代器运算（iterator arithmetic）”的能力，也就是在常量时间内向前或者向后跳跃任意的距离。这种运算同指针运算类似，不要吃惊，因为随机访问迭代器模拟的就是内建类型的指针，内建类型指针的行为表现就如同随机访问迭代器。Vector,deque和string迭代器都是随机访问迭代器。</p>
+<p>为了识别这五种迭代器类型，C++在标准库中为五种迭代器类型提供了一个“tag结构体”：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> input_iterator_tag &#123;&#125;;</div><div class="line"><span class="keyword">struct</span> output_iterator_tag &#123;&#125;;</div><div class="line"><span class="keyword">struct</span> forward_iterator_tag: <span class="keyword">public</span> input_iterator_tag &#123;&#125;;</div><div class="line"><span class="keyword">struct</span> bidirectional_iterator_tag: <span class="keyword">public</span> forward_iterator_tag &#123;&#125;;</div><div class="line"><span class="keyword">struct</span> random_access_iterator_tag: <span class="keyword">public</span> bidirectional_iterator_tag &#123;&#125;;</div></pre></td></tr></table></figure>
+<p>这些结构体之间的继承关系是有效的“is-a”关系（<a href="http://www.cnblogs.com/harlanc/p/6551155.html" title="Item 32" target="_blank" rel="external">Item32</a>）：所有的前向迭代器同样是输入迭代器，等等。我们很快会看到这种继承的效用。</p>
+<h2 id="2-如何实现advance简析"><a href="#2-如何实现advance简析" class="headerlink" title="2. 如何实现advance简析"></a>2. 如何实现advance简析</h2><p>回到advance。考虑到不同的迭代器功能，实现advance的一种方法是使用循环的最小公分母策略：<strong>对迭代器进行反复加或者减</strong>。然而，这个方法会花费<strong>线性的时间</strong>。随机访问迭代器支持<strong>常量时间</strong>的迭代器算法，在我们需要的时候会使用它的这种能力。</p>
+<p>我们真正想要的是像下面这样去实现advance:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT, typename DistT&gt;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">advance</span>(<span class="params">IterT&amp; iter, DistT d</span>)</span></div><div class="line">&#123;</div><div class="line"><span class="keyword">if</span> (iter <span class="keyword">is</span> a random access iterator) &#123;</div><div class="line"></div><div class="line">iter += d;                           <span class="comment">// use iterator arithmetic</span></div><div class="line"></div><div class="line">&#125;                                        <span class="comment">// for random access iters</span></div><div class="line"></div><div class="line"><span class="keyword">else</span> &#123;                                </div><div class="line"></div><div class="line"><span class="keyword">if</span> (d &gt;= <span class="number">0</span>) &#123; <span class="keyword">while</span> (d--) ++iter; &#125; <span class="comment">// use iterative calls to</span></div><div class="line"><span class="keyword">else</span> &#123; <span class="keyword">while</span> (d++) --iter; &#125; <span class="comment">// ++ or -- for other</span></div><div class="line">&#125; <span class="comment">// iterator categories</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这需要决定iter是不是一个随机访问迭代器，也就是需要知道它的类型，IterT，是不是随机访问迭代器类型。换句话说，我们需要获取一个类型的相关信息。这也是trait让你所做的：<strong>它们允许你在编译期间获取一个类型的相关信息</strong>。</p>
+<h2 id="3-Traits技术分析"><a href="#3-Traits技术分析" class="headerlink" title="3. Traits技术分析"></a>3. Traits技术分析</h2><h3 id="3-1-使用traits技术的要求"><a href="#3-1-使用traits技术的要求" class="headerlink" title="3.1 使用traits技术的要求"></a>3.1 使用traits技术的要求</h3><p>Traits不是C++中的关键字或者一个预定义的概念；它们是一种技术，也是一个C++程序员需要遵守的约定。<strong>使用这项技术的一个要求是它必须使内建类型同用户自定义类型一样能够很好的工作</strong>。例如，如果advance的入参为一个指针（像const<br>char*）和一个Int,advance必须能够工作，但是这就意味着trait技术必须能够使用在像指针一样的内建类型上。</p>
+<p>Traits必须能够同内建类型一块工作就意味着不能在类型内部嵌入一些信息，因为没有方法在指针内部嵌入信息。于是对于一种类型的traits信息，必须是放在类型外部的。标准的技术是将其放在模板和模板的一个或多个特化实例中。对于迭代器来说，标准库中的模板被命名为iterator_traits:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT&gt; <span class="comment">// template for information about</span></div><div class="line"><span class="keyword">struct</span> iterator_traits; <span class="comment">// iterator types</span></div></pre></td></tr></table></figure>
+<p>正如你所见的，iterator_traits是一个结构体。按照惯例，traits经常被实现为一个结构体。另外一种常用手法是将实现traits的结构体替换为traits class(这不是我说的)。</p>
+<p>Iterator_traits的工作方式是对于每个类型IterT，在结构体iterator_traits<itert>中声明一个叫做iterator_category的typedef。这个typedef唯一确认了IterT的迭代器类别。</itert></p>
+<h3 id="3-2-实现traits-class需要处理用户自定义类型"><a href="#3-2-实现traits-class需要处理用户自定义类型" class="headerlink" title="3.2 实现traits class需要处理用户自定义类型"></a>3.2 实现traits class需要处理用户自定义类型</h3><p>Iterator_traits会在两部分中实现它。首先，它强制任何用户自定义的迭代器类型必须包含一个叫做iterator_category的内嵌typedef，它能够识别合适的tag结构体。举个例子，deque的迭代器是随机访问的，因此一个deque迭代器的类会像是下面这个样子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">template &lt; ... &gt;                                                                         <span class="comment">// template params elided</span></div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">deque</span> &#123;                                                                           </div><div class="line"></div><div class="line"><span class="keyword">public</span>:                                                                                    </div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">iterator</span> &#123;                                                                        </div><div class="line"></div><div class="line"><span class="keyword">public</span>:                                                                                    </div><div class="line"></div><div class="line">typedef random_access_iterator_tag iterator_category;          </div><div class="line"></div><div class="line">...                                                                                             </div><div class="line"></div><div class="line">&#125;;                                                                                            </div><div class="line"></div><div class="line">...                                                                                             </div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>List的迭代器是双向的，所以用下面的方式处理：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">template &lt; ... &gt;</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">list</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line"><span class="keyword">class</span> <span class="title">iterator</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line">typedef bidirectional_iterator_tag iterator_category;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p> iterator_traits只是重复使用iterator类的内嵌typedef:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">// the iterator_category for type IterT is whatever IterT says it is;</div><div class="line"></div><div class="line">// see [Item 42](http://www.cnblogs.com/harlanc/p/6661228.html "Item 42") for info on the use of “typedef typename”</div><div class="line"></div><div class="line">template&lt;typename IterT&gt;</div><div class="line"></div><div class="line">struct iterator_traits &#123;</div><div class="line"></div><div class="line">typedef typename IterT::iterator_category iterator_category;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h3 id="3-3-实现traits-class需要处理指针类型"><a href="#3-3-实现traits-class需要处理指针类型" class="headerlink" title="3.3 实现traits class需要处理指针类型"></a>3.3 实现traits class需要处理指针类型</h3><p>这对用户自定义类型来说会工作的很好，但是对于指针迭代器来说就不工作了，因为指针中没有内嵌的typedef。Iterator_trait实现的第二部分需要处理指针迭代器。</p>
+<p>为了支持这种迭代器，iterator_traits为指针类型提供了一种部分模板特化（partial template specialization）。指针的行为表现同随机访问迭代器类似，所以iterator_trait为它们指定了随机访问类别：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt; <span class="comment">// partial template specialization</span></div><div class="line"><span class="keyword">struct</span> iterator_traits&lt;T*&gt; <span class="comment">// for built-in pointer types</span></div><div class="line">&#123;</div><div class="line">typedef random_access_iterator_tag iterator_category;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h3 id="3-4-实现traits-class总结"><a href="#3-4-实现traits-class总结" class="headerlink" title="3.4 实现traits class总结"></a>3.4 实现traits class总结</h3><p>到现在你应该了解了如何设计和实现一个traits class：</p>
+<ul>
+<li>确认你想要支持的类型的一些信息(例如，对于迭代器来说，它们的迭代器类别)。</li>
+<li>为了确认信息，你需要选择一个名字（例如，iterator_category）</li>
+<li>为你想支持的类型提供包含相关信息的一个模板和一些特化（例如，iterator_traits）</li>
+</ul>
+<h2 id="4-使用traits"><a href="#4-使用traits" class="headerlink" title="4. 使用traits"></a>4. 使用traits</h2><p>class实现advance</p>
+<h3 id="4-1-类别判断不应该在运行时进行"><a href="#4-1-类别判断不应该在运行时进行" class="headerlink" title="4.1 类别判断不应该在运行时进行"></a>4.1 类别判断不应该在运行时进行</h3><p>考虑iterator_traits——实际上是std::iterator_traits，既然它是C++标准库的一部分——我们能为advance的实现精炼成我们自己的伪代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT, typename DistT&gt;</div><div class="line">void advance(IterT&amp; iter, DistT d)</div><div class="line">&#123;</div><div class="line">if (typeid(typename std::iterator_traits&lt;IterT&gt;::iterator_category) ==</div><div class="line">typeid(std::random_access_iterator_tag))</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>虽然这看上去很有希望，但它不会如我们所愿。第一，它会导致编译问题，这个问题我们将在Item 48研究；现在，有更加基本的问题需要考虑。IterT的类型在编译期被确认，所以iterator_traits<itert>::iterator_category同样能够在编译期被确定。但是if语句会在运行时被评估（除非你的优化器足够疯狂，把if语句去掉）。为什么将本来可以在编译期做的事情挪到运行时去做呢？它会浪费时间，并且会造成执行代码膨胀。</itert></p>
+<h3 id="4-2-将条件评估提前到编译期——使用重载"><a href="#4-2-将条件评估提前到编译期——使用重载" class="headerlink" title="4.2 将条件评估提前到编译期——使用重载"></a>4.2 将条件评估提前到编译期——使用重载</h3><p>我们真正想要的是为类型提供一个能够在编译期进行评估的条件结构（也就是一个if…else语句）。C++已经有一种方法来实现这种行为。她叫做<strong>重载</strong>。</p>
+<p>当你重载某个函数f的时候，你为不同的重载函数指定不同的参数类型。当你调用f时，编译器会根据你所传递的参数选择最佳匹配重载函数。编译器会说：“如果这个重载对于传递过来的参数来说是最佳匹配，那么调用这个f；如果另外一个重载函数是最佳匹配，那么调用另外一个函数；如果第三个函数是最佳匹配，调用第三个”等等，看到了么？这是一个与类型相关的编译期条件结构。为了让advance表现出我们想要的行为，所有我们必须要做的是创建一个重载函数的多个版本，它们包含了advance的“内脏”，每个函数都带有一个不同类型的iterator_category对象。我将这些函数命名为doAdvance：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT, typename DistT&gt; // use this impl for</div><div class="line">void doAdvance(IterT&amp; iter, DistT d, // random access</div><div class="line">std::random_access_iterator_tag) // iterators</div><div class="line">&#123;</div><div class="line">iter += d;</div><div class="line">&#125;</div><div class="line">template&lt;typename IterT, typename DistT&gt; // use this impl for</div><div class="line">void doAdvance(IterT&amp; iter, DistT d, // bidirectional</div><div class="line">std::bidirectional_iterator_tag) // iterators</div><div class="line">&#123;</div><div class="line">if (d &gt;= 0) &#123; while (d--) ++iter; &#125;</div><div class="line">else &#123; while (d++) --iter; &#125;</div><div class="line">&#125;</div><div class="line">template&lt;typename IterT, typename DistT&gt; // use this impl for</div><div class="line">void doAdvance(IterT&amp; iter, DistT d, // input iterators</div><div class="line">std::input_iterator_tag)</div><div class="line">&#123;</div><div class="line">if (d &lt; 0 ) &#123;</div><div class="line">throw std::out_of_range("Negative distance"); // see below</div><div class="line">&#125;</div><div class="line">while (d--) ++iter;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>因为forward_iterator_tag继承自input_iterator_tag，为input_iterator_tag提供的doAdvance版本同样能够处理forward迭代器。这是在不同iterator_tag结构体之间引入继承的动机。（事实上，这也是所有的使用public继承的动机：为基类类型实现的代码对于派生类类型来说同样适用。）</p>
+<p>对于随机访问迭代器和双向迭代器来说，advance的特化版本同时能够做正向或者负向的移动，但是对于forward迭代器或者input迭代器来说，如果你想进行一个负向的移动就会出现未定义行为。实现中如果简单的假设d是非负的，当传递一个负参数时，你就会进入一个很长的循环中，直到d变为0为止。在上面的代码中，我所使用的替代方法是抛出一个异常。两种实现都是有效的。这就是未定义行为的诅咒：你不能预测出来会发成什么。  </p>
+<p>考虑为doAdvance所重载的不同版本，所有advance需要做的就是调用它们，传递一个额外的合适的迭代器类别对象，最后编译器就能够使用重载方案来调用合适的实现：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT, typename DistT&gt;</div><div class="line">void advance(IterT&amp; iter, DistT d)</div><div class="line">&#123;</div><div class="line">doAdvance( // call the version</div><div class="line">iter, d, // of doAdvance</div><div class="line">typename // that is</div><div class="line">std::iterator_traits&lt;IterT&gt;::iterator_category() // appropriate for</div><div class="line">); // iter’s iterator</div><div class="line"></div><div class="line">&#125;                                                                                  // category</div></pre></td></tr></table></figure>
+<h2 id="5-traits-class使用总结"><a href="#5-traits-class使用总结" class="headerlink" title="5. traits class使用总结"></a>5. traits class使用总结</h2><p>我们可以总结一下如何使用traits class:</p>
+<ul>
+<li>创建一系列重载的”worker”函数或者函数模板（例如，doAdvance），通过使用traits 参数来进行区分。根据传递的traits信息来对应的实现每个函数。</li>
+<li>创建一个“master”函数或者函数模板（例如，advance）来调用worker，将traits class提供的信息传递进去。</li>
+</ul>
+<p>Traits被广泛使用在标准库中。对于iterator_traits来说，除了iterator_category，还为迭代器提供了四种其它的信息（最有用的就是value_type—<a href="http://www.cnblogs.com/harlanc/p/6661228.html" title="Item 42" target="_blank" rel="external">Item 42</a>中给出了一个例子。）还有char_traits，存储了字符类型的信息，numeric_limits,提供数字类型信息，例如，它们能够表示的最大和最小值等等。（numeric_limits这个名字可能让你感到意外，因为传统的命名方式是以“traits”结尾，但是numeric_limits没有遵守。）</p>
+<p>TR1（Item 54）为了为类型提供信息引入了大量的新的traits class，包括is_fundamental<t>(判断T是否为内建类型)，is_array<t>(判断T是否为数组)，和is_base_of<t1,t2>（判断T1和T2是否相同或者是T2的基类）。TR1向标准C++中添加了大概有50个traits classes。</t1,t2></t></t></p>
+<h2 id="6-本条款总结"><a href="#6-本条款总结" class="headerlink" title="6. 本条款总结"></a>6. 本条款总结</h2><ul>
+<li>Traits classes使得在编译期就能够获得类型信息。它们用模板和模板特化版本来进行实现。</li>
+<li>利用重载，traits classes使得在类型上执行编译期if-else测试成为可能。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/11/2017-04-11_08_38_读书笔记_effective_c++_Item_46_如果想进行类型转换，在模板内部定义非成员函数/" rel="next" title="读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 46 如果想进行类型转换，在模板内部定义非成员函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/15/2017-04-15_12_54_读书笔记_effective_c++_Item_48__了解模板元编程/" rel="prev" title="读书笔记 effective c++ Item 48  了解模板元编程">
+                读书笔记 effective c++ Item 48  了解模板元编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-五种迭代器种类回顾"><span class="nav-number">1.</span> <span class="nav-text">1. 五种迭代器种类回顾</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-如何实现advance简析"><span class="nav-number">2.</span> <span class="nav-text">2. 如何实现advance简析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Traits技术分析"><span class="nav-number">3.</span> <span class="nav-text">3. Traits技术分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-使用traits技术的要求"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 使用traits技术的要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-实现traits-class需要处理用户自定义类型"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 实现traits class需要处理用户自定义类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-实现traits-class需要处理指针类型"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 实现traits class需要处理指针类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-实现traits-class总结"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 实现traits class总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-使用traits"><span class="nav-number">4.</span> <span class="nav-text">4. 使用traits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-类别判断不应该在运行时进行"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 类别判断不应该在运行时进行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-将条件评估提前到编译期——使用重载"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 将条件评估提前到编译期——使用重载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-traits-class使用总结"><span class="nav-number">5.</span> <span class="nav-text">5. traits class使用总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-本条款总结"><span class="nav-number">6.</span> <span class="nav-text">6. 本条款总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

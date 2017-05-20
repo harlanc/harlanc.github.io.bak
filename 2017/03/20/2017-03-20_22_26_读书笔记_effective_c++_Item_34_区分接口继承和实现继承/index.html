@@ -1,0 +1,944 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="看上去最为简单的(public)继承的概念由两个单独部分组成：函数接口的继承和函数模板继承。这两种继承之间的区别同本书介绍部分讨论的函数声明和函数定义之间的区别完全对应。 1. 类函数的三种实现作为一个类设计者，有时候你只想派生类继承成员函数的接口（声明">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 34 区分接口继承和实现继承">
+<meta property="og:url" content="http://yoursite.com/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="看上去最为简单的(public)继承的概念由两个单独部分组成：函数接口的继承和函数模板继承。这两种继承之间的区别同本书介绍部分讨论的函数声明和函数定义之间的区别完全对应。 1. 类函数的三种实现作为一个类设计者，有时候你只想派生类继承成员函数的接口（声明">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.910Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 34 区分接口继承和实现继承">
+<meta name="twitter:description" content="看上去最为简单的(public)继承的概念由两个单独部分组成：函数接口的继承和函数模板继承。这两种继承之间的区别同本书介绍部分讨论的函数声明和函数定义之间的区别完全对应。 1. 类函数的三种实现作为一个类设计者，有时候你只想派生类继承成员函数的接口（声明">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 34 区分接口继承和实现继承 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 34 区分接口继承和实现继承</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-20T22:26:00+08:00">
+                2017-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 34 区分接口继承和实现继承">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><p>看上去最为简单的(public)继承的概念由两个单独部分组成：<strong>函数接口的继承和函数模板继承</strong>。这两种继承之间的区别同本书介绍部分讨论的函数声明和函数定义之间的区别完全对应。</p>
+<h2 id="1-类函数的三种实现"><a href="#1-类函数的三种实现" class="headerlink" title="1. 类函数的三种实现"></a>1. 类函数的三种实现</h2><p>作为一个类设计者，有时候你<strong>只想派生类继承成员函数的接口</strong>（声明<br><a id="more"></a><br>。有时候你想让派生<strong>类同时继承接口和实现，但是你允许它们覆盖掉继承而来的函数实现</strong>。但有时候你却想<strong>让派生类继承一个函数的接口和实现并且不允许它们被覆盖掉</strong>。</p>
+<p>为了对这些不同的选择有一个更好的理解，考虑表示几何图形的类继承体系：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Shape</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span>(<span class="params"></span>) <span class="keyword">const</span> </span>= <span class="number">0</span>;</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">error</span>(<span class="params"><span class="keyword">const</span> std::<span class="keyword">string</span>&amp; msg</span>)</span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">objectID</span>(<span class="params"></span>) <span class="keyword">const</span></span>;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Rectangle</span>: <span class="title">public</span> <span class="title">Shape</span> &#123; ... &#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Ellipse</span>: <span class="title">public</span> <span class="title">Shape</span> &#123; ... &#125;;</div></pre></td></tr></table></figure>
+<p>Shape是一个抽象类；是由纯虚函数draw所标记的。因此客户不能创建Shape类的实例，而只有它的派生类才可以。尽管如此，Shape对（public）继承自它的所有类会产生很大的影响，因为：</p>
+<ul>
+<li>成员函数接口总是被继承，正如<a href="http://www.cnblogs.com/harlanc/p/6551155.html" title="Item 32" target="_blank" rel="external">Item 32</a>中解释的，public继承意味着“is-a”，也就是对基类来说为真的任何东西对派生类来说也必须为真。因此，如果一个函数可以被应用在一个类中，它也必须能被应用到它的派生类中。</li>
+</ul>
+<p>Shape类中声明了三个函数。第一个，draw,画出当前对象；第二个，error，当error需要被记录的时候被调用。第三个，objectID,为当前对象返回一个唯一的整型标识符。每个函数以一种不同的方式被声明：draw是纯虚函数；error是简单的（不是纯的）虚函数；objectID是非虚函数。这些不同声明隐藏的含义是什么呢？</p>
+<h3 id="1-1-纯虚函数"><a href="#1-1-纯虚函数" class="headerlink" title="1.1 纯虚函数"></a>1.1 纯虚函数</h3><p>考虑第一个纯虚函数draw:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Shape</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">draw</span>(<span class="params"></span>) <span class="keyword">const</span> </span>= <span class="number">0</span>;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>纯虚函数的两个最具特色的特征是：<strong>它们必须被继承它们的任何具现类重新声明；在抽象类中它们通常情况下没有定义</strong>。将这两个特征放在一起，你就会发现：</p>
+<ul>
+<li>声明纯虚函数的意图是让派生类只继承函数接口</li>
+</ul>
+<p>这使得Shape::draw函数是非常有意义的，因为对于所有的Shape对象来说能够被画出来是一个合理的需求，但是Shape类不能为这个函数提供合理的默认实现，比如，画一个椭圆的算法和画一个矩形的算法是不一样的。Shape::draw的声明对派生具现类的设计者说，“你必须提供一个draw函数，但是我并不知道你该如何实现它。”</p>
+<p>顺便说一下，为一个纯虚函数提供一个定义也是可能的。也就是你可以为Shape::draw提供一个实现，C++不会发出抱怨，但是调用它的唯一方式是在函数名前加上类名限定符：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Shape *ps = new Shape;     // error! Shape is abstract</div><div class="line"></div><div class="line">Shape *ps1 = new Rectangle; // fine</div><div class="line"></div><div class="line">ps1-&gt;draw();                // calls Rectangle::draw</div><div class="line"></div><div class="line">Shape *ps2 = new Ellipse;      // fine</div><div class="line"></div><div class="line">ps2-&gt;draw();        // calls Ellipse::draw</div><div class="line"></div><div class="line">ps1-&gt;Shape::draw(); // calls Shape::draw</div><div class="line"></div><div class="line">ps2-&gt;Shape::draw(); // calls Shape::draw</div></pre></td></tr></table></figure>
+<p>除了帮助你在鸡尾酒会上给你的程序员伙伴留下深刻印象之外，这个特性通常来说效用有限。然而，你在下面会看到，它可以作为一种机制为简单的（非纯的）虚函数提供比平常更加安全的默认实现。</p>
+<h3 id="1-2-非纯的虚函数"><a href="#1-2-非纯的虚函数" class="headerlink" title="1.2 非纯的虚函数"></a>1.2 非纯的虚函数</h3><p>简单虚函数背后的故事同纯虚函数有些不太一样。通常情况下来说，派生类继承函数接口，但是简单虚函数提供了可能会被派生类覆盖的实现。如果你再想想，你会意识到：</p>
+<ul>
+<li>声明一个简单虚函数的目的是让派生类继承一个函数接口或者一个默认实现。</li>
+</ul>
+<p>考虑Shape::error的情况：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Shape</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">error</span>(<span class="params"><span class="keyword">const</span> std::<span class="keyword">string</span>&amp; msg</span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这个接口表明在遇到错误的时候每个类必须提供一个错误函数，但是每个类对错误如何进行处理可以自由控制。如果一个类不想做任何特殊的事情，那么调用基类Shape中error的默认实现就可以了。也就是Shape::error的声明对派生类的设计者说，“<strong>你可以支持**</strong>error<strong><strong>函数，但如果你不想自己实现，你可以使用</strong></strong>Shape<strong>**类中的默认版本</strong>。”</p>
+<h4 id="1-2-1-同时为简单虚函数提供函数接口和默认实现是危险的"><a href="#1-2-1-同时为简单虚函数提供函数接口和默认实现是危险的" class="headerlink" title="1.2.1 同时为简单虚函数提供函数接口和默认实现是危险的"></a>1.2.1 同时为简单虚函数提供函数接口和默认实现是危险的</h4><p><strong>同时为简单虚函数提供函数接口和默认实现是危险的</strong>。为什么？考虑为XYZ航空公司设计了飞机继承体系。XYZ只有两种类型的的飞机，型号A和型号B，同种飞机的飞行方式相同。因此，XYZ设计了如下的继承体系：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">class Airport &#123; ... &#125;;                                                                    // represents airports</div><div class="line"></div><div class="line">class Airplane &#123;                                                                       </div><div class="line"></div><div class="line">public:                                                                                     </div><div class="line"></div><div class="line">virtual void fly(const Airport&amp; destination);                           </div><div class="line"></div><div class="line">...                                                                                             </div><div class="line"></div><div class="line">&#125;;                                                                                             </div><div class="line"></div><div class="line">void Airplane::fly(const Airport&amp; destination)                        </div><div class="line"></div><div class="line">&#123;                                                                                              </div><div class="line"></div><div class="line">default code for flying an airplane to the given destination      </div><div class="line"></div><div class="line">&#125;                                                                                              </div><div class="line"></div><div class="line">class ModelA: public Airplane &#123; ... &#125;;                                         </div><div class="line"></div><div class="line">class ModelB: public Airplane &#123; ... &#125;;</div></pre></td></tr></table></figure>
+<p>为了表示所有的飞机必须支持fly函数，还有不同型号的飞机可能需要fly的不同实现，因此Airplane::fly被声明为virtual。然而，为了防止在ModelA和ModelB中实现同一份代码，我们为Airplane::fly提供了默认实现，ModelA和ModelB可以同时继承。</p>
+<p>这是典型的面向对象设计。两个类分享同一个特征（实现fly的方式），所以一般的特征都会移到基类中，然后被派生类继承。这种设计使得类的普通特性比较清晰，防止代码重复，可以促进将来的增强实现，使长期维护更加容易——这是面向对象如此受欢迎的原因，XYZ应该为此感到骄傲。</p>
+<p>现在假设XYZ公司界定引入新类型的飞机，Model C。型号C和型号A和B不一样，它的飞行方式变了。</p>
+<p>XYZ的程序员为Model C在继承体系中添加了新类，但是他们如此匆忙的添加新类，以至于忘了重新定义fly函数：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">ModelC</span>: <span class="title">public</span> <span class="title">Airplane</span> &#123;</div><div class="line"></div><div class="line">...                                            <span class="comment">// no fly function is declared</span></div><div class="line"></div><div class="line">&#125;;            </div></pre></td></tr></table></figure>
+<p>在他们的代码中有类似下面的实现：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function">Airport <span class="title">PDX</span>(<span class="params">...</span>)</span>;                              <span class="comment">// PDX is the airport near my home</span></div><div class="line"></div><div class="line">Airplane *pa = <span class="keyword">new</span> ModelC;          </div><div class="line"></div><div class="line">...                                                   </div><div class="line"></div><div class="line">pa-&gt;fly(PDX); <span class="comment">// calls Airplane::fly!</span></div></pre></td></tr></table></figure>
+<p>这会是一个灾难：型号C的飞机尝试用型号A或者型号B的飞行方式去飞行。这不是增加旅客信心的行为。</p>
+<h4 id="1-2-2-解决方法一，将默认实现分离成单独函数"><a href="#1-2-2-解决方法一，将默认实现分离成单独函数" class="headerlink" title="1.2.2 解决方法一，将默认实现分离成单独函数"></a>1.2.2 解决方法一，将默认实现分离成单独函数</h4><p>这里的问题不在于Airplane::fly有默认的行为，而在于允许 Model C在没有明确说明它需要基类行为的情况下继承了基类的行为。幸运的是，很容易为派生类提供<strong>只有在它们需要的情况下才为其提供的默认行为</strong>。这个窍门断绝了虚函数接口和默认实现之间的联系。下面是实现的方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Airplane &#123;</div><div class="line">public:</div><div class="line">virtual void fly(const Airport&amp; destination) = 0;</div><div class="line">...</div><div class="line">protected:</div><div class="line">void defaultFly(const Airport&amp; destination);</div><div class="line">&#125;;</div><div class="line">void Airplane::defaultFly(const Airport&amp; destination)</div><div class="line">&#123;</div><div class="line">default code for flying an airplane to the given destination</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意Airplane::fly已经转成了一个纯虚函数。它为飞行提供了接口。在Airplane类中同样展示出了默认实现，但是现在它是以独立函数的形式存在，defaultFly。像ModelA和ModelB这样的类如果想使用默认实现，只要在fly函数体内调用Inline函数defaultFly就可以了（<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item30</a>中有inline函数和虚函数之间交互的信息）：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">ModelA</span>: <span class="title">public</span> <span class="title">Airplane</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fly</span>(<span class="params"><span class="keyword">const</span> Airport&amp; destination</span>)</span></div><div class="line">&#123; defaultFly(destination); &#125;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">ModelB</span>: <span class="title">public</span> <span class="title">Airplane</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fly</span>(<span class="params"><span class="keyword">const</span> Airport&amp; destination</span>)</span></div><div class="line">&#123; defaultFly(destination); &#125;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>对于ModelC类来说，偶然的继承fly的不正确实现将不再可能，因为Airplane中的纯虚函数强制ModelC提供它自己版本的fly。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">class ModelC: public Airplane &#123;</div><div class="line">public:</div><div class="line">virtual void fly(const Airport&amp; destination);</div><div class="line">...</div><div class="line">&#125;;</div><div class="line">void ModelC::fly(const Airport&amp; destination)</div><div class="line">&#123;</div><div class="line">code for flying a ModelC airplane to the given destination</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个机制也不是十分安全的（程序员仍然能够复制粘贴而导致错误），但是它比原来的设计可靠多了。因为对于Airplane::defaultFly来说，它是protected的是因为它是Airplane和它的派生类中的实现细节。使用airplane的客户只关心它们能够起飞，而不管飞行是如何实现的。</p>
+<p>Airplane::defaultFly是一个非虚函数同样重要。因为没有派生类可以重定义这个函数，这也是Item36所描述的真理。如果defaultFly是虚的，就会有一个循环问题：当派生类想重新定义defaultFly但是忘了会怎样？ </p>
+<h4 id="1-2-3-解决方法二，利用纯虚函数提供默认实现"><a href="#1-2-3-解决方法二，利用纯虚函数提供默认实现" class="headerlink" title="1.2.3 解决方法二，利用纯虚函数提供默认实现"></a>1.2.3 解决方法二，利用纯虚函数提供默认实现</h4><p>一些人反对将函数接口和默认实现分离的想法，就像上面的fly和defaultFly一样。首先，它们意识到，繁殖出十分相关的函数名字污染了类命名空间。但是它们仍然同意将函数接口和默认实现分离。它们如何处理这种看上去矛盾的事情呢？通过利用纯虚函数必须在具现派生类中重新声明这个事实，但是它们也有可能有自己的实现。下面的例子展示了Airplane继承体系是如何利用定义纯虚函数的能力的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">class Airplane &#123;</div><div class="line">public:</div><div class="line">virtual void fly(const Airport&amp; destination) = 0;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"></div><div class="line">void Airplane::fly(const Airport&amp; destination) // an implementation of</div><div class="line">&#123; // a pure virtual function</div><div class="line">default code for flying an airplane to</div><div class="line">the given destination</div><div class="line">&#125;</div><div class="line">class ModelA: public Airplane &#123;</div><div class="line">public:</div><div class="line">virtual void fly(const Airport&amp; destination)</div><div class="line">&#123; Airplane::fly(destination); &#125;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line">class ModelB: public Airplane &#123;</div><div class="line">public:</div><div class="line">virtual void fly(const Airport&amp; destination)</div><div class="line">&#123; Airplane::fly(destination); &#125;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line">class ModelC: public Airplane &#123;</div><div class="line">public:</div><div class="line">virtual void fly(const Airport&amp; destination);</div><div class="line">...</div><div class="line">&#125;;</div><div class="line">void ModelC::fly(const Airport&amp; destination)</div><div class="line">&#123;</div><div class="line">code for flying a ModelC airplane to the given destination</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个设计同前面的设计是基本相同的，除了纯虚函数体Airplane::fly代替了独立函数Airplane::defaultFly。从本质上来说，fly已经被分成了两个基本的组件。它的声明指定了接口（派生类必须使用它），同时它的定义指定了默认行为（派生类可能会使用，但是只有在显示的请求的时候才会使用）。将fly和defaultFly合并到一起，你就会失去为两个函数提供不同保护级别的能力：过去是protected的代码（在defaultFly中）现在变成了public的（因为它在fly中）。</p>
+<h3 id="1-3-非虚函数"><a href="#1-3-非虚函数" class="headerlink" title="1.3 非虚函数"></a>1.3 非虚函数</h3><p>最后，让我们看一看Shape的非虚函数，objectID:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Shape</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">objectID</span>(<span class="params"></span>) <span class="keyword">const</span></span>;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>当一个成员函数是非虚的，就不想其在派生类中有不同的行为。事实上，一个非虚成员函数指定了一种超越特化的不变性（<em>invariant over specialization</em>），无论一个派生类被如何特化,它的行为不可改变。</p>
+<ul>
+<li><strong>声明一个非虚函数的意图在于让派生类继承一个函数接口，并且有一个强制的实现</strong>，</li>
+</ul>
+<p>你可以将Shape::objectID的声明想象成如下，“每一个Shape对象都有一个函数来产生一个对象标识符，这个对象标识符以相同的方式计算出来。计算方式由Shape::objectID的定义来决定，任何派生类都不应该尝试去修改它的定义”。因为一个非虚函数确定了一个超越特化的不变性，它永远不会在派生类中被定义，这一点将在Item36中进行讨论。 </p>
+<h2 id="2-类设计者容易犯的两种错误"><a href="#2-类设计者容易犯的两种错误" class="headerlink" title="2. 类设计者容易犯的两种错误"></a>2. 类设计者容易犯的两种错误</h2><p>对纯虚函数，简单虚函数和非虚函数进行声明的<strong>不同点在于允许你精确的指定派生类会继承什么：只继承接口，继承接口和默认实现或者接口和强制实现</strong>。因为从根本上来说这些不同的声明类型意味着不同的东西，在你声明成员函数的时候你必须在他们之间进行选择。如果你这么做了，你就应该能够避免没有经验的类设计者才会犯的两种普通错误。</p>
+<h3 id="2-1-错误一，将所有函数声明为非虚"><a href="#2-1-错误一，将所有函数声明为非虚" class="headerlink" title="2.1 错误一，将所有函数声明为非虚"></a>2.1 错误一，将所有函数声明为非虚</h3><p>第一种错误是将所有函数声明成非虚。这没有给派生类的特化留下任何余地；特别对于非虚析构函数来说是有问题的（<a href="http://www.cnblogs.com/harlanc/p/6395052.html" title="Item 7" target="_blank" rel="external">Item 7</a>）。当然，我们有足够的理由设计一个不被当作基类的类，在这种情况下，只声明非虚函数是合适的。然而通常情况下，这些类在下面两种情况下被创建出来：要么是忽略了虚函数和非虚函数的区别，要么就是过度担心虚函数所花费的开销。事实是基本上任何被用作基类的类都会使用虚函数。（<a href="http://www.cnblogs.com/harlanc/p/6395052.html" title="Item 7" target="_blank" rel="external">Item 7</a>）</p>
+<p>如果你关心虚函数的开销，允许我拿出80-20法则（<a href="http://www.cnblogs.com/harlanc/p/6523201.html" title="Item 30" target="_blank" rel="external">Item 30</a>也提到了），它表明了在一个典型的程序中，20%的代码会花费80%的运行时间。这个法则很重要，因为它意味着，平均来说，你的程序中的80%的函数调用可以是虚函数调用，但对你的程序的性能影响却是很轻微的。在你对能否负担的起虚函数的开销进行担心之前，确保你所关注的代码是对程序有重大影响的20%的那一部分。</p>
+<h3 id="2-1-错误二，将所有函数声明为虚函数"><a href="#2-1-错误二，将所有函数声明为虚函数" class="headerlink" title="2.1 错误二，将所有函数声明为虚函数"></a>2.1 错误二，将所有函数声明为虚函数</h3><p>另外一个普通的问题是将所有成员函数声明成虚函数。有时候这么做是对的——<a href="http://www.cnblogs.com/harlanc/p/6538258.html" title="Item 31" target="_blank" rel="external">Item 31</a>中的接口类就是这么做的。然而，这也是一个类设计者缺乏坚定立场的标志。一些函数不应该在派生类中被重定义，当碰到这种情况，你就应该把这个函数定义为非虚。不是说只要花费一点时间对函数进行重定义，就能使使类满足所有人的需求。如果你需要特化上的不变性，不要害怕说不!  </p>
+<h2 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h2><ul>
+<li><ul>
+<li>接口继承不同于实现继承。在public继承下，派生类总是会继承基类接口。</li>
+<li>纯虚函数只是指定了接口继承。</li>
+<li>简单虚函数指定了接口继承外加一个默认实现。</li>
+<li>非虚函数指定了一个接口继承外加一个强制实现。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/" rel="next" title="读书笔记 effective C++ Item 33 避免隐藏继承而来的名字">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective C++ Item 33 避免隐藏继承而来的名字
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/21/2017-03-21_20_29_ISO_C++_14_重点介绍[译]/" rel="prev" title="ISO C++ 14 重点介绍[译]">
+                ISO C++ 14 重点介绍[译] <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-类函数的三种实现"><span class="nav-number">1.1.</span> <span class="nav-text">1. 类函数的三种实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-纯虚函数"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 纯虚函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-非纯的虚函数"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 非纯的虚函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-同时为简单虚函数提供函数接口和默认实现是危险的"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">1.2.1 同时为简单虚函数提供函数接口和默认实现是危险的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-解决方法一，将默认实现分离成单独函数"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">1.2.2 解决方法一，将默认实现分离成单独函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-3-解决方法二，利用纯虚函数提供默认实现"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">1.2.3 解决方法二，利用纯虚函数提供默认实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-非虚函数"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 非虚函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-类设计者容易犯的两种错误"><span class="nav-number">1.2.</span> <span class="nav-text">2. 类设计者容易犯的两种错误</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-错误一，将所有函数声明为非虚"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 错误一，将所有函数声明为非虚</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-错误二，将所有函数声明为虚函数"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.1 错误二，将所有函数声明为虚函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-总结"><span class="nav-number">1.3.</span> <span class="nav-text">3. 总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

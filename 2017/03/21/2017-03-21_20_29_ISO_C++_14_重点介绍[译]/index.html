@@ -1,0 +1,924 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++ 14," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="原文链接 http://marknelson.us/2014/09/11/highlights-of-iso-c14/ 下面是对你的日常开发有重大影响的C++14新变动，列出了一些示例代码，并讨论何时以及为什么要使用它们。 1. 返回值类型推导（Return type deduction）对auto做进一步的阐述是很有趣的事情。C++仍然是类型安全的，但是类型安全机制越来越多的由编译">
+<meta name="keywords" content="C++ 14">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ISO C++ 14 重点介绍[译]">
+<meta property="og:url" content="http://yoursite.com/2017/03/21/2017-03-21_20_29_ISO_C++_14_重点介绍[译]/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="原文链接 http://marknelson.us/2014/09/11/highlights-of-iso-c14/ 下面是对你的日常开发有重大影响的C++14新变动，列出了一些示例代码，并讨论何时以及为什么要使用它们。 1. 返回值类型推导（Return type deduction）对auto做进一步的阐述是很有趣的事情。C++仍然是类型安全的，但是类型安全机制越来越多的由编译">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.938Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ISO C++ 14 重点介绍[译]">
+<meta name="twitter:description" content="原文链接 http://marknelson.us/2014/09/11/highlights-of-iso-c14/ 下面是对你的日常开发有重大影响的C++14新变动，列出了一些示例代码，并讨论何时以及为什么要使用它们。 1. 返回值类型推导（Return type deduction）对auto做进一步的阐述是很有趣的事情。C++仍然是类型安全的，但是类型安全机制越来越多的由编译">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/21/2017-03-21_20_29_ISO_C++_14_重点介绍[译]/"/>
+
+
+
+
+
+  <title>ISO C++ 14 重点介绍[译] | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/21/2017-03-21_20_29_ISO_C++_14_重点介绍[译]/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ISO C++ 14 重点介绍[译]</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-21T20:29:00+08:00">
+                2017-03-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/21/2017-03-21_20_29_ISO_C++_14_重点介绍[译]/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/21/2017-03-21_20_29_ISO_C++_14_重点介绍[译]/" class="leancloud_visitors" data-flag-title="ISO C++ 14 重点介绍[译]">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>原文链接</p>
+<p><a href="http://marknelson.us/2014/09/11/highlights-of-iso-c14/" target="_blank" rel="external">http://marknelson.us/2014/09/11/highlights-of-iso-c14/</a></p>
+<p>下面是对你的日常开发有重大影响的C++14新变动，列出了一些示例代码，并讨论何时以及为什么要使用它们。</p>
+<h2 id="1-返回值类型推导（Return-type-deduction）"><a href="#1-返回值类型推导（Return-type-deduction）" class="headerlink" title="1. 返回值类型推导（Return type deduction）"></a>1. 返回值类型推导（Return type deduction）</h2><p>对auto做进一步的阐述是很有趣的事情。C++仍然是类型安全的，但是类型安全机制越来越多的由编译<br><a id="more"></a><br>来执行，而非程序员自己。<br>在C++11中，程序员已经开始使用auto来进行声明了。当使用全限定类型名称（fully qualified type name ）会让你感到吃惊时（因为太长了），例如，创建迭代器，这时候你会感激auto的出现。新发明的C++代码更加易读：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> ( auto ii = collection.begin() ; ...</div></pre></td></tr></table></figure>
+<p>上面的代码仍然是类型安全的——编译器知道begin()在其所在的上下文中会返回什么类型，因此关于类型ii是什么就不再有问题了，并且对每个使用auto的地方都会进行检查。<br>在C++ 14中，auto的使用在几个方面进行了扩展。一个非常有意义的地方是返回类型推导（return type deduction）。如果我在函数内部写下这样一行代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> <span class="number">1.4</span>;</div></pre></td></tr></table></figure>
+<p>编译器和我都清楚的知道函数的返回值是double。所以在C++14中，我可以将函数返回类型定义为auto而不是double：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function">auto <span class="title">getvalue</span>(<span class="params"></span>) </span>&#123;</div></pre></td></tr></table></figure>
+<p>这个新特性的细节非常容易被理解。举个例子，如果一个函数有多个返回值，它们需要有相同的类型。代码如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function">auto <span class="title">f</span>(<span class="params"><span class="keyword">int</span> i</span>)</span></div><div class="line">&#123;</div><div class="line"><span class="keyword">if</span> ( i &lt; <span class="number">0</span> )</div><div class="line"><span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line"><span class="keyword">else</span></div><div class="line"><span class="keyword">return</span> <span class="number">2.0</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>看上去应该将返回类型推导为double，但是标准会禁止这种模棱两可的行为，编译器会发出抱怨：</p>
+<p><strong><em>error_01.cpp:6:5: error: ‘auto’ in return type deduced as ‘double’ here but deduced as ‘int’ in</em></strong><br><strong><em>earlier return statement</em></strong><br><strong><em>return 2.0</em></strong><br><strong><em>^</em></strong><br><strong><em>1 error generated.</em></strong></p>
+<p>为什么返回类型推导对于C++程序来说是锦上添花的。首先，有时候你必须返回一个非常复杂的类型，比如在对标准库容器进行搜索的时候返回一个迭代器。auto返回类型使得函数更加易读，易写。其次，这个原因可能不是那么明显，使用auto返回类型能够增强你的重构能力。举个例子，考虑下面的代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">#include &lt;iostream&gt;</div><div class="line">#include &lt;vector&gt;</div><div class="line">#include &lt;string&gt;</div><div class="line"></div><div class="line">struct record &#123;</div><div class="line">std::string name;</div><div class="line">int id;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">auto find_id(const std::vector&lt;record&gt; &amp;people,</div><div class="line">const std::string &amp;name)</div><div class="line">&#123;</div><div class="line">auto match_name = [&amp;name](const record&amp; r) -&gt; bool &#123;</div><div class="line">return r.name == name;</div><div class="line">&#125;;</div><div class="line">auto ii = find_if(people.begin(), people.end(), match_name );</div><div class="line">if (ii == people.end())</div><div class="line">return -1;</div><div class="line">else</div><div class="line">return ii-&gt;id;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">std::vector&lt;record&gt; roster = &#123; &#123;"mark",1&#125;,</div><div class="line">&#123;"bill",2&#125;,</div><div class="line">&#123;"ted",3&#125;&#125;;</div><div class="line">std::cout &lt;&lt; find_id(roster,"bill") &lt;&lt; "\n";</div><div class="line">std::cout &lt;&lt; find_id(roster,"ron") &lt;&lt; "\n";</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在这个例子中，使find_id返回auto比返回int并没有使我节省多少脑力。但是考虑一下，如果我决定重构record结构体，会发生生么。这次我不在record对象中使用一个整型来唯一标记一个人了，而是使用一个新的GUID类型：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">struct record &#123;</div><div class="line">std::string name;</div><div class="line">GUID id;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>对record对象所做的这个改变会导致一系列的连锁反应，比如函数的返回类型会发生变化。但是如果我对函数返回值使用自动类型推导，编译器会默默的应对这些变化。任何在大型工程上进行开发的C++程序员都会熟悉这个问题。对单一数据结构的修改会导致无休止的对原代码的迭代，对变量，参数以及返回类型的修改。auto的广泛使用能够消减很大一部分这样的工作。</p>
+<p><em><span style="font-family: 'Microsoft YaHei';">注意：在上面的例子和剩下的章节中，我会创建和使用命名的lambda.我猜测大多数用户在使用类似std::find_if()的lambdas函数时，都会将其定义为匿名inline对象，这是非常便利的使用方式。鉴于页面宽度有限，我认为命名lambda在你的浏览器中更加易读。</span></em></p>
+<p><em><span style="font-family: 'Microsoft YaHei';">所以这种写法你不必特地的模仿，仅仅是更加易读而已。特别在你没有lambda经验的情况下，读起来会简单些。</span></em></p>
+<p>使用auto作为返回值的立竿见影的效果是reality of it’s doppelganger, decltype(auto)，还有有了类型推导的规则。现在你可以使用它来自动获取类型信息了，如下面的代码片段：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">template&lt;typename Container&gt;</div><div class="line">struct finder &#123;</div><div class="line">static decltype(Container::find) finder1 = Container::find;</div><div class="line">static decltype(auto) finder2 = Container::find;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h2 id="2-泛型lambdas"><a href="#2-泛型lambdas" class="headerlink" title="2. 泛型lambdas"></a>2. 泛型lambdas</h2><p>另外一个auto悄悄潜伏的地方是在lambda参数的定义中。使用auto类型声明定义lambda参数同创建模板函数基本相当。lambda会基于参数推导类型来进行特定的实例化。</p>
+<p>这对创建可在不同上下文中重用的lambdas来说是很方便的。在下面的简单例子中，我创建了一个lambdas用做标准库函数的谓词（predicate）。在C++11的世界里，我分别为整型加法，字符串加法显示的实例化了一个lambda。</p>
+<p>有了泛型lambda，我能用其定义单一的lambda。虽然它的语法不包括关键字template，这仍然是对C++泛型编程的进一步扩展：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">#include &lt;iostream&gt;</div><div class="line">#include &lt;vector&gt;</div><div class="line">#include &lt;string&gt;</div><div class="line">#include &lt;numeric&gt;</div><div class="line"></div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">std::vector&lt;int&gt; ivec = &#123; 1, 2, 3, 4&#125;;</div><div class="line">std::vector&lt;std::string&gt; svec = &#123; "red",</div><div class="line">"green",</div><div class="line">"blue" &#125;;</div><div class="line">auto adder = [](auto op1, auto op2)&#123; return op1 + op2; &#125;;</div><div class="line">std::cout &lt;&lt; "int result : "</div><div class="line">&lt;&lt; std::accumulate(ivec.begin(),</div><div class="line">ivec.end(),</div><div class="line">0,</div><div class="line">adder )</div><div class="line">&lt;&lt; "\n";</div><div class="line">std::cout &lt;&lt; "string result : "</div><div class="line">&lt;&lt; std::accumulate(svec.begin(),</div><div class="line">svec.end(),</div><div class="line">std::string(""),</div><div class="line">adder )</div><div class="line">&lt;&lt; "\n";</div><div class="line">return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>产生如下结果：</p>
+<p><strong><em>int result : 10</em></strong><br><strong><em>string result : redgreenblue</em></strong></p>
+<p>即使你对匿名inline lambdas进行实例化，正如如前面讨论的，泛型参数仍然是有用的。当你的数据结构发生了变化或者APIs中的函数被修改了，对泛型lambdas进行调整时只需要重新编译就可以了，不需要重新实现：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">std::cout &lt;&lt; "string result : "</div><div class="line">&lt;&lt; std::accumulate(svec.begin(),</div><div class="line">svec.end(),</div><div class="line">std::string(""),</div><div class="line">[](auto op1,auto op2)&#123; return op1+op2; &#125; )</div><div class="line">&lt;&lt; "\n";</div></pre></td></tr></table></figure>
+<h2 id="3-被初始化的lambdas捕获-Initialized-lambda-captures"><a href="#3-被初始化的lambdas捕获-Initialized-lambda-captures" class="headerlink" title="3. 被初始化的lambdas捕获(Initialized lambda captures)"></a>3. 被初始化的lambdas捕获(Initialized lambda captures)</h2><p>在C++11中我们必须开始适应lambda捕获特化（lambda capture specification）的概念。这种声明会在创建闭包（closure）的时候对编译器进行引导：lambda定义了一个函数的实例，还有定义在lambda作用域之外的绑定在函数上的变量。</p>
+<p>在早期的推导返回类型的例子中，我实现了捕获单个变量名字的一个lambda定义，用做谓词中搜索字符串的源：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">auto match_name = [&amp;name](<span class="keyword">const</span> record&amp; r) -&gt; <span class="keyword">bool</span> &#123;</div><div class="line"><span class="keyword">return</span> r.name == name;</div><div class="line">&#125;;</div><div class="line">auto ii = find_if(people.begin(), people.end(), match_name );</div></pre></td></tr></table></figure>
+<p> 这种特殊的捕获使lambda获取了按引用访问变量的权限。捕获也能按值来执行，在两种情况中，变量的使用方式都会符合C++的直觉。按值捕获意味着lambda在本地变量的拷贝上进行操作，按引用捕获意味着lambda在外围作用域的变量本身进行操作。</p>
+<p> 这些都很好，但也会有伴随而来的一些局限性。我想委员会感觉需要处理的一件事情是使用move-only语义来初始化捕获变量。  </p>
+<p> 这意味着什么？如果我们认为lambda即将成为参数的接收器，我们想使用move语义捕获外部变量。举个例子，考虑如何使lambda接收一个move-only unique_ptr参数。第一个尝试是按值捕获，失败了：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">std::unique_ptr&lt;int&gt; p(new int);</div><div class="line">*p = 11;</div><div class="line">auto y = [p]() &#123; std::cout &lt;&lt; "inside: " &lt;&lt; *p &lt;&lt; "\n";&#125;;</div></pre></td></tr></table></figure>
+<p> 这会生成一个编译错误因为unique_ptr没有拷贝构造函数——它所想的就是禁止拷贝。  </p>
+<p>  将其改为按引用捕获就能编译通过，但是没有达到预期效果：也就是通过将值move到本地的拷贝来接收参数。最后你可以通过先创建本地变量然后在捕获的引用上调用std::move（）来完成，但是效率不高。  </p>
+<p>  通过对捕获语句语法进行修改可以修复这个问题。现在我们不是只声明一个捕获变量，我们也能对其初始化。看下面的例子：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">auto y = [&amp;r = x, x = x+<span class="number">1</span>]()-&gt;<span class="keyword">int</span> &#123;...&#125;</div></pre></td></tr></table></figure>
+<p> 上面的代码捕获了x的拷贝，同时为x增加了1。这个例子很容易理解，但是我不确定它是否为接收move-only变量捕获了这种新语法的值。使用这个新语法的例子如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#include &lt;memory&gt;</div><div class="line">#include &lt;iostream&gt;</div><div class="line"></div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">std::unique_ptr&lt;int&gt; p(new int);</div><div class="line">int x = 5;</div><div class="line">*p = 11;</div><div class="line">auto y = [p=std::move(p)]() &#123; std::cout &lt;&lt; "inside: " &lt;&lt; *p &lt;&lt; "\n";&#125;;</div><div class="line">y();</div><div class="line">std::cout &lt;&lt; "outside: " &lt;&lt; *p &lt;&lt; "\n";</div><div class="line">return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在这个例子中，捕获的值p用move语义来初始化，在没有声明本地变量的情况下有效的接收了指针：<br><strong><em>inside: 11</em></strong><br><strong><em>Segmentation fault (core dumped)</em></strong></p>
+<p>这个令人讨厌的结果正是你想要的——在p被捕获并且move到lambda中后，代码对p进行了解引用。</p>
+<h2 id="4-弃用的-deprecated-属性"><a href="#4-弃用的-deprecated-属性" class="headerlink" title="4. [[弃用的]][[deprecated]]属性"></a>4. [[弃用的]][[deprecated]]属性</h2><p>初次看到deprecated 属性是在java中，我承认有点嫉妒。对大多数程序员来说代码腐烂（rot）是一个巨大的问题。（曾经鼓励删除代码？但我从来没有这么做过）。这个新属性提供了攻克这个问题的系统级别的方法。</p>
+<p>用起来很简单，将标签【[[deprecated]]放在声明之前就可以了，声明可以为类，变量，函数或其他东西。结果像下面这个样子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">class</div><div class="line">[[deprecated]] flaky &#123;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>当你的程序使用了一个deprecated实体，原本需要编译器做出反应，现在留给了代码实现者。很清楚大多数人希望能够看到某种警告，也能随手把这种warning关掉。举个例子，clang3.4在实例化一个deprecated类的时候会发出以下警告：<br><strong><em>dep.cpp:14:3: warning: ‘flaky’ is deprecated [-Wdeprecated-declarations]</em></strong><br><strong><em>  flaky f;</em></strong><br><strong><em>  ^</em></strong><br><strong><em>dep.cpp:3:1: note: ‘flaky’ declared here</em></strong><br><strong><em>flaky {</em></strong><br><strong><em>^</em></strong></p>
+<p>C++的属性标记语法看上去有点不熟悉。在属性列表中，[[deprecated]]被放在关键字（如class 或者enum）之后，实体名字之前。<br>这个标记有另外一种形式，它包含了一个信息参数。由开发人员决定如何写这个信息。clang3.4忽略了这个信息。</p>
+<p>看下面的代码片段</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class</div><div class="line">[[deprecated]] flaky &#123;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">[[deprecated("Consider using something other than cranky")]]</div><div class="line">int cranky()</div><div class="line">&#123;</div><div class="line">return 0;</div><div class="line">&#125;</div><div class="line"></div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">flaky f;</div><div class="line">return cranky();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>它并没有包含error信息：<br><strong><em>dep.cpp:14:10: warning: ‘cranky’ is deprecated [-Wdeprecated-declarations]</em></strong><br><strong><em>  return cranky();</em></strong><br><strong><em>         ^</em></strong><br><strong><em>dep.cpp:6:5: note: ‘cranky’ declared here</em></strong><br><strong><em>int cranky()</em></strong><br><strong><em>    ^</em></strong></p>
+<h2 id="5-二进制数字和数字分隔符"><a href="#5-二进制数字和数字分隔符" class="headerlink" title="5. 二进制数字和数字分隔符"></a>5. 二进制数字和数字分隔符</h2><p>有两个新功能不是惊天动地的，但他们确实代表了很好的句法结构的改善。这样的很小的改变改善了代码可读性，进一步减少了bug数量。C++ 程序员现在可以创建一个二进制数字，向已经包含十进制，十六进制以及很少使用的八进制的标准中又添加了一员。二进制数字使用前缀0b后面紧接数字。在美国和英国，我们使用逗号来作为数字分隔符，如：$1,000,000。这种写法真正方便了读者，使得我们的大脑处理很长的数字时更加容易。因为同样的原因C++标准委员会添加了数字分隔符。它们不影响数值，只是通过分块让数字的读写更加容易。</p>
+<p>数字分隔符使用什么字符？在C++中基本上每个标点符号都被特定的特性使用了，因此没有很明显的选择。最后的选择是使用单引号字符，使得C++的百万数表示如下：1’000’000.00。记住分隔符对数值没有任何影响，因此百万数也可表示如下：1’0’00’0’00.00。<br>下面的例子使用了两个新特性：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#include &lt;iostream&gt;</div><div class="line"></div><div class="line">int main()</div><div class="line">&#123;</div><div class="line">int val = 0b11110000;</div><div class="line">std::cout &lt;&lt; "Output mask: "</div><div class="line">&lt;&lt; 0b1000'0001'1000'0000</div><div class="line">&lt;&lt; "\n";</div><div class="line">std::cout &lt;&lt; "Proposed salary: $"</div><div class="line">&lt;&lt; 300'000.00</div><div class="line">&lt;&lt; "\n";</div><div class="line">return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>结果也是你所意料的：<br><strong><em>Output mask: 33152</em></strong><br><strong><em>Proposed salary: $300000</em></strong></p>
+<h2 id="6-剩余特性"><a href="#6-剩余特性" class="headerlink" title="6. 剩余特性"></a>6. 剩余特性</h2><p>c++的其他新特性无需多述。变量模板在变量上对模板的扩展。总会使用到的例子是变量pi<t>的一个实现。当实现为double的时候，变量会返回3.14,当实现为int时，它可能返回3,当实现为string时，可能返回“3.14”或者”pi”，这是个很棒的特性，以前是在<limits>中实现的。变量模板的语法和语义和类模板是基本相同的——你无需额外的学习就能使用它们。对constexpr函数的限制放松了，例如，可以有多个返回值，可以在内部使用case和if语句，可以用循环以及其它。这就对能在编译器做的事进行了扩展，为模板的引入插上了翅膀。其他小的特性包括为内存分配指定大小（sized deallocations）和一些语法的整理（tidying）。</limits></t></p>
+<h2 id="7-下一步做啥？"><a href="#7-下一步做啥？" class="headerlink" title="7. 下一步做啥？"></a>7. 下一步做啥？</h2><p>通过对语言进行改善来保持语言的流行，C++委员会感觉到了压力，它们已经为另外一个标准进行准备了，也就是C++17。</p>
+<p>可能更加有趣的事情是创立一些小组，这些小组可以创建技术规格和文档，虽然不会达到标准的水平，但是会被ISO委员会发布和支持。大概这会更加快速的执行。委员会当前致力于8个部分，包括：</p>
+<ul>
+<li>文件系统</li>
+<li>并发（Concurrency）</li>
+<li>并行（Parallelism）</li>
+<li>网络</li>
+<li>概念（Concepts ）</li>
+</ul>
+<p>这些技术规格的成功与否必须由是否被采纳和使用来评判。如果我们发现所有实现都使用了这些规格，那么为这个规格建立的新轨道就算成功了。</p>
+<p>C/C++一致保持着很好的使用度。现代C++，我们从C++11开始算起，在语言易用性和没有损害性能前提下的安全性有了长足的进步。对于特定类型的工作，很难有理由来将C或者C++替换掉。C++14标准并不像C++11跳跃度这样大，但是它使语言在一个很好的方向上。如果标准委员会在接下来的10年能够在生产率上维持当前的水准，在以性能为导向的应用中C++应该会继续成为被选择的语言。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-14/" rel="tag"># C++ 14</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/" rel="next" title="读书笔记 effective c++ Item 34 区分接口继承和实现继承">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 34 区分接口继承和实现继承
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/23/2017-03-23_21_47_读书笔记_effective_c++_Item_35_考虑虚函数的替代者/" rel="prev" title="读书笔记 effective c++ Item 35 考虑虚函数的替代者">
+                读书笔记 effective c++ Item 35 考虑虚函数的替代者 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-返回值类型推导（Return-type-deduction）"><span class="nav-number">1.</span> <span class="nav-text">1. 返回值类型推导（Return type deduction）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-泛型lambdas"><span class="nav-number">2.</span> <span class="nav-text">2. 泛型lambdas</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-被初始化的lambdas捕获-Initialized-lambda-captures"><span class="nav-number">3.</span> <span class="nav-text">3. 被初始化的lambdas捕获(Initialized lambda captures)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-弃用的-deprecated-属性"><span class="nav-number">4.</span> <span class="nav-text">4. [[弃用的]][[deprecated]]属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-二进制数字和数字分隔符"><span class="nav-number">5.</span> <span class="nav-text">5. 二进制数字和数字分隔符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-剩余特性"><span class="nav-number">6.</span> <span class="nav-text">6. 剩余特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-下一步做啥？"><span class="nav-number">7.</span> <span class="nav-text">7. 下一步做啥？</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

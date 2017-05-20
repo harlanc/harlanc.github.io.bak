@@ -1,0 +1,906 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 自定义new和delete的三个常见原因我们先回顾一下基本原理。为什么人们一开始就想去替换编译器提供的operator new和operator delete版本？有三个最常见的原因：  为了检测内存使用错误。不能成功delete new出来的内存会">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的">
+<meta property="og:url" content="http://yoursite.com/2017/04/19/2017-04-19_08_00_读书笔记_effective_c++_Item_50_了解何时替换new和delete_是有意义的/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1. 自定义new和delete的三个常见原因我们先回顾一下基本原理。为什么人们一开始就想去替换编译器提供的operator new和operator delete版本？有三个最常见的原因：  为了检测内存使用错误。不能成功delete new出来的内存会">
+<meta property="og:updated_time" content="2017-05-20T10:40:57.392Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的">
+<meta name="twitter:description" content="1. 自定义new和delete的三个常见原因我们先回顾一下基本原理。为什么人们一开始就想去替换编译器提供的operator new和operator delete版本？有三个最常见的原因：  为了检测内存使用错误。不能成功delete new出来的内存会">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/19/2017-04-19_08_00_读书笔记_effective_c++_Item_50_了解何时替换new和delete_是有意义的/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/19/2017-04-19_08_00_读书笔记_effective_c++_Item_50_了解何时替换new和delete_是有意义的/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-19T08:00:00+08:00">
+                2017-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/19/2017-04-19_08_00_读书笔记_effective_c++_Item_50_了解何时替换new和delete_是有意义的/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/19/2017-04-19_08_00_读书笔记_effective_c++_Item_50_了解何时替换new和delete_是有意义的/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 50 了解何时替换new和delete 是有意义的">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-自定义new和delete的三个常见原因"><a href="#1-自定义new和delete的三个常见原因" class="headerlink" title="1. 自定义new和delete的三个常见原因"></a>1. 自定义new和delete的三个常见原因</h2><p>我们先回顾一下基本原理。为什么人们一开始就想去替换编译器提供的operator new和operator delete版本？有三个最常见的原因：</p>
+<ul>
+<li>为了检测内存使用错误。不能成功delete new出来的内存会<a id="more"></a>
+成内存泄漏。在new出来的内存上使用多于一次的delete会产生未定义行为。如果operator new持有一份内存分配的列表，并且operator delete从列表中移除地址，那么就很容易侦测出这种使用错误。类似的，不同种类的编程错误能够导致数据右越界（overrun）（越过分配内存块的结尾写数据）或者左越界(underrun)（在分配内存块的开始之前写数据）。自定义的operator new能够分配额外的内存块，所以在客户申请内存前后就有空间存放已知的字节模式（“签名signatures”）。Operato delete能够检查签名是否发生了变化，如果变了，那么在分配内存块的生命周期中，越界（overrun orunderrun）就有可能会发生,operator delete会记录这个事实，并且将违规指针的值记录下来。</li>
+<li>为了提高效率。编译器提供的operator new和operator delete的版本是供大众使用的。它们必须能被长时间运行的程序所用（例如 web server），也能被执行时间小于1秒的程序所使用。它们必须要处理对大内存块，小内存块以及大小混合内存块的请求。它们必须要适应不同的内存分配模式，从为持续运行的程序提供内存块的动态分配到为大量短暂存在对象提供的常量大小的内存块分配和释放。它们必须考虑内存碎片问题，如果不做内存碎片的检查，最后有可能发生内存充足却因为分布在不同的小内存块中而导致内存请求失败的问题。</li>
+</ul>
+<p>考虑以上在内存管理上的不同要求，编译器版本的operator new和operator delete为你提供一个大众化内存分配策略就不足为奇了。它们能够为每个人都工作  的很好，但是对于这些人来说都不是最优的。如果你对程序的动态内存运用模式有一个很好的理解，你就会发现使用自定义版本的operator new和operator delete会胜过默认版本。“胜过”的意思就是它们运行的更快——有时速度提升是数量级的,它们使用的内存会更少——最高能减少50%的内存。对于一些应用来说，能够很容易的替换默认operator new和operator delete版本，却能够收获很大的性能提升。</p>
+<ul>
+<li>为了收集内存使用的统计信息。在沿着自定义new和delete这条小路前进之前，对你的软件是如何使用动态分配内存的相关信息进行收集是很精明的。内存分配块的大小是如何分布的？内存块的生命周期是如何分布的？内存的分配和释放是使用FIFO（先进先出）的顺序，还是使用LIFO（后进先出）的顺序？或者有时候更加趋近于随机的顺序？内存使用的模式是不时地发生变化的么？例如，你的软件在不同的执行阶段是不是有不同的内存分配和释放模式？一次能够使用的动态分配内存的最大容量是多少？自定义版本的operator new和operator delete使得收集这些信息变得容易。</li>
+</ul>
+<h2 id="2-自定义operator-new中的对齐问题"><a href="#2-自定义operator-new中的对齐问题" class="headerlink" title="2. 自定义operator new中的对齐问题"></a>2. 自定义operator new中的对齐问题</h2><p>从概念上来说，实现一个自定义operator new是非常容易的。例如，我们快速的实现一个全局operator new，它能够很容易的检测内存越界。它也有很多小的错误，但是我们一会再去为它们担心。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> signature = <span class="number">0xDEADBEEF</span>;</div><div class="line"></div><div class="line">typedef unsigned <span class="keyword">char</span> Byte;</div><div class="line"><span class="comment">// this code has several flaws — see below</span></div><div class="line"><span class="keyword">void</span>* <span class="function"><span class="keyword">operator</span> <span class="title">new</span>(<span class="params">std::size_t size</span>) <span class="title">throw</span>(<span class="params">std::bad_alloc</span>)</span></div><div class="line">&#123;</div><div class="line"></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="title">std</span>;</div><div class="line">size_t realSize = size + <span class="number">2</span> * <span class="keyword">sizeof</span>(<span class="keyword">int</span>);             <span class="comment">// increase size of request so 2</span></div><div class="line"><span class="comment">// signatures will also fit inside</span></div><div class="line"></div><div class="line"><span class="keyword">void</span> *pMem = malloc(realSize);   <span class="comment">// call malloc to get the actual</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> (!pMem) <span class="keyword">throw</span> bad_alloc();                                                          <span class="comment">// memory</span></div><div class="line"></div><div class="line"><span class="comment">// write signature into first and last parts of the memory              </span></div><div class="line"></div><div class="line">*(static_cast&lt;<span class="keyword">int</span>*&gt;(pMem)) = signature;                                        </div><div class="line"></div><div class="line">*(reinterpret_cast&lt;<span class="keyword">int</span>*&gt;(static_cast&lt;Byte*&gt;(pMem)+realSize-<span class="keyword">sizeof</span>(<span class="keyword">int</span>))) =          </div><div class="line"></div><div class="line">signature;                                                                                       </div><div class="line"></div><div class="line"><span class="comment">// return a pointer to the memory just past the first signature       </span></div><div class="line"></div><div class="line"><span class="keyword">return</span> static_cast&lt;Byte*&gt;(pMem) + <span class="keyword">sizeof</span>(<span class="keyword">int</span>);                             </div><div class="line"></div><div class="line">&#125;      </div></pre></td></tr></table></figure>
+<p>这个operator new的大多数毛病是因为它不符合C++惯例。例如，Item 51中解释了所有的operator new都应该包含一个反复调用new-handling函数的循环，但是这个函数里没有。然而，因为在Item51中会有解释，在这里我们将其忽略。我现在想关注一个更加微妙的问题：<strong>对齐（**</strong>alignment<strong>**）</strong>。</p>
+<p>对于许多计算机架构来说，在内存中替换特定类型的数据时，需要在特定种类的地址上进行。例如，一种架构可能需要指针定义的开始地址为4的整数倍（也就是4字节对齐的）或者定义double的开始地址必须为8的整数倍（也就是8字节对齐的）。不遵守这个约束条件在运行时就会导致硬件异常。其他架构可能更加宽松，也即是如果满足对齐会有更好的性能。例如，在英特尔X86架构中double可以被对齐在任何字节边界上，但是如果它们是8字节对齐的，访问它们的速度会大大加快。</p>
+<p>Operator new和对齐（alignment）是相关的，因为C++需要所有operator new返回的指针都能够被恰当的对齐，malloc工作在同样的需求下，所以让operator new返回从malloc得到的指针是安全的。然而，在上面的operator new中，我们没有返回从malloc得到的指针，我们返回的是从malloc得到的指针加上int大小的偏移量。这就在安全上没有保证了！如果客户通过调用operator new来为double获取足够的内存（或者如果我们实现了operator new[]，为double数组申请内存），并且我们工作在int为4字节大小但是double需要8字节对齐的机器上，我们可能返回一个没有恰当的对齐的指针。这可能会导致程序崩溃。或者它只会导致程序运行更加缓慢。不管哪种结果，都不是我们想要的。</p>
+<h2 id="3-通常情况你无需自定义new和delete"><a href="#3-通常情况你无需自定义new和delete" class="headerlink" title="3. 通常情况你无需自定义new和delete"></a>3. 通常情况你无需自定义new和delete</h2><p>因为像对齐（alignment）这样的细节问题的存在，程序员在专心完成其他任务的时候将这些细节问题忽略会导致各种问题的抛出，这就能够将专业级别的内存管理器区分出来。实现一个能够工作的内存管理器是非常容易的。实现一个工作良好的就非常难了。作为通用规则，我建议你不要尝试，除非有必要。</p>
+<h3 id="3-1-使用默认版本和商业产品"><a href="#3-1-使用默认版本和商业产品" class="headerlink" title="3.1 使用默认版本和商业产品"></a>3.1 使用默认版本和商业产品</h3><p>在许多情况下，你不必这么做。在一些编译器的内存管理函数中有控制调试和记录日志功能的开关。快速瞥一眼你的编译器文档可能就能消除你自己来实现New和delete的想法。在许多平台中，商业产品能够替换编译器自带的内存管理函数。它们的增强的功能和改善的性能能够使你受益，你所需要做的就是重新链接（前提是你必须买下这个产品。）</p>
+<h3 id="3-2-使用开源内存管理器"><a href="#3-2-使用开源内存管理器" class="headerlink" title="3.2 使用开源内存管理器"></a>3.2 使用开源内存管理器</h3><p>另外一个选择是开源的内存管理器。在许多平台上都能找到这样的管理器，所以你可以下载和尝试。其中一个开源的内存分配器是来自Boost的Pool库（Item 55）。这个Pool库提供的内存分配器对自定义内存管理很有帮助：也就是在有大量的小对象需要分配的时候。许多C++书籍中，包含本书的早期版本，展示出了高性能小对象内存分配器的源码，但他们通常都会忽略一些细节，像可移植性，对于对齐的考虑，线程安全等等。真正的库提供的源码都是更加健壮的。即使你自己决定去实现你自己的new和delete，看一下这些开源的版本能够让你对容易忽略的细节有了深刻洞察力，而这些细节就将“基本工作”和“真正工作”区分开来。（鉴于对齐是这样一个细节，因此注意一下TR1是很有价值的，其中包含了对特定类型对齐的支持。）</p>
+<h2 id="4-使用自定义版本new和delete的意义总结"><a href="#4-使用自定义版本new和delete的意义总结" class="headerlink" title="4. 使用自定义版本new和delete的意义总结"></a>4. 使用自定义版本new和delete的意义总结</h2><p>这个条款的论题是让你知道在什么情况下对默认版本的new和delete进行替换是有意义的，无论是在全局范围内替换还是在类的范围内替换。我们现在做一个总结。</p>
+<ul>
+<li>检测内存使用错误。</li>
+<li>收集使用动态分配内存的统计信息。</li>
+<li>提高内存分配和释放的速度。为大众提供的分配器通常情况下比自定义版本要慢的多，特别是在自定义版本是专门为特定类型对象所设计的情况下。类特定的分配器是固定大小分配器的一个实例应用，例如在Boost的Pool库中提供的分配器。如果你的应用是单线程的，但是你的编译器默认版本是线程安全的，你可以通过实现线程不安全的分配器来获得可观的速度提升。当然，在下决定要提升operator new和operator delete的速度之前，研究一下你的程序来确定这些函数真的是瓶颈所在。</li>
+<li>减少默认内存管理的空间开销。大众内存管理器通常情况下不仅慢，而且使用更多的内存。因为它们会为每个内存分配块引入一些额外的开销。为小对象创建的分配器从根本上消除了这些开销。</li>
+<li>能够补偿在默认分配器中的次优对齐。正如我先前提到的，在X86架构的机器上访问double，在8字节对齐的情况下速度是最快的。但是一些编译器中的operator new不能够保证对于动态分配的double是8字节对齐的。在这种情况中，用能够保证8字节对齐的版本替换默认版本可以很大程度的提高性能。</li>
+<li>将相关对象集中起来。如果你知道一些特定的数据结构通常情况下会被放在一起被使用，当在这些数据上进行工作时你想让页错误出现的频率最小化，为这些数据结构创建一个单独的堆就有意义了，这样它们就能够聚集在尽可能少的页中。替换new和delete的默认版本可以达到这种聚集。</li>
+<li>可以获得非常规的行为。有时候你想让operator new和delete能够做一些编译器版本不能做的事。例如，你可能想在共享内存中进行内存分配和释放，但是你只有一个C API来进行内存管理。实现自定义版本的new 和delete（可能是placement 版本——见Item 52）允许你为C API穿上C++的外衣。另外一个例子，你可以自己实现一个operator delete来为释放的内存填充数据0以达到增强应用数据安全性的目的。</li>
+</ul>
+<h2 id="5-本条款总结"><a href="#5-本条款总结" class="headerlink" title="5. 本条款总结"></a>5. 本条款总结</h2><p>有许多正当的理由来自定义new 和delete，包括提高性能，调试堆应用错误和收集堆使用信息。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/17/2017-04-17_08_01_读书笔记_effective_c++_Item_49_理解new-handler的行为/" rel="next" title="读书笔记 effective c++ Item 49 理解new-handler的行为">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 49 理解new-handler的行为
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/21/2017-04-21_08_01_读书笔记_effective_c++_Item_51_实现new和delete的时候要遵守约定/" rel="prev" title="读书笔记 effective c++ Item 51 实现new和delete的时候要遵守约定">
+                读书笔记 effective c++ Item 51 实现new和delete的时候要遵守约定 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-自定义new和delete的三个常见原因"><span class="nav-number">1.</span> <span class="nav-text">1. 自定义new和delete的三个常见原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-自定义operator-new中的对齐问题"><span class="nav-number">2.</span> <span class="nav-text">2. 自定义operator new中的对齐问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-通常情况你无需自定义new和delete"><span class="nav-number">3.</span> <span class="nav-text">3. 通常情况你无需自定义new和delete</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-使用默认版本和商业产品"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 使用默认版本和商业产品</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-使用开源内存管理器"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 使用开源内存管理器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-使用自定义版本new和delete的意义总结"><span class="nav-number">4.</span> <span class="nav-text">4. 使用自定义版本new和delete的意义总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-本条款总结"><span class="nav-number">5.</span> <span class="nav-text">5. 本条款总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

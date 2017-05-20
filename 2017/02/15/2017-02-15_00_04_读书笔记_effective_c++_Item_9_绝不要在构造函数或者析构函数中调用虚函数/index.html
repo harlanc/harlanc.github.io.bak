@@ -1,0 +1,895 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="1.关于构造函数的一个违反直觉的行为我会以重复标题开始：你不应该在构造或者析构的过程中调用虚函数，因为这些调用的结果会和你想的不一样。如果你同时是一个java或者c#程序员，那么请着重注意这个条款，因为这是c++同它们不一样的地方。 假设你已经有一个为股票交易建模的类">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 9 绝不要在构造函数或者析构函数中调用虚函数">
+<meta property="og:url" content="http://yoursite.com/2017/02/15/2017-02-15_00_04_读书笔记_effective_c++_Item_9_绝不要在构造函数或者析构函数中调用虚函数/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="1.关于构造函数的一个违反直觉的行为我会以重复标题开始：你不应该在构造或者析构的过程中调用虚函数，因为这些调用的结果会和你想的不一样。如果你同时是一个java或者c#程序员，那么请着重注意这个条款，因为这是c++同它们不一样的地方。 假设你已经有一个为股票交易建模的类">
+<meta property="og:updated_time" content="2017-05-20T10:40:56.187Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 9 绝不要在构造函数或者析构函数中调用虚函数">
+<meta name="twitter:description" content="1.关于构造函数的一个违反直觉的行为我会以重复标题开始：你不应该在构造或者析构的过程中调用虚函数，因为这些调用的结果会和你想的不一样。如果你同时是一个java或者c#程序员，那么请着重注意这个条款，因为这是c++同它们不一样的地方。 假设你已经有一个为股票交易建模的类">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/15/2017-02-15_00_04_读书笔记_effective_c++_Item_9_绝不要在构造函数或者析构函数中调用虚函数/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 9 绝不要在构造函数或者析构函数中调用虚函数 | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/15/2017-02-15_00_04_读书笔记_effective_c++_Item_9_绝不要在构造函数或者析构函数中调用虚函数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 9 绝不要在构造函数或者析构函数中调用虚函数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-15T00:04:00+08:00">
+                2017-02-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/15/2017-02-15_00_04_读书笔记_effective_c++_Item_9_绝不要在构造函数或者析构函数中调用虚函数/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/15/2017-02-15_00_04_读书笔记_effective_c++_Item_9_绝不要在构造函数或者析构函数中调用虚函数/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 9 绝不要在构造函数或者析构函数中调用虚函数">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-关于构造函数的一个违反直觉的行为"><a href="#1-关于构造函数的一个违反直觉的行为" class="headerlink" title="1.关于构造函数的一个违反直觉的行为"></a>1.关于构造函数的一个违反直觉的行为</h2><p>我会以重复标题开始：你不应该在构造或者析构的过程中调用虚函数，因为这些调用的结果会和你想的不一样。如果你同时是一个java或者c#程序员，那么请着重注意这个条款，因为这是c++同它们不一样的地方。</p>
+<p>假设你已经有一个为股票交易建模的类<br><a id="more"></a><br>承体系，它可以买卖股票等。这些交易的可审计性很重要，所以每次交易对象被创建的时候，需要在审计日志中创建一个合适的记录。这看上去是解决问题的合理方法：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">class Transaction &#123; // base class for all</div><div class="line"></div><div class="line">public: // transactions</div><div class="line"></div><div class="line">Transaction();</div><div class="line"></div><div class="line">virtual void logTransaction() const = 0; // make type-dependent</div><div class="line"></div><div class="line">// log entry</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">Transaction::Transaction() // implementation of</div><div class="line"></div><div class="line">&#123; // base class ctor</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">logTransaction(); // as final action, log this</div><div class="line"></div><div class="line">&#125; // transaction</div><div class="line"></div><div class="line">class BuyTransaction: public Transaction &#123; // derived class</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">virtual void logTransaction() const; // how to log trans-</div><div class="line"></div><div class="line">// actions of this type</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">class SellTransaction: public Transaction &#123; // derived class</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">virtual void logTransaction() const; // how to log trans-</div><div class="line"></div><div class="line">// actions of this type</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>考虑执行下面的代码会发生什么：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">BuyTransaction b;</div></pre></td></tr></table></figure>
+<p>BuyTransaction的构造函数会被调用，但是在这之前，Transaction的构造函数必须被调用：派生类的基类部分的构建要早于派生类部分。Transaction构造函数的最后一行调用虚函数logTransaction,这个地方会让你感到惊讶。被调用的logTransaction版本是Transaction中的版本而不是BuyTransaction中的版本，即使对象被创建的类型是BuyTransaction.<strong>在基类的构造函数中，虚函数永远不会下降到派生类中</strong>。相反，对象的行为看上去会像一个基类类型。非正式的说法就是，<strong>在基类构建期间，虚函数不再是虚函数</strong>。</p>
+<h2 id="2-这种行为为什么会出现（一）"><a href="#2-这种行为为什么会出现（一）" class="headerlink" title="2.这种行为为什么会出现（一）"></a>2.这种行为为什么会出现（一）</h2><p>对于这个违反直觉的行为有一个很好的原因。<strong>因为基类构造函数先于派生类构造函数执行，当基类构造函数执行的时候派生类数据成员还没来得及被初始化</strong>。如果在基类构造期间虚函数的调用会下降到派生类，派生类函数基本上肯定会引用本地数据成员，但是这些数据成员还没有被初始化呢。这会直达未定义行为和调试到深夜的后果（late-night debugging sessions）。向下调用一个对象的未初始化部分本身就是很危险的，所以c++不让你这么做。</p>
+<h2 id="3-这种行为为什么会出现（二）"><a href="#3-这种行为为什么会出现（二）" class="headerlink" title="3.这种行为为什么会出现（二）"></a>3.这种行为为什么会出现（二）</h2><p> 还有更根本的原因。在派生类对象构建基类部分期间，对象的类型属于基类。不但虚函数会被处理成基类类型，使用运行时类型信息的语言部分（dynamic_cast Item 27和typeid）也会把对象当作基类类型.在我们的例子中，当Transaction构造函数在初始化BuyTransaction对象的基类部分时，对象的类型是Transaction.这就是c++的每个部分是如何处理它的，并且这种处理方法也是合理的：<strong>当对象的**</strong>BuyTransaction<strong>**部分还没有被初始化，最安全的做法就是当它们不存在</strong>。<strong>一个对象直到派生类构造函数被执行其类型才会变成派生类对象</strong>。</p>
+<h2 id="4-上面的行为析构函数也会出现"><a href="#4-上面的行为析构函数也会出现" class="headerlink" title="4.上面的行为析构函数也会出现"></a>4.上面的行为析构函数也会出现</h2><p>理由同样适用于析构函数。一旦一个派生类的析构函数运行完成，就假设对象的派生类数据成员未定义，于是c++当做它们不存在。一进入基类析构函数，对象就会变成一个基类对象，c++的所有部分——虚函数，dynamic_casts等等——都会按基类的方式来处理。</p>
+<h2 id="5-如何防止这个行为出现？"><a href="#5-如何防止这个行为出现？" class="headerlink" title="5.如何防止这个行为出现？"></a>5.如何防止这个行为出现？</h2><p>在上面的示例代码中，Transaction构造函数直接调用虚函数，很容易看到它违反了这个条款。这个违反是如此容易被发现，一些编译器会发出警告。（其他的则不会，关于warning的讨论见Item53）.即使在没有警告的情况下，这个问题在运行时之前很容易显现出来，因为logTransaction函数是Transaction中的纯虚函数。除非它被定义（不太有希望，但是可能，见Item34），否则程序链接会出现问题：链接器将找不到Transaction::logTransaction的定义。</p>
+<p>在构造和析构期间对虚函数的调用不总是这么容易能够被发现。如果Transaction有多个构造函数，每个构造函数必须执行相同的工作，防止代码重复的一个好的软件工程是将普通的初始化代码，包含对logTransaction的调用，放到一个私有的非虚初始化函数中，也即是 Init:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Transaction</span> &#123;</div><div class="line"></div><div class="line"><span class="keyword">public</span>:</div><div class="line"></div><div class="line">Transaction()</div><div class="line"></div><div class="line">&#123; init(); &#125; <span class="comment">// call to non-virtual...</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">logTransaction</span>(<span class="params"></span>) <span class="keyword">const</span> </span>= <span class="number">0</span>;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"><span class="keyword">private</span>:</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span>(<span class="params"></span>)</span></div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">logTransaction(); <span class="comment">// ...that calls a virtual!</span></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这部分代码和早一点的那个版本从概念上来说是相同的，但是它更加阴险，因为它能够被成功的编译和链接。在这种情况下，因为logTransaction是Transaction的纯虚函数，大多数运行的系统会在调用纯虚函数的时候终止程序（通常会发出一个消息）。然而，如果logTransaction是一个“普通的”虚函数（也就是不是纯虚函数），并且在Transaction中有一个实现，如果这个版本的logTransaction被调用，程序会愉快的执行下去，让你自己去理解为什么创建派生类对象的时候会调用错误的logTransaction版本。防止这个问题的<strong>唯一方法是在创建和销毁对象的时候你的构造函数和虚构函数不会去调用虚函数并且它们调用的函数也需要遵守这个约定</strong>。</p>
+<h2 id="6-如何保证调用到继承体系中正确的函数版本"><a href="#6-如何保证调用到继承体系中正确的函数版本" class="headerlink" title="6.如何保证调用到继承体系中正确的函数版本"></a>6.如何保证调用到继承体系中正确的函数版本</h2><p>但是你怎么才能够确保每次Transaction继承体系中的对象被创建的时候，能够调用合适的logTransaction版本？这里很清楚，从Transaction中的构造函数中调用这个对象的虚函数是错误的做法。</p>
+<p>有不同的方法来处理这个问题。一个方法是将logTransaction变成一个非虚函数，这就需要派生类的构造函数将必要的log信息传递给Transaction构造函数。这时候Transaction构造函数就能够安全的调用非虚的logTransaction，像下面这样：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">class Transaction &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">explicit Transaction(const std::string&amp; logInfo);</div><div class="line"></div><div class="line">void logTransaction(const std::string&amp; logInfo) const; // now a non-</div><div class="line"></div><div class="line">// virtual func</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">Transaction::Transaction(const std::string&amp; logInfo)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">logTransaction(logInfo); // now a non-</div><div class="line"></div><div class="line">&#125; // virtual call</div><div class="line"></div><div class="line">class BuyTransaction: public Transaction &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">BuyTransaction( parameters )</div><div class="line"></div><div class="line">: Transaction(createLogString( parameters )) // pass log info</div><div class="line"></div><div class="line">&#123; ... &#125; // to base class</div><div class="line"></div><div class="line">... // constructor</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">static std::string createLogString( parameters );</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>换句话说，既然你不能够在构造对象期间在基类中使用虚函数向下调用，你可以使用<strong>由派生类向上传递必要的构造信息到基类构造函数</strong>的方法来进行弥补。</p>
+<p>在这个例子中，注意BuyTransaction类中（private）静态函数createLogString的使用。使用一个helper函数来创建传递到基类构造函数的值比在成员初始化列表中提供基类需要的值更加方便（更加易读）。通过将此函数声明成static，就不会有引用BuyTransaction对象未初始化数据成员的危险（static函数只能够操作static数据成员）。这是很重要的，因为数据成员处于未定义状态的事实，就是在基类构造或析构期间调用虚函数不能向下调用的原因。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/14/2017-02-14_07_34_读书笔记_effective_c++_Item_8_不要让异常(exceptions)离开析构函数/" rel="next" title="读书笔记 effective c++ Item 8 不要让异常(exceptions)离开析构函数">
+                <i class="fa fa-chevron-left"></i> 读书笔记 effective c++ Item 8 不要让异常(exceptions)离开析构函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/15/2017-02-15_23_42_读书笔记_effective_c++_Item_10_让赋值运算符返回指向_this的引用/" rel="prev" title="读书笔记 effective c++ Item 10 让赋值运算符返回指向*this的引用">
+                读书笔记 effective c++ Item 10 让赋值运算符返回指向*this的引用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-关于构造函数的一个违反直觉的行为"><span class="nav-number">1.</span> <span class="nav-text">1.关于构造函数的一个违反直觉的行为</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-这种行为为什么会出现（一）"><span class="nav-number">2.</span> <span class="nav-text">2.这种行为为什么会出现（一）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-这种行为为什么会出现（二）"><span class="nav-number">3.</span> <span class="nav-text">3.这种行为为什么会出现（二）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-上面的行为析构函数也会出现"><span class="nav-number">4.</span> <span class="nav-text">4.上面的行为析构函数也会出现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-如何防止这个行为出现？"><span class="nav-number">5.</span> <span class="nav-text">5.如何防止这个行为出现？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-如何保证调用到继承体系中正确的函数版本"><span class="nav-number">6.</span> <span class="nav-text">6.如何保证调用到继承体系中正确的函数版本</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

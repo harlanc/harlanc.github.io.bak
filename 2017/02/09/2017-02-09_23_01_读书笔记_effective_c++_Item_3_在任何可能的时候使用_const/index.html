@@ -1,0 +1,941 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="effective c++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Const可以修饰什么？ Const 关键字是万能的，在类外部，你可以用它修饰全局的或者命名空间范围内的常量，也可以用它来修饰文件，函数和块作用域的静态常量。在类内部，你可以使用它来声明静态或者非静态的数据成员。对于指针来说，你可以指定指针本身是不是const,">
+<meta name="keywords" content="effective c++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记 effective c++ Item 3 在任何可能的时候使用 const">
+<meta property="og:url" content="http://yoursite.com/2017/02/09/2017-02-09_23_01_读书笔记_effective_c++_Item_3_在任何可能的时候使用_const/index.html">
+<meta property="og:site_name" content="HarlanC&#39;s Blog">
+<meta property="og:description" content="Const可以修饰什么？ Const 关键字是万能的，在类外部，你可以用它修饰全局的或者命名空间范围内的常量，也可以用它来修饰文件，函数和块作用域的静态常量。在类内部，你可以使用它来声明静态或者非静态的数据成员。对于指针来说，你可以指定指针本身是不是const,">
+<meta property="og:updated_time" content="2017-05-20T10:40:46.370Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记 effective c++ Item 3 在任何可能的时候使用 const">
+<meta name="twitter:description" content="Const可以修饰什么？ Const 关键字是万能的，在类外部，你可以用它修饰全局的或者命名空间范围内的常量，也可以用它来修饰文件，函数和块作用域的静态常量。在类内部，你可以使用它来声明静态或者非静态的数据成员。对于指针来说，你可以指定指针本身是不是const,">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/09/2017-02-09_23_01_读书笔记_effective_c++_Item_3_在任何可能的时候使用_const/"/>
+
+
+
+
+
+  <title>读书笔记 effective c++ Item 3 在任何可能的时候使用 const | HarlanC's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">HarlanC's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/09/2017-02-09_23_01_读书笔记_effective_c++_Item_3_在任何可能的时候使用_const/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">读书笔记 effective c++ Item 3 在任何可能的时候使用 const</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-09T23:01:00+08:00">
+                2017-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/02/09/2017-02-09_23_01_读书笔记_effective_c++_Item_3_在任何可能的时候使用_const/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/09/2017-02-09_23_01_读书笔记_effective_c++_Item_3_在任何可能的时候使用_const/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 3 在任何可能的时候使用 const">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Const可以修饰什么？"><a href="#Const可以修饰什么？" class="headerlink" title="Const可以修饰什么？"></a>Const可以修饰什么？</h2><hr>
+<p>Const 关键字是万能的，在类外部，你可以用它修饰全局的或者命名空间范围内的常量，也可以用它来修饰文件，函数和块作用域的静态常量。在类内部，你可以使用它来声明静态或者非静态的数据成员。对于指针来说，你可以指定指针本身是不是const,<br><a id="more"></a><br>针指向的数据是不是const,两者可以同时为const或者两者同时为非const.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Char greeting[]=”Hello”;</div><div class="line">Char *p = greeting;<span class="comment">//non-const pointer non-const data </span></div><div class="line">Const <span class="keyword">char</span> *p = greeting; <span class="comment">//non-const pointer const data</span></div><div class="line">Char *<span class="keyword">const</span> p = greeting;<span class="comment">//const pointer non-const data</span></div><div class="line">Const <span class="keyword">char</span> *<span class="keyword">const</span> p = greeting;<span class="comment">//const pointer const data.</span></div></pre></td></tr></table></figure>
+<h2 id="在指针中const的位置说明"><a href="#在指针中const的位置说明" class="headerlink" title="在指针中const的位置说明"></a>在指针中const的位置说明</h2><p>这项语法并不像看上去那么反复无常，<strong>如果关键字**</strong>const<strong><strong>出现在星号的左侧，那么指针指向的内容为const,</strong></strong>如果关键字const<strong><strong>出现在星号的右侧，那么指针本身是const;</strong></strong>如果星号出现在两侧，那么两者都为const.**</p>
+<p>当指针指向的内容为const时，一些程序员将const放在类型之前，一些程序员将const放在类型之后，星号之前，这两者在意义上是等同的，下面的两个函数有相同的参数类型：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">f1</span>(<span class="params"><span class="keyword">const</span> Widget *pw</span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">f2</span>(<span class="params">Widget <span class="keyword">const</span> *pw</span>)</span>;</div></pre></td></tr></table></figure>
+<p>因为两种形式在代码中都是存在的，因此应该能够识别两者。 </p>
+<h2 id="Const在迭代器中应用"><a href="#Const在迭代器中应用" class="headerlink" title="Const在迭代器中应用"></a>Const在迭代器中应用</h2><p>STL迭代器是模仿的指针，因此迭代器的行为非常像一个指针，声明一个迭代器的const就像声明一个指针的const: 迭代器不允许指向不同的东西，但迭代器指向的东西是可以改变的。如果你想让迭代器指向的东西不能被修改，这时你就需要一个<strong>const_iterator.</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">std::vector&lt;int&gt; vec;</div><div class="line">…</div><div class="line">const std::vector&lt;int&gt;::iterator iter= vec.begin();//iter acts like a T*const</div><div class="line">*iter = 10;//OK</div><div class="line">++iter;//error  </div><div class="line">std::vector&lt;int&gt;::const_iterator citer = vec.begin();//citer acts like a T const *</div><div class="line">*citer = 10;//error</div><div class="line">++citer;//OK</div></pre></td></tr></table></figure>
+<h2 id="Const修饰函数返回值和函数参数"><a href="#Const修饰函数返回值和函数参数" class="headerlink" title="Const修饰函数返回值和函数参数"></a>Const修饰函数返回值和函数参数</h2><p>Const 的一些强大的用法来源于在函数声明上的应用。在一个函数声明中，const可以修饰函数返回值，函数参数，对于成员函数来说，可以修饰整个函数。</p>
+<p>一个函数返回一个const值在一般情况下是不合适的。但有时在保证安全和效率的情况下可以减少客户端的出错率。举个例子，为有理数声明一个operator*函数。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Rational</span>&#123;…&#125;; </div><div class="line"><span class="keyword">const</span> Rational <span class="keyword">operator</span>*(<span class="keyword">const</span> Rational&amp;lhs,<span class="keyword">const</span> Rational&amp;rhs);</div></pre></td></tr></table></figure>
+<p>为什么operator*的结果是一个const对象？因为如果不是const,客户端可以提交以下的暴行：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Rational a,b,c;</div><div class="line">…</div><div class="line">(a*b)=c;<span class="comment">//invoke operator= on the result of a*b</span></div></pre></td></tr></table></figure>
+<p>我不知道为什么程序员会对两个数的乘积进行赋值，但我确实知道程序员虽然不想这么做，但确实这么做了。所有都是因为一个简单的输入错误（一个可以隐式转换成bool的类型）：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">If(a*b=c)…</div></pre></td></tr></table></figure>
+<p>如果a和b是内建类型，那么上面的代码是不合法的，一个好的用户自定义类型的特点是它们避免同内建类型的无端的不兼容（上面的代码如果内建类型不合法，那么用户自定义类型也应该不合法）。因此对两个数的乘积进行赋值也就没有理由这么做了。将operator*的返回值声明成const可以阻止这种赋值操作。</p>
+<p>对于const参数来说没有什么特别新的，它们就像local的const对象，你应该在任何可以使用它们的时候使用它。除非你像更改一个参数或者本地对象，否则确保它被声明成const,敲打六个字符的努力会可以使你免于类似上面的错误的打搅。</p>
+<h2 id="Const-成员函数介绍"><a href="#Const-成员函数介绍" class="headerlink" title="Const 成员函数介绍"></a>Const 成员函数介绍</h2><p>将const作用于成员函数上面的意图是能够确认哪些成员函数可以通过const对象被调用。这类成员函数很重要，原因有两条：<strong>一，它们使得类的接口更容易被理解</strong>，知道哪些函数可以改变对象哪些不可以，这一点很重要。<strong>二，它们使得和**</strong>const<strong>**对象一起工作成为可能</strong>，这是编写高效代码的很重要的方面，因为Item20解释道，提高c++程序性能的基本方法是按const引用传递对象。这项是可行的前提是，const成员函数能够处理const修饰的对象。</p>
+<p>许多人忽略了一个事实，不同常量性的两个成员函数是可以重载的，这时c++的重要特性。考虑一个表现文本块的类：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">class TextBlock</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">  public:</div><div class="line"></div><div class="line">    …</div><div class="line"></div><div class="line">    const char&amp;operator[](std::size_t positioin) const</div><div class="line"></div><div class="line">    &#123;return text[position];&#125;</div><div class="line"></div><div class="line">    char&amp;operator[](std::size_t position)</div><div class="line"></div><div class="line">    &#123;return text[position];&#125;</div><div class="line"></div><div class="line">  private:</div><div class="line"></div><div class="line">     std::string text;</div><div class="line"> &#125;;</div></pre></td></tr></table></figure>
+<p>TextBlock 的operator[]函数可以像下面这样使用：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">TextBlock tb(“Hello”);</div><div class="line"></div><div class="line">Std::cout&lt;tb[0];//call non-const operator[]</div><div class="line"></div><div class="line">Const TextBlock ctb(“World”);</div><div class="line"></div><div class="line">Std::cout&lt;&lt;ctb[0];//call const TextBlock::operator[]</div></pre></td></tr></table></figure>
+<p>顺便说一下，将指向const对象的指针或者指向const对象的引用作为参数经常出现在真实世界的程序中。上面的关于ctb的例子过于造作。下面的例子更符合实际：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">void Print(const TextBlock &amp;ctb)</div><div class="line"></div><div class="line">&#123;</div><div class="line">    std::cout&lt;&lt;ctb[0];//call const TextBlock::operator[]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通过重载operator[],给不同的函数版本不同的返回值类型，可以对 const和非const TextBlocks进行不同处理：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">std::cout &lt;&lt; tb[0]; // fine — reading a non-const TextBlock</div><div class="line"></div><div class="line">tb[0] = ’x’; // fine — writing a non-const TextBlock</div><div class="line"></div><div class="line">std::cout &lt;&lt; ctb[0]; // fine — reading a const TextBlock</div><div class="line"></div><div class="line">ctb[0] = ’x’; // error! — writing a const TextBlock</div></pre></td></tr></table></figure>
+<p>注意这里错误的出现是由于调用operator[]的返回值引起的，调用operator[]本身没有问题。问题出现在尝试给一个const char&amp;类型的变量进行赋值操作， const char&amp;是const 版本的operator[]的返回值类型。</p>
+<p>同时需要注意non-const operator[]的返回值类型是指向char的引用，如果operator[]返回一个char,那么下面的句子将不能通过编译：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tb[<span class="number">0</span>] = ‘x’;</div></pre></td></tr></table></figure>
+<p>因为尝试修改内建类型的函数返回值是不合法的。即使是合法的，c++中的按值返回（Item20）意味着我们修改的是tb.text[0]的拷贝，而不是tb.text[0]本身，这不是你需要的行为。</p>
+<h2 id="Const成员函数的两个派别"><a href="#Const成员函数的两个派别" class="headerlink" title="Const成员函数的两个派别"></a>Const成员函数的两个派别</h2><p>将成员函数声明成const意味这什么，对于这个问题有两种流行的见解：*bitwise  </p>
+<p>constness <em>(also known as </em>physical constness<em>) and </em>logical constness<em>*。</em></p>
+<p><strong>Bitwise  const**</strong>阵营**相信当且仅当成员函数不修改对象的任何数据成员（不包括statics数据成员）时它才是const成员函数，举个例子：成员函数没有修改对象内部的任意bits.bitwise<br>const的一个好处是能够比较容易的识别出反例：编译器只要寻找对数据成员的赋值就可以了。事实上，bitwise<br>const是常量性的c++定义，const成员函数不允许修改对象的任何非静态数据成员。</p>
+<p>不幸的是，许多成员函数没有表现的特别常量性，而不能通过bitwise-const测试。特别的，一个成员函数修改指针指向的内容没有表现出常量性。但是如果指针是在对象内部，这个函数是bitwise<br>const的，编译器不会发出抱怨。这会导致一个违反直觉的行为。举个例子，我们有个像testBlock的类，用char*而不是string来存储数据，因为它需要同一个不是识别string的C-API进行通讯</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class CTextBlock &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">char&amp; operator[](std::size_t position) const // inappropriate (but bitwise</div><div class="line"></div><div class="line">&#123; return pText[position]; &#125;                  // const) declaration of operator[]</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">char *pText;</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<hr>
+<p>这个类(不恰当的)将operator[]声明为一个const成员函数，而函数返回的是指向对象内部数据的引用（更深层次的讨论见Item28）。把它抛到一边，注意到operator[]的实现没有以任何方式修改pText。因此，编译器很高兴的为operator[]生成了代码，它毕竟是bitwise const的，这时编译器检查的所有东西，但是看一下允许发生什么：<strong><em> </em></strong></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">const</span> CTextBlock <span class="title">cctb</span>(<span class="params"><span class="string">"Hello"</span></span>)</span>; <span class="comment">// declare constant object</span></div><div class="line"></div><div class="line"><span class="keyword">char</span> *pc = &amp;cctb[<span class="number">0</span>];  <span class="comment">// call the const operator[] to get a pointer to cctb’s data</span></div><div class="line"></div><div class="line">*pc = ’J’;                                       <span class="comment">// cctb now has the value “Jello”</span></div></pre></td></tr></table></figure>
+<hr>
+<p>当你用特定值创建一个const对象的时候，这里出现了错误，你只是调用了对象的const成员函数，但是值仍然被修改了！</p>
+<p><strong>因此产生了logical constness**</strong>的概念**，这种观点的拥护者辩论到，一个const成员函数可以修改对象内部的一些bits,但是只有在客户端不能够内侦测到的情况下才行。</p>
+<h3 id="logical-constness的两个问题"><a href="#logical-constness的两个问题" class="headerlink" title="logical constness的两个问题"></a>logical constness的两个问题</h3><ul>
+<li>问题一 </li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">class CTextBlock &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">std::size_t length() const;</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">char *pText;</div><div class="line"></div><div class="line">std::size_t textLength;     // last calculated length of textblock</div><div class="line"></div><div class="line">bool lengthIsValid;          // whether length is currently valid</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line">std::size_t CTextBlock::length() const</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">if (!lengthIsValid) &#123;</div><div class="line"></div><div class="line">textLength = std::strlen(pText); // error! can’t assign to textLength</div><div class="line"></div><div class="line">lengthIsValid = true;                    // and lengthIsValid in a const</div><div class="line"></div><div class="line">&#125;                                               // member function</div><div class="line"></div><div class="line">return textLength;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Length()的这种实现当然不是bitwise const的，textLength和lengthIsValid都有可能被修改。但是看上去这个函数对const CTextBlock对象来说应该是有效的。编译器不同意。它们坚持bitwise constness。该怎么做？</p>
+<p>解决方法比较简单：利用c++常量相关的扭动空间，也就是mutable,mutable将数据成员从bitwise constness的约束中释放出来：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">class CTextBlock &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">std::size_t length() const;</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">char *pText;</div><div class="line"></div><div class="line">mutable std::size_t textLength;               // these data members may</div><div class="line"></div><div class="line">mutable bool lengthIsValid;                    // always be modified, even in const member functions</div><div class="line"></div><div class="line">std::size_t CTextBlock::length() const</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">if (!lengthIsValid) &#123;</div><div class="line"></div><div class="line">textLength = std::strlen(pText);          // now fine</div><div class="line"></div><div class="line">lengthIsValid = true;                            // also fine</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">return textLength;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<ul>
+<li><strong><em>问题二</em></strong></li>
+</ul>
+<p>Mutable对于<strong>对**</strong>bitwise-constness<strong>**不是很介意</strong>的问题是一个好的解决方法，但是它不能够解决所有的const相关的难题。例如：假设TextBlock中的operator[]不仅返回一个指向合适字符的引用，它同时执行边界检查，为访问信息打印日志，可能甚至会检查数据完整性。将所有这些同时放在const和non-const operator[]（Item30）函数中,产生了下面这种怪胎：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">class TextBlock &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">const char&amp; operator[](std::size_t position) const</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">... // do bounds checking</div><div class="line"></div><div class="line">... // log access data</div><div class="line"></div><div class="line">... // verify data integrity</div><div class="line"></div><div class="line">return text[position];</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">char&amp; operator[](std::size_t position)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">... // do bounds checking</div><div class="line"></div><div class="line">... // log access data</div><div class="line"></div><div class="line">... // verify data integrity</div><div class="line"></div><div class="line">return text[position];</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">private:</div><div class="line"></div><div class="line">std::string text;</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>你能说出代码重复，编译时间变长，不易维护，代码膨胀等令人头痛的问题么？当然，可以把边界检查等所有代码移到一个单独的成员函数中（当然是private的），两个版本的opeator[]都会调用这个函数，但是仍然会有重复调用函数，仍然会有重复的返回语句。</p>
+<p>你真正需要的是之实现operator[]一次，而使用两次。也就是你需要用一个版本的operator[]去调用另一个版本的operator[]。这把我们带到了如何将constness去掉（casting）的问题。</p>
+<p>作为一个通用的规则，casting是一个坏的方法，我用了一整个条款(Item27)来告诉你不要使用casting,但是代码重复也是不令人愉快的。operator[]的const版本做了non-const版本要做的所有事情，唯一的区别是有一个const返回类型。去掉返回值的常量性是安全的，任何人调用non-const operator[]必须在第一个位置有一个non-const的对象。否则它们不能够被叫做non-const函数。所以non-const operator[]调用const版本是防止代码重复的安全的方法，即使需要cast.下面是代码，你在读完后面的解释后可能会更加清楚。 </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">class TextBlock &#123;</div><div class="line"></div><div class="line">public:</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">const char&amp; operator[](std::size_t position) const // same as before</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">return text[position];</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">char&amp; operator[](std::size_t position)                          // now just calls const op[]</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">return</div><div class="line"></div><div class="line">const_cast&lt;char&amp;&gt;(                                                  // cast away const on op[]’s return type;</div><div class="line"></div><div class="line">static_cast&lt;const TextBlock&amp;&gt;(*this) [position]//add const to *this’s type call const version of op[]</div><div class="line"></div><div class="line">);</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>你所看到的是，代码使用了两个cast,我们想让operator[]的non-const版本调用const版本，但是如果在non-operator[]内部，我们只是调用operator[],我们会递归的调用自己。为了防止无限的递归调用，必须指定我们调用的是const operator[],但是没有直接的方法做到这一点。因此我们需要将<em>this从原生类型TextBlock&amp; 转换(cast)成const TextBlock&amp;。是的，我们使用cast来添加const.因此我们会使用两个cast:一个为</em>this添加const,另一个将const从operator[]的返回值中移除。</p>
+<p>添加const的cast只是强制进行安全转型（从non-const转换成const）,所以我们使用static_cast.将常量性移除只有通过const_cast才能完成，我们没有别的选择。（从技术上来说，一个C风格的cast也能达到目的，但是，正如Item27所描述的，这样的cast不是正确的选择。如果你不熟悉static_cast或者const_cast，参考Item27）.</p>
+<p>在这个例子中，我们调用的是一个operator,所以语法看起来有些奇怪。这个结果不能赢得选美大赛，但是依赖const版本的函数来实现non-const版本的函数，达到了避免代码重复的效果。为了达到目标而写出如此难看的语法，是你能够决定的，但是依靠const函数来实现non-const成员函数的技术是绝对值得了解的。</p>
+<p>更值得了解的是，反向调用-也就是通过const来调用non-const版本的函数来避免代码重复-不是你应该做的。需要记住，const成员函数承诺绝不修改对象的逻辑状态，但是non-const函数并没有这样的承诺。如果你从一个const成员函数中调用一个non-const成员函数，就会出现你承诺不应该被修改的东西最终被修改的风险，这也是为什么用const成员函数调用non-const成员函数是错误的：对象有可能被改变。事实上，为了是代码通过编译，你需要使用const_cast将<em>this的常量性去除，这是会出现麻烦的迹象。相反的调用顺序是安全的，一个non-const成员函数可以对一个对象做任何它想做的，所以调用const成员函数是没有危险。这也是为什么static_cast可以应用在</em>this上的原因:没有const相关的危险。</p>
+<hr>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-c/" rel="tag"># effective c++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/08/2017-02-08_07_53_读书笔记__effective_c++_Item_2_尽量使用const,枚举(enums),内联(inlines),不要使用宏定义(define)/" rel="next" title="读书笔记  effective c++ Item 2 尽量使用const,枚举(enums),内联(inlines),不要使用宏定义(define)">
+                <i class="fa fa-chevron-left"></i> 读书笔记  effective c++ Item 2 尽量使用const,枚举(enums),内联(inlines),不要使用宏定义(define)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/11/2017-02-11_20_23_读书笔记_effective_c++_Item_4_确保对象被使用前进行初始化/" rel="prev" title="读书笔记 effective c++ Item 4 确保对象被使用前进行初始化">
+                读书笔记 effective c++ Item 4 确保对象被使用前进行初始化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
+               alt="Harlan Chen" />
+          <p class="site-author-name" itemprop="name">Harlan Chen</p>
+           
+              <p class="site-description motion-element" itemprop="description">生有涯，知无涯。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/harlanc/" target="_blank" title="博客园">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  博客园
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Const可以修饰什么？"><span class="nav-number">1.</span> <span class="nav-text">Const可以修饰什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在指针中const的位置说明"><span class="nav-number">2.</span> <span class="nav-text">在指针中const的位置说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Const在迭代器中应用"><span class="nav-number">3.</span> <span class="nav-text">Const在迭代器中应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Const修饰函数返回值和函数参数"><span class="nav-number">4.</span> <span class="nav-text">Const修饰函数返回值和函数参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Const-成员函数介绍"><span class="nav-number">5.</span> <span class="nav-text">Const 成员函数介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Const成员函数的两个派别"><span class="nav-number">6.</span> <span class="nav-text">Const成员函数的两个派别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#logical-constness的两个问题"><span class="nav-number">6.1.</span> <span class="nav-text">logical constness的两个问题</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Harlan Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "8b8d5c70c3a142db9f01c789f95c52b1",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("srG9VazdFVB0NGqAhm2HyMMr-gzGzoHsz", "oEMz0cnj9eimqiBJ3v0os0hF");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
