@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-20T12:11:45.681Z</updated>
+  <updated>2017-05-20T12:20:11.443Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,11 +20,9 @@
     <link href="http://yoursite.com/2017/05/19/2017-05-19_07_08_%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%92%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/"/>
     <id>http://yoursite.com/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/</id>
     <published>2017-05-18T23:08:00.000Z</published>
-    <updated>2017-05-20T12:11:45.681Z</updated>
+    <updated>2017-05-20T12:20:11.443Z</updated>
     
-    <content type="html"><![CDATA[<p><a href="http://harlancn.me/2017/05/10/2017-05-10_21_13_%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E6%9C%89%E6%AF%92/" title="上一篇" target="_blank" rel="external">上一篇</a>博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接：</p>
-<p><a href="http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html" target="_blank" rel="external">http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html</a> </p>
-<p>近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听说过Spring框架（Spring Framework）,就是所谓的依赖注入容器，在你的印象里面依赖注入和Spring是等同的。但这个想法是错误的，依赖注入是一个很简单的概念，它可以被应用到任何地方，除了依赖注入容器之外，它同样能够被应用到单元测试中。这篇文章我们讨论一下几点：</p>
+    <content type="html"><![CDATA[<p><a href="http://harlancn.me/2017/05/10/2017-05-10_21_13_%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E6%9C%89%E6%AF%92/" title="上一篇" target="_blank" rel="external">上一篇</a>博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接：<br><a href="http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html" target="_blank" rel="external">http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html</a><br>近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听说过Spring框架（Spring Framework）,就是所谓的依赖注入容器，在你的印象里面依赖注入和Spring是等同的。但这个想法是错误的，依赖注入是一个很简单的概念，它可以被应用到任何地方，除了依赖注入容器之外，它同样能够被应用到单元测试中。这篇文章我们讨论一下几点：</p>
 <ul>
 <li>什么是依赖注入</li>
 <li>如何实现一个友好的依赖注入类</li>
@@ -70,9 +68,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;&lt;a href=&quot;http://harlancn.me/2017/05/10/2017-05-10_21_13_%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E6%9C%89%E6%AF%92/&quot; title=&quot;上一篇&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;上一篇&lt;/a&gt;博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接：&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html&lt;/a&gt; &lt;/p&gt;
-&lt;p&gt;近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听说过Spring框架（Spring Framework）,就是所谓的依赖注入容器，在你的印象里面依赖注入和Spring是等同的。但这个想法是错误的，依赖注入是一个很简单的概念，它可以被应用到任何地方，除了依赖注入容器之外，它同样能够被应用到单元测试中。这篇文章我们讨论一下几点：&lt;/p&gt;
+      &lt;p&gt;&lt;a href=&quot;http://harlancn.me/2017/05/10/2017-05-10_21_13_%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E6%9C%89%E6%AF%92/&quot; title=&quot;上一篇&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;上一篇&lt;/a&gt;博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接：&lt;br&gt;&lt;a href=&quot;http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html&lt;/a&gt;&lt;br&gt;近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听说过Spring框架（Spring Framework）,就是所谓的依赖注入容器，在你的印象里面依赖注入和Spring是等同的。但这个想法是错误的，依赖注入是一个很简单的概念，它可以被应用到任何地方，除了依赖注入容器之外，它同样能够被应用到单元测试中。这篇文章我们讨论一下几点：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;什么是依赖注入&lt;/li&gt;
 &lt;li&gt;如何实现一个友好的依赖注入类&lt;/li&gt;
@@ -292,19 +288,18 @@
     <link href="http://yoursite.com/2017/04/27/2017-04-27_08_14_%E8%B0%88%E4%B8%80%E4%B8%8B%E6%88%91%E4%BB%AC%E6%98%AF%E5%A6%82%E4%BD%95%E5%BC%80%E5%B1%95code_review%E7%9A%84/"/>
     <id>http://yoursite.com/2017/04/27/2017-04-27_08_14_谈一下我们是如何开展code_review的/</id>
     <published>2017-04-27T00:14:00.000Z</published>
-    <updated>2017-05-20T10:40:57.830Z</updated>
+    <updated>2017-05-20T12:19:05.345Z</updated>
     
-    <content type="html"><![CDATA[<p>众所周知，代码审查是软件开发过程中十分重要的环节，楼主结合自己的实际工作经验，和大家分享一下在实际工作中代码审查是如何开展的，</p>
-<p>笔者水平有限，若有错误和纰漏，还请大家指正。</p>
+    <content type="html"><![CDATA[<p>众所周知，代码审查是软件开发过程中十分重要的环节，楼主结合自己的实际工作经验，和大家分享一下在实际工作中代码审查是如何开展的，笔者水平有限，若有错误和纰漏，还请大家指正。</p>
 <h2 id="代码审查的阻力"><a href="#代码审查的阻力" class="headerlink" title="代码审查的阻力"></a>代码审查的阻力</h2><p>我想不通公司不同部门对代码审查这项工作的重视程度还是不一样的，对于代码审查的阻力总结了以下几点：</p>
 <ul>
-<li>国内的整体环境，国内的公司，尤其是互联网公司，讲究速度致上，软件开发的迭代周期周期短，速<a id="more"></a>
-快，因为竞争太大，开发的产品要求快速上线，对代码审查不是很重视，先上线，出了问题再解决。</li>
+<li>国内的整体环境，国内的公司，尤其是互联网公司，讲究速度致上，软件开发的迭代周期周期短，速度快，因为竞争太大，开发的产品要求快速上线，对代码审查不是很重视，先上线，出了问题再解决。</li>
 <li>公司的规模，大公司重视流程，把代码审查作为软件开发中的重要一环，甚至计入考核，不管什么一旦成为制度，开展起来就相对容易了。小公司则不然，尤其是刚起步的，可能觉的代码审查没有必要。</li>
 <li>和你的领导有关系，就和上面说的，代码审查如果没有形成制度，如果你的领导是技术出身，明白代码审查的重要性，那么会要求你去做。如果是来自别的领域，可能认识不到它的重要性，觉的代码审查是浪费时间（就和代码重构一个道理）。</li>
-<li>个人原因，尤其是刚刚进入公司的员工，大学的软件工程课里面好像是没有介绍代码审查的，就是有，没有实际经验，也体会不到它的重要性，笔者刚入职时就是这么认为的。</li>
+<li>个人原因，尤其是刚刚进入公司的员工，大学的软件工程课里面好像是没有介绍代码审查的，就是有，没有实际经验，也体会不到它的重要性，笔者刚入职时就是这么认为的。<a id="more"></a>
+<h2 id="代码审查的重要性"><a href="#代码审查的重要性" class="headerlink" title="代码审查的重要性"></a>代码审查的重要性</h2></li>
 </ul>
-<h2 id="代码审查的重要性"><a href="#代码审查的重要性" class="headerlink" title="代码审查的重要性"></a>代码审查的重要性</h2><p>说了代码审查工作的开展遇到的阻力，下面说一下为什么代码审查是重要的。</p>
+<p>说了代码审查工作的开展遇到的阻力，下面说一下为什么代码审查是重要的。</p>
 <ul>
 <li>代码审查是保证代码质量的重要手段。软件缺陷可能隐藏在各个地方，测试是发现缺陷的重要方法，但专业的测试人员更多的可能是黑盒测试，他们不去关注代码内部的逻辑，只去关注代码实现的功能，有人说测试代码中的逻辑需要开发人员进行单元测试，一方面，单元测试覆盖率基本上不可能达到100%，另一方面，毕竟是单元测试，测试场景简单，有些复杂的场景有可能会测不到。各种测试完成后，如果还有缺陷，那只能让客户充当我们的“终极测试”了。抱怨会接踵而来，客户满意度会越来越低。所以，我们要想出一切可以使用的方法来进一步提高代码质量的方法，还有代码审查么，测试发现不了的问题，通过代码审查也许你能够发现。</li>
 <li>代码审查是熟悉软件架构，了解软件业务逻辑的好方法。学习代码是需要切入点的，一个上百万行代码的系统，从哪里开始着手，只能一个模块一个模块，一个组件一个组件的来熟悉，掌握。实现一个比较大的功能，你应该不会是唯一的开发人员，从系统架构师输出的系统设计，然后到各个团队中技术Lead输出的component级别的设计，到开始实现时，应该会把功能分为不同的模块有不同的开发人员协同实现。这是个学习的机会，不要只局限于自己这部分，为了了解这个大的功能，甚至和这个功能相关的其他已经实现的功能，你同样需要关注其他人的工作。有目的的看代码和漫无目的的浏览效果是不一样的，你已经对新功能有所了解，审查代码之前，你认为代码会怎么写，别人哪里和你想的不一样，旧功能和新功能是如何相互影响的等等，心里怀着问题，你的学习速度会更快，记得更加深刻。</li>
@@ -337,11 +332,13 @@
     
     <summary type="html">
     
-      &lt;p&gt;众所周知，代码审查是软件开发过程中十分重要的环节，楼主结合自己的实际工作经验，和大家分享一下在实际工作中代码审查是如何开展的，&lt;/p&gt;
-&lt;p&gt;笔者水平有限，若有错误和纰漏，还请大家指正。&lt;/p&gt;
+      &lt;p&gt;众所周知，代码审查是软件开发过程中十分重要的环节，楼主结合自己的实际工作经验，和大家分享一下在实际工作中代码审查是如何开展的，笔者水平有限，若有错误和纰漏，还请大家指正。&lt;/p&gt;
 &lt;h2 id=&quot;代码审查的阻力&quot;&gt;&lt;a href=&quot;#代码审查的阻力&quot; class=&quot;headerlink&quot; title=&quot;代码审查的阻力&quot;&gt;&lt;/a&gt;代码审查的阻力&lt;/h2&gt;&lt;p&gt;我想不通公司不同部门对代码审查这项工作的重视程度还是不一样的，对于代码审查的阻力总结了以下几点：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;国内的整体环境，国内的公司，尤其是互联网公司，讲究速度致上，软件开发的迭代周期周期短，速
+&lt;li&gt;国内的整体环境，国内的公司，尤其是互联网公司，讲究速度致上，软件开发的迭代周期周期短，速度快，因为竞争太大，开发的产品要求快速上线，对代码审查不是很重视，先上线，出了问题再解决。&lt;/li&gt;
+&lt;li&gt;公司的规模，大公司重视流程，把代码审查作为软件开发中的重要一环，甚至计入考核，不管什么一旦成为制度，开展起来就相对容易了。小公司则不然，尤其是刚起步的，可能觉的代码审查没有必要。&lt;/li&gt;
+&lt;li&gt;和你的领导有关系，就和上面说的，代码审查如果没有形成制度，如果你的领导是技术出身，明白代码审查的重要性，那么会要求你去做。如果是来自别的领域，可能认识不到它的重要性，觉的代码审查是浪费时间（就和代码重构一个道理）。&lt;/li&gt;
+&lt;li&gt;个人原因，尤其是刚刚进入公司的员工，大学的软件工程课里面好像是没有介绍代码审查的，就是有，没有实际经验，也体会不到它的重要性，笔者刚入职时就是这么认为的。
     
     </summary>
     
