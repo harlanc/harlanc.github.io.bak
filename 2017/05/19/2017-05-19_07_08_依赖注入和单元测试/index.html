@@ -92,19 +92,19 @@
 
 
 
-<meta name="description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Inj">
+<meta name="description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听">
 <meta name="keywords" content="软件工程,单元测试">
 <meta property="og:type" content="article">
 <meta property="og:title" content="依赖注入和单元测试">
 <meta property="og:url" content="http://yoursite.com/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/index.html">
 <meta property="og:site_name" content="HarlanC&#39;s Blog">
-<meta property="og:description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Inj">
+<meta property="og:description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听">
 <meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518224926666-1842361008.jpg">
 <meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518225528775-2016525207.jpg">
-<meta property="og:updated_time" content="2017-05-20T10:40:57.986Z">
+<meta property="og:updated_time" content="2017-05-20T12:11:45.681Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="依赖注入和单元测试">
-<meta name="twitter:description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Inj">
+<meta name="twitter:description" content="上一篇博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接： http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html  近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听">
 <meta name="twitter:image" content="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518224926666-1842361008.jpg">
 
 
@@ -354,15 +354,15 @@
       
 
       
-        <p><a href="http://www.cnblogs.com/harlanc/p/6838155.html" title="上一篇" target="_blank" rel="external">上一篇</a>博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接：</p>
+        <p><a href="http://harlancn.me/2017/05/10/2017-05-10_21_13_%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E6%9C%89%E6%AF%92/" title="上一篇" target="_blank" rel="external">上一篇</a>博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接：</p>
 <p><a href="http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html" target="_blank" rel="external">http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html</a> </p>
-<p>近些年来对于依赖注入（Dependency Inj<br><a id="more"></a><br>ction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听说过Spring框架（Spring Framework）,就是所谓的依赖注入容器，在你的印象里面依赖注入和Spring是等同的。但这个想法是错误的，依赖注入是一个很简单的概念，它可以被应用到任何地方，除了依赖注入容器之外，它同样能够被应用到单元测试中。这篇文章我们讨论一下几点：</p>
+<p>近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听说过Spring框架（Spring Framework）,就是所谓的依赖注入容器，在你的印象里面依赖注入和Spring是等同的。但这个想法是错误的，依赖注入是一个很简单的概念，它可以被应用到任何地方，除了依赖注入容器之外，它同样能够被应用到单元测试中。这篇文章我们讨论一下几点：</p>
 <ul>
 <li>什么是依赖注入</li>
 <li>如何实现一个友好的依赖注入类</li>
 <li>为什么依赖注入可以使单元测试更加简单</li>
 </ul>
-<p>Ladies and gentlemen,开动你的引擎！</p>
+<p>Ladies and gentlemen,开动你的引擎！<br><a id="more"></a></p>
 <h2 id="1-一辆简单的car"><a href="#1-一辆简单的car" class="headerlink" title="1. 一辆简单的car"></a>1. 一辆简单的car</h2><p><img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170518224926666-1842361008.jpg" alt=""></p>
 <p>首先我们考虑一个简单的例子，这里我们使用engine 类和car 类。为了更加清楚的描述问题，我们将类和接口都置空。每辆car会有一个engine，我们想给car装备上著名的MooseEngine。</p>
 <p>Engine类如下：</p>
@@ -546,7 +546,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
