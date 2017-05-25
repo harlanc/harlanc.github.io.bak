@@ -74,10 +74,12 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="linux编程,APUE," />
 
 
 
+
+  
 
 
   <link rel="alternate" href="/atom.xml" title="HarlanC's Blog" type="application/atom+xml" />
@@ -92,15 +94,21 @@
 
 
 
-<meta name="description" content="生有涯，知无涯。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="HarlanC&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="3.1 文件描述符对于内核而言，所有打开的文件都通过文件描述符引用。文件描述符是一个非负整数。当打开一个现有文件或创建一个新文件时，内核向进程返回一个文件描述符。当读，写一个文件时，使用open或者creat返回的文件描述符标识该文件，并将其作为参数传递给read或者write。我们把标准输入(0)，标准输出(1)和标准错误(2)文件描述符替换为符号常量STDIN_FINENO,STDOUT_F">
+<meta name="keywords" content="linux编程,APUE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UNIX 文件I&#x2F;O">
+<meta property="og:url" content="http://yoursite.com/2017/05/25/APUE-UNIX文件IO/index.html">
 <meta property="og:site_name" content="HarlanC&#39;s Blog">
-<meta property="og:description" content="生有涯，知无涯。">
+<meta property="og:description" content="3.1 文件描述符对于内核而言，所有打开的文件都通过文件描述符引用。文件描述符是一个非负整数。当打开一个现有文件或创建一个新文件时，内核向进程返回一个文件描述符。当读，写一个文件时，使用open或者creat返回的文件描述符标识该文件，并将其作为参数传递给read或者write。我们把标准输入(0)，标准输出(1)和标准错误(2)文件描述符替换为符号常量STDIN_FINENO,STDOUT_F">
+<meta property="og:image" content="http://files.cnblogs.com/files/harlanc/%E6%96%87%E4%BB%B6IO.bmp">
+<meta property="og:image" content="http://files.cnblogs.com/files/harlanc/figure3.7.bmp">
+<meta property="og:image" content="http://files.cnblogs.com/files/harlanc/figure3-8.bmp">
+<meta property="og:updated_time" content="2017-05-25T13:51:56.779Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="HarlanC&#39;s Blog">
-<meta name="twitter:description" content="生有涯，知无涯。">
+<meta name="twitter:title" content="UNIX 文件I&#x2F;O">
+<meta name="twitter:description" content="3.1 文件描述符对于内核而言，所有打开的文件都通过文件描述符引用。文件描述符是一个非负整数。当打开一个现有文件或创建一个新文件时，内核向进程返回一个文件描述符。当读，写一个文件时，使用open或者creat返回的文件描述符标识该文件，并将其作为参数传递给read或者write。我们把标准输入(0)，标准输出(1)和标准错误(2)文件描述符替换为符号常量STDIN_FINENO,STDOUT_F">
+<meta name="twitter:image" content="http://files.cnblogs.com/files/harlanc/%E6%96%87%E4%BB%B6IO.bmp">
 
 
 
@@ -128,13 +136,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/05/25/APUE-UNIX文件IO/"/>
 
 
 
 
 
-  <title>HarlanC's Blog</title>
+  <title>UNIX 文件I/O | HarlanC's Blog</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -160,9 +168,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -255,9 +261,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -283,9 +289,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/25/APUE-UNIX文件IO/" itemprop="url">UNIX 文件I/O</a></h1>
+          <h1 class="post-title" itemprop="name headline">UNIX 文件I/O</h1>
         
 
         <div class="post-meta">
@@ -310,6 +314,16 @@
           
 
           
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/05/25/APUE-UNIX文件IO/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
             
           
 
@@ -343,9 +357,7 @@
       
 
       
-        
-          
-            <p><img src="http://files.cnblogs.com/files/harlanc/%E6%96%87%E4%BB%B6IO.bmp" alt=""></p>
+        <p><img src="http://files.cnblogs.com/files/harlanc/%E6%96%87%E4%BB%B6IO.bmp" alt=""></p>
 <h2 id="3-1-文件描述符"><a href="#3-1-文件描述符" class="headerlink" title="3.1 文件描述符"></a>3.1 文件描述符</h2><p>对于内核而言，所有打开的文件都通过文件描述符引用。文件描述符是一个非负整数。当打开一个现有文件或创建一个新文件时，内核向进程返回一个文件描述符。当读，写一个文件时，使用open或者creat返回的文件描述符标识该文件，并将其作为参数传递给read或者write。<br>我们把标准输入(0)，标准输出(1)和标准错误(2)文件描述符替换为符号常量STDIN_FINENO,STDOUT_FILENO,STDERR_FILENO,系统支持的最大文件描述符数量可以由以下方式获取：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">#include &lt;unistd.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#include &lt;sys/resource.h&gt;</div><div class="line">#include &lt;errno.h&gt;</div><div class="line">int main(void)</div><div class="line">&#123;</div><div class="line">     /*****************************</div><div class="line">     * print file descriptors for</div><div class="line">     * standard input</div><div class="line">     * standard output</div><div class="line">     * standard err</div><div class="line">     * ***************************/</div><div class="line">     printf(&quot;%d\n&quot;,STDIN_FILENO);</div><div class="line">     printf(&quot;%d\n&quot;,STDOUT_FILENO);</div><div class="line">     printf(&quot;%d\n&quot;,STDERR_FILENO);</div><div class="line">     //printf(&quot;%d\n&quot;,OPEN_MAX); OPEN_MAX is deprecated</div><div class="line">     /*************************************</div><div class="line">     * how to get the OPEN_MAX value</div><div class="line">     ************************************/</div><div class="line">     struct rlimit limit;</div><div class="line">     if(getrlimit(RLIMIT_NOFILE,&amp;limit)==-1)</div><div class="line">       perror(&quot;getrlimit&quot;);</div><div class="line">     printf(&quot;getrlimit=%d\n&quot;,(int)limit.rlim_cur);</div><div class="line">     </div><div class="line">     return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h2 id="3-2-open和openat"><a href="#3-2-open和openat" class="headerlink" title="3.2 open和openat"></a>3.2 open和openat</h2><p>使用open和openat可以打开或者创建一个文件，下面是使用open和openat的实例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">#include &lt;fcntl.h&gt;</div><div class="line">#include &lt;stdio.h&gt;</div><div class="line">#define RWRWRW  (S_IRUSR |S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)</div><div class="line"></div><div class="line">int main(void)</div><div class="line">&#123;  </div><div class="line">    /*****************************************************************/</div><div class="line">    //int open(const char*path,int oflag,.../*mode_t mode*/);</div><div class="line">    //int openat(int fd,const char*path,int oflag,.../*mode_t mode*/)</div><div class="line">    /****************************************************************/</div><div class="line">    /*One of the following five flags must be specified:</div><div class="line">    //  O_RDONLY read only</div><div class="line">    //  O_WRONLY write only</div><div class="line">    //  O_RDWR  read and write</div><div class="line">    //   most implementations define O_RDONLY as 0,O_WRONLY as 1,</div><div class="line">    //   O_RDWR as 2.</div><div class="line">    //  O_EXEC execute-only</div><div class="line">    //  O_SEARCH  search-only\</div><div class="line">    ****************************************************************/</div><div class="line">    /*The following ones are optional:</div><div class="line">     *  O_APPEND</div><div class="line">     *  O_CLOEXEC</div><div class="line">     *  O_CREAT</div><div class="line">     *  O_DIRECTORY</div><div class="line">     *  O_EXEL</div><div class="line">     *  O_NOCTTY</div><div class="line">     *  O_NOFOLLOW</div><div class="line">     *  O_NONBLOCK</div><div class="line">     *  O_SYNC</div><div class="line">     *  O_TRUNC</div><div class="line">     *  O_TTY_INIT</div><div class="line">     *  O_DSYNC</div><div class="line">     *  O_RSYNC</div><div class="line">     * */</div><div class="line">     int fd = openat(0,&quot;/tmp/test.txt&quot;,O_WRONLY|O_CREAT,RWRWRW);//0 is ignored if path is absolute path.</div><div class="line">     close(fd);</div><div class="line">     int dir_fd = open(&quot;/tmp&quot;,O_RDONLY);</div><div class="line">     printf(&quot;%d\n&quot;,dir_fd);</div><div class="line">     fd = openat(dir_fd,&quot;test.txt&quot;,O_RDONLY);</div><div class="line">     printf(&quot;%d\n&quot;,fd);</div><div class="line">     </div><div class="line">     fd = open(&quot;/tmp/test.txt&quot;,O_RDWR);</div><div class="line">     printf(&quot;%d\n&quot;,fd);</div><div class="line">     int rv = write(fd,&quot;test&quot;,4);</div><div class="line">     printf(&quot;%d\n&quot;,rv);    </div><div class="line"></div><div class="line">     /*</div><div class="line">      *Test if a file exists</div><div class="line">      */</div><div class="line">     </div><div class="line">     fd = open(&quot;/tmp/test.txt&quot;,O_CREAT|O_EXCL);</div><div class="line">     printf(&quot;The file exists,so the open result is %d\n&quot;,fd);      </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>fd参数把open和openat区分开，共有三种可能：</p>
@@ -474,1316 +486,74 @@ int main(void)
 
 }
 </code></pre>
-          
+      
+    </div>
+
+    <div>
+      
         
+
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
     <div>
+      
+        
+
       
     </div>
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/" itemprop="url">依赖注入和单元测试</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-19T07:08:00+08:00">
-                2017-05-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/linux编程/" rel="tag"># linux编程</a>
           
-            
+            <a href="/tags/APUE/" rel="tag"># APUE</a>
           
-
-          
-          
-             <span id="/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/" class="leancloud_visitors" data-flag-title="依赖注入和单元测试">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
         
-          <p><a href="http://harlancn.me/2017/05/10/2017-05-10_21_13_%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E6%9C%89%E6%AF%92/" title="上一篇" target="_blank" rel="external">上一篇</a>博文介绍了测试的相关概念，这篇主要说一下依赖注入以及如何在单元测试中使用。原文链接：<br><a href="http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html" target="_blank" rel="external">http://www.javaranch.com/journal/200709/dependency-injection-unit-testing.html</a><br>近些年来对于依赖注入（Dependency Injction）这个词大家已经应该很熟悉了。我们经常使用它因为这是一个非常好的面向对象概念。你可能也听说过Spring框架（Spring Framework）,就是所谓的依赖注入容器，在你的印象里面依赖注入和Spring是等同的。但这个想法是错误的，依赖注入是一个很简单的概念，它可以被应用到任何地方，除了依赖注入容器之外，它同样能够被应用到单元测试中。这篇文章我们讨论一下几点：</p>
-<ul>
-<li>什么是依赖注入</li>
-<li>如何实现一个友好的依赖注入类</li>
-<li>为什么依赖注入可以使单元测试更加简单</li>
-</ul>
-<p>Ladies and gentlemen,开动你的引擎！<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/19/2017-05-19_07_08_依赖注入和单元测试/" rel="next" title="依赖注入和单元测试">
+                <i class="fa fa-chevron-left"></i> 依赖注入和单元测试
+              </a>
+            
           </div>
-          <!--/noindex-->
-        
-      
-    </div>
 
-    <div>
-      
-    </div>
+          <span class="post-nav-divider"></span>
 
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/10/2017-05-10_21_13_单元测试有毒/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/10/2017-05-10_21_13_单元测试有毒/" itemprop="url">单元测试有毒</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+          <div class="post-nav-prev post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-10T21:13:00+08:00">
-                2017-05-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/05/10/2017-05-10_21_13_单元测试有毒/" class="leancloud_visitors" data-flag-title="单元测试有毒">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          <p>最近想对我们的单元测试做一下总结，楼主在日常工作中写了不少单元测试，但有些概念和用法并没有刨根问题的去追寻，研究。于是把一些不清晰的概念输入到google中来寻找答案，发现了几个不错的帖子，从中学到了东西，也发现了问题，于是忍不住又翻译了一把，和大家分享，如有错误，敬请指正。</p>
-<p>我们所做的产品测试包括了下文所说的软件测试词汇表中的大部分，也就是“单元测试”，组件测试，系统测试，集成测试，压力测试和验收测试。开发团队成员做的<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/05/10/2017-05-10_21_13_单元测试有毒/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-      
 
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/07/APUE-UNIX_系统概述/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/07/APUE-UNIX_系统概述/" itemprop="url">UNIX 系统概述</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-07T11:44:00+08:00">
-                2017-05-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/05/07/APUE-UNIX_系统概述/" class="leancloud_visitors" data-flag-title="UNIX 系统概述">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170507114106679-1710680497.png" alt=""></p>
-<h2 id="1-UNIX体系结构（UNIX-Architecture）"><a href="#1-UNIX体系结构（UNIX-Architecture）" class="headerlink" title="1. UNIX体系结构（UNIX Architecture）"></a>1. UNIX体系结构（UNIX Architecture）</h2><p>调用内核的接口叫做系统调用（system call,图1.1中的阴影部分），普通函数库是建立在系统调用接口的基础之上。应用（application）可以同时使用函数库或者<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/05/07/APUE-UNIX_系统概述/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
+    <div class="post-spread">
       
     </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/27/2017-04-27_08_14_谈一下我们是如何开展code_review的/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/27/2017-04-27_08_14_谈一下我们是如何开展code_review的/" itemprop="url">谈一下我们是如何开展code review的</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-27T08:14:00+08:00">
-                2017-04-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/04/27/2017-04-27_08_14_谈一下我们是如何开展code_review的/" class="leancloud_visitors" data-flag-title="谈一下我们是如何开展code review的">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>众所周知，代码审查是软件开发过程中十分重要的环节，楼主结合自己的实际工作经验，和大家分享一下在实际工作中代码审查是如何开展的，笔者水平有限，若有错误和纰漏，还请大家指正。</p>
-<h2 id="代码审查的阻力"><a href="#代码审查的阻力" class="headerlink" title="代码审查的阻力"></a>代码审查的阻力</h2><p>我想不通公司不同部门对代码审查这项工作的重视程度还是不一样的，对于代码审查的阻力总结了以下几点：</p>
-<ul>
-<li>国内的整体环境，国内的公司，尤其是互联网公司，讲究速度致上，软件开发的迭代周期周期短，速度快，因为竞争太大，开发的产品要求快速上线，对代码审查不是很重视，先上线，出了问题再解决。</li>
-<li>公司的规模，大公司重视流程，把代码审查作为软件开发中的重要一环，甚至计入考核，不管什么一旦成为制度，开展起来就相对容易了。小公司则不然，尤其是刚起步的，可能觉的代码审查没有必要。</li>
-<li>和你的领导有关系，就和上面说的，代码审查如果没有形成制度，如果你的领导是技术出身，明白代码审查的重要性，那么会要求你去做。如果是来自别的领域，可能认识不到它的重要性，觉的代码审查是浪费时间（就和代码重构一个道理）。</li>
-<li>个人原因，尤其是刚刚进入公司的员工，大学的软件工程课里面好像是没有介绍代码审查的，就是有，没有实际经验，也体会不到它的重要性，笔者刚入职时就是这么认为的。
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/27/2017-04-27_08_14_谈一下我们是如何开展code_review的/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/25/2017-04-25_07_46_effective_c++_思维导图/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/25/2017-04-25_07_46_effective_c++_思维导图/" itemprop="url">effective c++ 思维导图</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T07:46:00+08:00">
-                2017-04-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective c++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/04/25/2017-04-25_07_46_effective_c++_思维导图/" class="leancloud_visitors" data-flag-title="effective c++ 思维导图">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>历时两个多月的时间，终于把effective c++又复习了一遍，比较慢，看的是英文版，之前看的时候做过一些笔记，但不够详细，这次笔者是从头到尾的翻译了一遍，加了一些标题，先记录到word里面，然后发布到博客园上。这么做是为了方便查阅，复习C++，同时练习英文，希望这些帖子也能够对大家有所帮助。</p>
-<p>有人回复说有些过时了，的确，但大部分还都<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/25/2017-04-25_07_46_effective_c++_思维导图/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/" itemprop="url">读书笔记 effective c++ Item 55 让你自己熟悉Boost</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-25T07:43:00+08:00">
-                2017-04-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective c++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 55 让你自己熟悉Boost">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>你正在寻找一个高质量的，开源的，与平台和编译器无关的程序库的集合？看一下Boost吧。想加入一个由雄心勃勃的，充满天赋的正致力于最高水平的程序库设计和实现工作的C++程序员们组成的团体么？看一下Boost吧。想了解C++将来可能会是什么样子的？看一下Boost吧。</p>
-<p>Boost是一个C++开发人员组<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/25/2017-04-25_07_43_读书笔记_effective_c++_Item_55_让你自己熟悉Boost/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/23/2017-04-23_18_21_读书笔记_effective_c++_Item_54_让你自己熟悉包括TR1在内的标准库/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/23/2017-04-23_18_21_读书笔记_effective_c++_Item_54_让你自己熟悉包括TR1在内的标准库/" itemprop="url">读书笔记 effective c++ Item 54 让你自己熟悉包括TR1在内的标准库</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-23T18:21:00+08:00">
-                2017-04-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective c++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/04/23/2017-04-23_18_21_读书笔记_effective_c++_Item_54_让你自己熟悉包括TR1在内的标准库/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 54 让你自己熟悉包括TR1在内的标准库">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="1-C-0x的历史渊源"><a href="#1-C-0x的历史渊源" class="headerlink" title="1. C++0x的历史渊源"></a>1. C++0x的历史渊源</h2><p>C++标准——也就是定义语言的文档和程序库——在1998被批准。在2003年，一个小的“修复bug”版本被发布。然而标准委员会仍然在继续他们的工作，一个“2.0版本”的C++标准预计在2009年被发布（虽然所有的工作很有可能在2007年底被完成）。直到<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/23/2017-04-23_18_21_读书笔记_effective_c++_Item_54_让你自己熟悉包括TR1在内的标准库/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/22/2017-04-22_18_55_读书笔记_effective_c++_Item_53_关注编译器发出的警告/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/22/2017-04-22_18_55_读书笔记_effective_c++_Item_53_关注编译器发出的警告/" itemprop="url">读书笔记 effective c++ Item 53 关注编译器发出的警告</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-22T18:55:00+08:00">
-                2017-04-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective c++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/04/22/2017-04-22_18_55_读书笔记_effective_c++_Item_53_关注编译器发出的警告/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 53 关注编译器发出的警告">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>许多程序员常常忽略编译器发出的警告。毕竟，如果问题很严重，它才将会变成一个error，不是么?相对来说，这个想法可能在其它语言是无害的，但是在C++中，我敢打赌编译器的实现者对于对接下来会发生什么比你有更好的理解。例如，下面的错误是每个人都时不时会犯的：</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">B</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f</span>(<span class="params"></span>) <span class="keyword">const</span></span>;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">D</span>: <span class="title">public</span> <span class="title">B</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f</span>(<span class="params"></span>)</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/22/2017-04-22_18_55_读书笔记_effective_c++_Item_53_关注编译器发出的警告/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/22/2017-04-22_12_59_读书笔记_effective_c++_Item_52_如果你实现了placement_new,你也要实现placement_delete/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/22/2017-04-22_12_59_读书笔记_effective_c++_Item_52_如果你实现了placement_new,你也要实现placement_delete/" itemprop="url">读书笔记 effective c++ Item 52 如果你实现了placement new,你也要实现placement delete</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-22T12:59:00+08:00">
-                2017-04-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective c++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/04/22/2017-04-22_12_59_读书笔记_effective_c++_Item_52_如果你实现了placement_new,你也要实现placement_delete/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 52 如果你实现了placement new,你也要实现placement delete">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="1-调用普通版本的operator-new抛出异常会发生什么？"><a href="#1-调用普通版本的operator-new抛出异常会发生什么？" class="headerlink" title="1. 调用普通版本的operator new抛出异常会发生什么？"></a>1. 调用普通版本的operator new抛出异常会发生什么？</h2><p>Placement new和placement delete不是C++动物园中最常遇到的猛兽，所以你不用担心你对它们不熟悉。当你像下面这样实现一个new表达式的时候，<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/22/2017-04-22_12_59_读书笔记_effective_c++_Item_52_如果你实现了placement_new,你也要实现placement_delete/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-  </section>
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
-
+  </div>
 
 
           </div>
@@ -1791,6 +561,12 @@ int main(void)
 
 
           
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
 
         </div>
         
@@ -1810,8 +586,17 @@ int main(void)
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
@@ -1891,6 +676,22 @@ int main(void)
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-文件描述符"><span class="nav-text">3.1 文件描述符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-open和openat"><span class="nav-text">3.2 open和openat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-函数creat"><span class="nav-text">3.3 函数creat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-函数close"><span class="nav-text">3.4 函数close</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-函数lseek"><span class="nav-text">3.5 函数lseek</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-6-函数read和write"><span class="nav-text">3.6 函数read和write</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-7-文件共享"><span class="nav-text">3.7 文件共享</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-8-原子操作"><span class="nav-text">3.8 原子操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-9-函数dup和dup2"><span class="nav-text">3.9 函数dup和dup2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-10-函数fcntl"><span class="nav-text">3.10 函数fcntl</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -2011,6 +812,10 @@ int main(void)
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
 
   
 
