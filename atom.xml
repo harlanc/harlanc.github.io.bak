@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-05-31T12:37:18.649Z</updated>
+  <updated>2017-05-31T12:51:01.513Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -16,91 +16,91 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>markdown�����ϴ�ͼƬ����������һ�����߲����Ŀ���</title>
-    <link href="http://yoursite.com/2017/05/31/markdown%E5%8D%9A%E5%AE%A2%E4%B8%8A%E4%BC%A0%E5%9B%BE%E7%89%87%E5%88%A9%E5%99%A8%E2%80%94%E2%80%94%E8%AE%B0%E4%B8%80%E4%B8%AA%E5%B7%A5%E5%85%B7%E6%8F%92%E4%BB%B6%E7%9A%84%E5%BC%80%E5%8F%91/"/>
-    <id>http://yoursite.com/2017/05/31/markdown博客上传图片利器——记一个工具插件的开发/</id>
+    <title>markdown博客上传图片利器——记一个工具插件的开发</title>
+    <link href="http://yoursite.com/2017/05/31/markdown%E5%8D%9A%E5%AE%A2%E4%B8%8A%E4%BC%A0%E5%9B%BE%E7%89%87%E5%88%A9%E5%99%A8%E2%80%94%E8%AE%B0%E4%B8%80%E4%B8%AA%E5%B7%A5%E5%85%B7%E6%8F%92%E4%BB%B6%E7%9A%84%E5%BC%80%E5%8F%91/"/>
+    <id>http://yoursite.com/2017/05/31/markdown博客上传图片利器—记一个工具插件的开发/</id>
     <published>2017-05-31T12:36:00.000Z</published>
-    <updated>2017-05-31T12:37:18.649Z</updated>
+    <updated>2017-05-31T12:51:01.513Z</updated>
     
-    <content type="html"><![CDATA[<p>##1. ����##</p>
-<p>д������һ���Լ���ͼ���ǲ�����ѡ�����������������ߣ���markdown����������ͼƬ�Ĳ������£�</p>
+    <content type="html"><![CDATA[<p>##1. 背景##</p>
+<p>写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：</p>
 <ul>
-<li>��ȡͼƬ�����浽����(�����ص��Ի�����ѡ�񱣴�·����ѡ���ļ����ͣ������ļ���)��</li>
-<li>�ϴ���ͼ��������(������ҳ����ת���ϴ�ҳ�棬����browse,ѡ�񱾵��ļ���upload…)</li>
-<li>��ȡͼƬ����(Ϊ��ȷ�����󣬿������������д���ͼƬ��������link)</li>
-<li>���������ӵ�markdown������(Ctrl+v ���Ƶ�������)</li>
+<li>截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。</li>
+<li>上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…)</li>
+<li>获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link)</li>
+<li>将链接添加到markdown博客中(Ctrl+v 复制到博客中)</li>
 </ul>
-<p>���Ǻܷ����ģ���ô�ɲ������Լ�ʵ��һ������������Щ�����������أ�<br><a id="more"></a></p>
-<p>##2. ����##</p>
-<p>����Ҫȷ��ʹ���ļҵ�ͼ����������������һ�£���˵��ţ�ƱȽϿ��ף����ﲻ�Ǵ����档�������ṩ��SDKҲ�Ƚ�ȫ����������������ţ�ƣ�������ȷ��������ʵ��һ����ͼ������ʵ�ֽ�ͼ+ͼƬupload���ܣ���ͷʵ��һ�����߲�̫��ʵ����һ����Դ�Ľ�ͼ���߱ȽϿ��ף�����Ŀǰ�����õ���<a href="https://github.com/greenshot/greenshot" target="_blank" rel="external">greenshot</a>,������������һ����Դ�Ĺ��ߣ����ˣ��������ˡ�</p>
-<p>##3. ����##</p>
-<p>Ϊgreenshot����һ������������ʵ�����¹��ܣ�</p>
+<p>还是很繁琐的，那么可不可以自己实现一个工具来做这些繁琐的事情呢？<br><a id="more"></a></p>
+<p>##2. 分析##</p>
+<p>首先要确定使用哪家的图床服务，网上搜了一下，都说七牛云比较靠谱（这里不是打广告。。），提供的SDK也比较全，我们这里就用七牛云，接下来确定该如何实现一个截图工具来实现截图+图片upload功能，从头实现一个工具不太现实，找一个开源的截图工具比较靠谱，博主目前正在用的是<a href="https://github.com/greenshot/greenshot" target="_blank" rel="external">greenshot</a>,发现这正好是一个开源的工具，好了，就是它了。</p>
+<p>##3. 需求##</p>
+<p>为greenshot添加一个插件，初步实现以下功能：</p>
 <ul>
-<li>������ţ��SDK�ӿڣ��������öԻ��򣬿�������accesskey,secretkey,scope��default domain��֧���ϴ������ܽ���Щ���ñ��浽����(Ϊ�˼򵥣���access key��secret key����������)</li>
-<li>����ΪͼƬ��������ǰ׺</li>
-<li>֧��ѡ���ļ����ͣ�֧��bmp,gif,png,jpg�ȸ�ʽ</li>
-<li>�ϴ��ļ��������Զ���ͼ���е��ļ�link���Ƶ�������</li>
+<li>针对七牛云SDK接口，添加配置对话框，可以配置accesskey,secretkey,scope，default domain来支持上传，并能将这些配置保存到本地(为了简单，将access key和secret key保存成明文)</li>
+<li>可以为图片名字添加前缀</li>
+<li>支持选择文件类型，支持bmp,gif,png,jpg等格式</li>
+<li>上传文件后可以自动将图床中的文件link复制到剪贴板</li>
 </ul>
-<p>##4. ׼��##</p>
+<p>##4. 准备##</p>
 <ul>
-<li>�������� visual Studio 2017</li>
-<li>ԭ����   ��ţ��SDKԴ��+greenshotԴ��</li>
-<li>����    ����һ����ţ���˺ţ���ͨͼ�����񣨿��԰ٶȻ���google…��</li>
+<li>开发工具 visual Studio 2017</li>
+<li>原材料   七牛云SDK源码+greenshot源码</li>
+<li>其它    申请一个七牛云账号，开通图床服务（可以百度或者google…）</li>
 </ul>
-<p>##5. ʵ��##</p>
-<p>����ʡ�ԣ�ʵ�ֱȽϼ򵥣��󲿷�ʱ�仨����Ϥgreenshot�����ܹ��ʹ��������ϣ�ֱ����Դ�룺<br><a href="https://github.com/harlanc/greenshot" target="_blank" rel="external">https://github.com/harlanc/greenshot</a></p>
+<p>##5. 实现##</p>
+<p>过程省略，实现比较简单，大部分时间花在熟悉greenshot代码架构和代码调试上，直接上源码：<br><a href="https://github.com/harlanc/greenshot" target="_blank" rel="external">https://github.com/harlanc/greenshot</a></p>
 <p>##6. Demo##</p>
-<p>####6.1 ��װ####</p>
+<p>####6.1 安装####</p>
 <ul>
-<li><p>���Ȱ�װGreenShot��<br><a href="http://getgreenshot.org/" target="_blank" rel="external">http://getgreenshot.org/</a></p>
+<li><p>首先安装GreenShot：<br><a href="http://getgreenshot.org/" target="_blank" rel="external">http://getgreenshot.org/</a></p>
 </li>
-<li><p>�����������±���Դ�룬ֱ�ӵ������������������ز�����</p>
-<p> ����: <a href="https://pan.baidu.com/s/1b5LQHo" target="_blank" rel="external">https://pan.baidu.com/s/1b5LQHo</a> ����: 33z8</p>
-<p> ѹ�����а��������ļ���һ��gsp����������xml�����ļ�����������Ӧ��Ŀ¼�£�</p>
+<li><p>如果不想重新编译源码，直接到下面的网盘链接下载插件：</p>
+<p> 链接: <a href="https://pan.baidu.com/s/1b5LQHo" target="_blank" rel="external">https://pan.baidu.com/s/1b5LQHo</a> 密码: 33z8</p>
+<p> 压缩包中包含三个文件，一个gsp插件，两个xml语言文件，拷贝到对应的目录下：</p>
 </li>
 </ul>
 <p>   <img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531193518.gif" alt=""></p>
 <p>   <img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531193719.gif" alt=""></p>
-<p>####6.2 ����####<br>����GreenShot,����������֤һ�²����Ƿ����سɹ����ʼ�����GreenShotͼ�꣬����<strong>Preference…</strong>��</p>
+<p>####6.2 配置####<br>打开GreenShot,首先我们验证一下插件是否加载成功，邮件单击GreenShot图标，单击<strong>Preference…</strong>：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531194153.gif" alt=""></p>
-<p>  ������������������<strong>Plugins</strong>�У�˵�����ڳɹ���</p>
+<p>  如果看到插件列在了<strong>Plugins</strong>中，说明加在成功：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531194440.gif" alt=""></p>
-<p>�������������棺</p>
+<p>打开配置主界面：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531194749.gif" alt=""></p>
-<p><strong>����1��4��������ȷ</strong>����Щ������дʲô�أ�</p>
+<p><strong>序号1到4必须填正确</strong>，这些都该填写什么呢？</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531195247.gif" alt=""></p>
-<p>����ͼ����½��ţ�ƣ�����<strong>��������-&gt;��Կ����</strong>�����ɿ���AK��SK��</p>
+<p>见下图，登陆七牛云，点击<strong>个人中心-&gt;密钥管理</strong>，即可看到AK和SK：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531195604.gif" alt=""></p>
-<p>����3��Ӧ�Ŵ洢�ռ����ƣ�������<strong>�½��洢�ռ�</strong>���Ѷ�Ӧ��������д��<strong>Scope</strong>�</p>
+<p>序号3对应着存储空间名称，你可以<strong>新建存储空间</strong>，把对应的名字填写到<strong>Scope</strong>里：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531195946.gif" alt=""></p>
-<p>����4��Ӧ����������������������ƴд���Ƶ���������ͼƬlink�ģ���֪����û�и��õķ�����Ŀǰ¥���õ��ǲ���������</p>
+<p>序号4对应着域名，这个域名是用于拼写复制到剪贴板的图片link的，不知道有没有更好的方法。目前楼主用的是测试域名：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531200256.gif" alt=""></p>
-<p>����5��ͼƬ��ʽ������6ΪͼƬ����ǰ׺����������ͼƬ��<br>���ˣ����ú�֮�󣬵���OK����Щ������Ϣ���ᱣ�浽���ص������ļ��У�ע��AK��SK�����������ı��棬С�Ĳ�Ҫй¶����</p>
-<p>####6.3 ʹ��####<br>��һ������ʹ�ã��Ҽ�����GreenShotͼ�꣬����<strong>Capture region</strong>,���������Ľ�ͼ��ʽ��</p>
+<p>序号5是图片格式，序号6为图片名字前缀，方便管理图片。<br>好了，配置好之后，点击OK，这些配置信息都会保存到本地的配置文件中，注意AK和SK在这里是明文保存，小心不要泄露。。</p>
+<p>####6.3 使用####<br>看一下如何使用，右键单击GreenShot图标，点击<strong>Capture region</strong>,或者其他的截图方式：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531200915.gif" alt=""></p>
-<p>����ȥ�߱༭ͼƬ��������ѡ��<strong>Open in image editor</strong>,��������ֱ���ϴ�������<strong>Upload to Qiniu</strong>���ɡ�</p>
+<p>如果去边编辑图片，你可以选择<strong>Open in image editor</strong>,如果你想直接上传，单击<strong>Upload to Qiniu</strong>即可。</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531201126.gif" alt=""></p>
-<p>�༭��ͼƬ֮�󣬵�����ţͼ�ꡣ</p>
+<p>编辑完图片之后，单击七牛图标。</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531201424.gif" alt=""></p>
-<p>����һ����Ctrl+V ,���������е�ͼƬ���ӿ��������Ĳ����У��󹦸��ɣ�</p>
+<p>最后一步，Ctrl+V ,将剪贴板中的图片链接拷贝到你的博客中，大功告成！</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;##1. ����##&lt;/p&gt;
-&lt;p&gt;д������һ���Լ���ͼ���ǲ�����ѡ�����������������ߣ���markdown����������ͼƬ�Ĳ������£�&lt;/p&gt;
+      &lt;p&gt;##1. 背景##&lt;/p&gt;
+&lt;p&gt;写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;��ȡͼƬ�����浽����(�����ص��Ի�����ѡ�񱣴�·����ѡ���ļ����ͣ������ļ���)��&lt;/li&gt;
-&lt;li&gt;�ϴ���ͼ��������(������ҳ����ת���ϴ�ҳ�棬����browse,ѡ�񱾵��ļ���upload…)&lt;/li&gt;
-&lt;li&gt;��ȡͼƬ����(Ϊ��ȷ�����󣬿������������д���ͼƬ��������link)&lt;/li&gt;
-&lt;li&gt;���������ӵ�markdown������(Ctrl+v ���Ƶ�������)&lt;/li&gt;
+&lt;li&gt;截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。&lt;/li&gt;
+&lt;li&gt;上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…)&lt;/li&gt;
+&lt;li&gt;获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link)&lt;/li&gt;
+&lt;li&gt;将链接添加到markdown博客中(Ctrl+v 复制到博客中)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;���Ǻܷ����ģ���ô�ɲ������Լ�ʵ��һ������������Щ�����������أ�&lt;br&gt;
+&lt;p&gt;还是很繁琐的，那么可不可以自己实现一个工具来做这些繁琐的事情呢？&lt;br&gt;
     
     </summary>
     
     
-      <category term="���߿���" scheme="http://yoursite.com/tags/%EF%BF%BD%EF%BF%BD%EF%BF%BD%DF%BF%EF%BF%BD%EF%BF%BD%EF%BF%BD/"/>
+      <category term="工具开发" scheme="http://yoursite.com/tags/%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/"/>
     
   </entry>
   
@@ -355,9 +355,9 @@ int main(void)
     </summary>
     
     
-      <category term="软件工程" scheme="http://yoursite.com/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/"/>
-    
       <category term="单元测试" scheme="http://yoursite.com/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/"/>
+    
+      <category term="软件工程" scheme="http://yoursite.com/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/"/>
     
   </entry>
   
@@ -474,9 +474,9 @@ int main(void)
     </summary>
     
     
-      <category term="软件工程" scheme="http://yoursite.com/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/"/>
-    
       <category term="单元测试" scheme="http://yoursite.com/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/"/>
+    
+      <category term="软件工程" scheme="http://yoursite.com/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/"/>
     
   </entry>
   

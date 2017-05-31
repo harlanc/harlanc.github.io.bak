@@ -74,7 +74,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="linux编程," />
+  <meta name="keywords" content="工具开发," />
 
 
 
@@ -92,17 +92,30 @@
 
 
 
-<meta name="description" content="子线程循环 10 次，接着主线程循环 100 次，接着又回到子线程循环 10 次，接着再回到主线程又循环 100 次，如此循环50次，试写出代码。 #include    #include    #include  static pthread_mutex_t mtx=PTHREAD_MUTEX_INITIALIZER;static">
-<meta name="keywords" content="linux编程">
+<meta name="description" content="##1. 背景## 写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中">
+<meta name="keywords" content="工具开发">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux 多线程编程 实例 1">
-<meta property="og:url" content="http://yoursite.com/2016/01/24/2016-01-24_17_55_Linux_多线程编程_实例_1/index.html">
+<meta property="og:title" content="markdown博客上传图片利器——记一个工具插件的开发">
+<meta property="og:url" content="http://yoursite.com/2017/05/31/markdown博客上传图片利器—记一个工具插件的开发/index.html">
 <meta property="og:site_name" content="HarlanC&#39;s Blog">
-<meta property="og:description" content="子线程循环 10 次，接着主线程循环 100 次，接着又回到子线程循环 10 次，接着再回到主线程又循环 100 次，如此循环50次，试写出代码。 #include    #include    #include  static pthread_mutex_t mtx=PTHREAD_MUTEX_INITIALIZER;static">
-<meta property="og:updated_time" content="2017-05-20T10:40:41.091Z">
+<meta property="og:description" content="##1. 背景## 写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531193518.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531193719.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531194153.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531194440.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531194749.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531195247.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531195604.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531195946.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531200256.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531200915.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531201126.gif">
+<meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531201424.gif">
+<meta property="og:updated_time" content="2017-05-31T12:51:01.513Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Linux 多线程编程 实例 1">
-<meta name="twitter:description" content="子线程循环 10 次，接着主线程循环 100 次，接着又回到子线程循环 10 次，接着再回到主线程又循环 100 次，如此循环50次，试写出代码。 #include    #include    #include  static pthread_mutex_t mtx=PTHREAD_MUTEX_INITIALIZER;static">
+<meta name="twitter:title" content="markdown博客上传图片利器——记一个工具插件的开发">
+<meta name="twitter:description" content="##1. 背景## 写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中">
+<meta name="twitter:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531193518.gif">
 
 
 
@@ -130,13 +143,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/01/24/2016-01-24_17_55_Linux_多线程编程_实例_1/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/05/31/markdown博客上传图片利器—记一个工具插件的开发/"/>
 
 
 
 
 
-  <title>Linux 多线程编程 实例 1 | HarlanC's Blog</title>
+  <title>markdown博客上传图片利器——记一个工具插件的开发 | HarlanC's Blog</title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -266,7 +279,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/01/24/2016-01-24_17_55_Linux_多线程编程_实例_1/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/31/markdown博客上传图片利器—记一个工具插件的开发/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Harlan Chen">
@@ -283,7 +296,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Linux 多线程编程 实例 1</h1>
+          <h1 class="post-title" itemprop="name headline">markdown博客上传图片利器——记一个工具插件的开发</h1>
         
 
         <div class="post-meta">
@@ -295,8 +308,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-24T17:55:00+08:00">
-                2016-01-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-31T20:36:00+08:00">
+                2017-05-31
               </time>
             
 
@@ -314,7 +327,7 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a class="cloud-tie-join-count" href="/2016/01/24/2016-01-24_17_55_Linux_多线程编程_实例_1/#comments" itemprop="discussionUrl">
+                <a class="cloud-tie-join-count" href="/2017/05/31/markdown博客上传图片利器—记一个工具插件的开发/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count join-count" itemprop="commentCount"></span>
                 </a>
               </span>
@@ -323,7 +336,7 @@
 
           
           
-             <span id="/2016/01/24/2016-01-24_17_55_Linux_多线程编程_实例_1/" class="leancloud_visitors" data-flag-title="Linux 多线程编程 实例 1">
+             <span id="/2017/05/31/markdown博客上传图片利器—记一个工具插件的开发/" class="leancloud_visitors" data-flag-title="markdown博客上传图片利器——记一个工具插件的开发">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -351,27 +364,67 @@
       
 
       
-        <p>子线程循环 10 次，接着主线程循环 100 次，接着又回到子线程循环 10 次，接着再回到主线程又循环 100 次，如此循环50次，试写出代码。</p>
-<p>#include <pthread.h>  </pthread.h></p>
-<p>#include <stdio.h>  </stdio.h></p>
-<p>#include <unistd.h></unistd.h></p>
-<p>static pthread_mutex_t mtx=PTHREAD_MUTEX_INITIALIZER;<br>static<br><a id="more"></a><br>thread_cond_t cond = PTHREAD_COND_INITIALIZER;</p>
-<p>static void <em>thread_func(void </em>arg)<br>{<br>    //sleep(10);<br>    int j=3;<br>    while(j–)<br>    {</p>
-<pre><code>pthread_mutex_lock(&amp;mtx);  
-pthread_cond_wait(&amp;cond,&amp;mtx);  
-//pthread  
-printf(&quot;10 times complete.\n&quot;);  
-//pthread  
-pthread_mutex_unlock(&amp;mtx);  
-}  
-</code></pre><p>}</p>
-<p>int main(void *arg)<br>{<br>    pthread_t tid;<br>    pthread_create(&amp;tid,NULL,thread_func,NULL);<br>    //sleep(5);<br>    int i=50;<br>    while(i–)<br>    {<br>        sleep(2);<br>        pthread_mutex_lock(&amp;mtx);<br>        printf(“100 times complete!.\n”);<br>        pthread_cond_signal(&amp;cond);</p>
-<pre><code>    pthread_mutex_unlock(&amp;mtx);  
-}  
-//pthread_join(tid,NULL);  
-//pthread_cancel(tid);  
-pthread_join(tid,NULL);  
-</code></pre><p>}</p>
+        <p>##1. 背景##</p>
+<p>写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：</p>
+<ul>
+<li>截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。</li>
+<li>上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…)</li>
+<li>获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link)</li>
+<li>将链接添加到markdown博客中(Ctrl+v 复制到博客中)</li>
+</ul>
+<p>还是很繁琐的，那么可不可以自己实现一个工具来做这些繁琐的事情呢？<br><a id="more"></a></p>
+<p>##2. 分析##</p>
+<p>首先要确定使用哪家的图床服务，网上搜了一下，都说七牛云比较靠谱（这里不是打广告。。），提供的SDK也比较全，我们这里就用七牛云，接下来确定该如何实现一个截图工具来实现截图+图片upload功能，从头实现一个工具不太现实，找一个开源的截图工具比较靠谱，博主目前正在用的是<a href="https://github.com/greenshot/greenshot" target="_blank" rel="external">greenshot</a>,发现这正好是一个开源的工具，好了，就是它了。</p>
+<p>##3. 需求##</p>
+<p>为greenshot添加一个插件，初步实现以下功能：</p>
+<ul>
+<li>针对七牛云SDK接口，添加配置对话框，可以配置accesskey,secretkey,scope，default domain来支持上传，并能将这些配置保存到本地(为了简单，将access key和secret key保存成明文)</li>
+<li>可以为图片名字添加前缀</li>
+<li>支持选择文件类型，支持bmp,gif,png,jpg等格式</li>
+<li>上传文件后可以自动将图床中的文件link复制到剪贴板</li>
+</ul>
+<p>##4. 准备##</p>
+<ul>
+<li>开发工具 visual Studio 2017</li>
+<li>原材料   七牛云SDK源码+greenshot源码</li>
+<li>其它    申请一个七牛云账号，开通图床服务（可以百度或者google…）</li>
+</ul>
+<p>##5. 实现##</p>
+<p>过程省略，实现比较简单，大部分时间花在熟悉greenshot代码架构和代码调试上，直接上源码：<br><a href="https://github.com/harlanc/greenshot" target="_blank" rel="external">https://github.com/harlanc/greenshot</a></p>
+<p>##6. Demo##</p>
+<p>####6.1 安装####</p>
+<ul>
+<li><p>首先安装GreenShot：<br><a href="http://getgreenshot.org/" target="_blank" rel="external">http://getgreenshot.org/</a></p>
+</li>
+<li><p>如果不想重新编译源码，直接到下面的网盘链接下载插件：</p>
+<p> 链接: <a href="https://pan.baidu.com/s/1b5LQHo" target="_blank" rel="external">https://pan.baidu.com/s/1b5LQHo</a> 密码: 33z8</p>
+<p> 压缩包中包含三个文件，一个gsp插件，两个xml语言文件，拷贝到对应的目录下：</p>
+</li>
+</ul>
+<p>   <img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531193518.gif" alt=""></p>
+<p>   <img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531193719.gif" alt=""></p>
+<p>####6.2 配置####<br>打开GreenShot,首先我们验证一下插件是否加载成功，邮件单击GreenShot图标，单击<strong>Preference…</strong>：</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531194153.gif" alt=""></p>
+<p>  如果看到插件列在了<strong>Plugins</strong>中，说明加在成功：</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531194440.gif" alt=""></p>
+<p>打开配置主界面：</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531194749.gif" alt=""></p>
+<p><strong>序号1到4必须填正确</strong>，这些都该填写什么呢？</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531195247.gif" alt=""></p>
+<p>见下图，登陆七牛云，点击<strong>个人中心-&gt;密钥管理</strong>，即可看到AK和SK：</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531195604.gif" alt=""></p>
+<p>序号3对应着存储空间名称，你可以<strong>新建存储空间</strong>，把对应的名字填写到<strong>Scope</strong>里：</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531195946.gif" alt=""></p>
+<p>序号4对应着域名，这个域名是用于拼写复制到剪贴板的图片link的，不知道有没有更好的方法。目前楼主用的是测试域名：</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531200256.gif" alt=""></p>
+<p>序号5是图片格式，序号6为图片名字前缀，方便管理图片。<br>好了，配置好之后，点击OK，这些配置信息都会保存到本地的配置文件中，注意AK和SK在这里是明文保存，小心不要泄露。。</p>
+<p>####6.3 使用####<br>看一下如何使用，右键单击GreenShot图标，点击<strong>Capture region</strong>,或者其他的截图方式：</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531200915.gif" alt=""></p>
+<p>如果去边编辑图片，你可以选择<strong>Open in image editor</strong>,如果你想直接上传，单击<strong>Upload to Qiniu</strong>即可。</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531201126.gif" alt=""></p>
+<p>编辑完图片之后，单击七牛图标。</p>
+<p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531201424.gif" alt=""></p>
+<p>最后一步，Ctrl+V ,将剪贴板中的图片链接拷贝到你的博客中，大功告成！</p>
 
       
     </div>
@@ -401,7 +454,7 @@ pthread_join(tid,NULL);
       
         <div class="post-tags">
           
-            <a href="/tags/linux编程/" rel="tag"># linux编程</a>
+            <a href="/tags/工具开发/" rel="tag"># 工具开发</a>
           
         </div>
       
@@ -414,8 +467,8 @@ pthread_join(tid,NULL);
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/12/15/2015-12-15_20_40_机器学习实战-边学边读python代码(5)/" rel="next" title="机器学习实战-边学边读python代码(5)">
-                <i class="fa fa-chevron-left"></i> 机器学习实战-边学边读python代码(5)
+              <a href="/2017/05/26/APUE-文件和目录/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
               </a>
             
           </div>
@@ -423,10 +476,6 @@ pthread_join(tid,NULL);
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/01/24/2016-01-24_17_58_Linux_多线程编程_实例_2/" rel="prev" title="Linux 多线程编程 实例 2">
-                Linux 多线程编程 实例 2 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
