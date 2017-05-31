@@ -266,6 +266,334 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/04/2017-04-04_18_20_读书笔记_effective_c++_Item_43_了解如何访问模板化基类中的名字/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/04/04/2017-04-04_18_20_读书笔记_effective_c++_Item_43_了解如何访问模板化基类中的名字/" itemprop="url">读书笔记 effective c++ Item 43 了解如何访问模板化基类中的名字</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-04T18:20:00+08:00">
+                2017-04-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/04/04/2017-04-04_18_20_读书笔记_effective_c++_Item_43_了解如何访问模板化基类中的名字/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 43 了解如何访问模板化基类中的名字">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="1-问题的引入——派生类不会发现模板基类中的名字"><a href="#1-问题的引入——派生类不会发现模板基类中的名字" class="headerlink" title="1. 问题的引入——派生类不会发现模板基类中的名字"></a>1. 问题的引入——派生类不会发现模板基类中的名字</h2><p>假设我们需要写一个应用，使用它可以为不同的公司发送消息。消息可以以加密或者明文（未加密）的方式被发送。如果在编译阶段我们有足够的信息来确定哪个信息会被发送到哪个公司，我们可以使用基于模板的解决方案：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">class CompanyA &#123;</div><div class="line">public:</div><div class="line">...</div><div class="line">void sendCleartext(const std::string&amp; msg);</div><div class="line">void sendEncrypted(const std::string&amp; msg);</div><div class="line">...</div><div class="line">&#125;;</div><div class="line">class CompanyB &#123;</div><div class="line">public:</div><div class="line">...</div><div class="line">void sendCleartext(const std::string&amp; msg);</div><div class="line">void sendEncrypted(const std::string&amp; msg);</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"></div><div class="line">...                                                       // classes for other companies</div><div class="line"></div><div class="line">class MsgInfo &#123; ... &#125;;                            // class for holding information</div><div class="line">// used to create a message</div><div class="line"></div><div class="line">template&lt;typename Company&gt;</div><div class="line">class MsgSender &#123;</div><div class="line">public:</div><div class="line">...                                                       // ctors, dtor, etc.</div><div class="line"></div><div class="line">void sendClear(const MsgInfo&amp; info)</div><div class="line">&#123;</div><div class="line">std::string msg;</div><div class="line">create msg from info;</div><div class="line">Company c;</div><div class="line">c.sendCleartext(msg);</div><div class="line">&#125;</div><div class="line">void sendSecret(const MsgInfo&amp; info)           // similar to sendClear, except</div><div class="line"></div><div class="line">&#123; ... &#125;                                              // calls c.sendEncrypted</div><div class="line"></div><div class="line">&#125;        </div></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/04/04/2017-04-04_18_20_读书笔记_effective_c++_Item_43_了解如何访问模板化基类中的名字/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/03/2017-04-03_08_15_读书笔记_effective_c++_Item_42_理解typename的两种涵义/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Harlan Chen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="HarlanC's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/04/03/2017-04-03_08_15_读书笔记_effective_c++_Item_42_理解typename的两种涵义/" itemprop="url">读书笔记 effective c++ Item 42 理解typename的两种涵义</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-03T08:15:00+08:00">
+                2017-04-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
+                    <span itemprop="name">Effective c++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/04/03/2017-04-03_08_15_读书笔记_effective_c++_Item_42_理解typename的两种涵义/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 42 理解typename的两种涵义">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="1-class和typename含义相同的例子"><a href="#1-class和typename含义相同的例子" class="headerlink" title="1. class和typename含义相同的例子"></a>1. class和typename含义相同的例子</h2><p>问题：在下面的模板声明中class和typename的区别是什么？</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> template&lt;class T&gt; class Widget;     // uses “class”</div><div class="line">&lt;!--more--&gt;</div><div class="line"></div><div class="line"></div><div class="line"> template&lt;typename T&gt; class Widget;            // uses “typename”</div></pre></td></tr></table></figure>
+<p>答案：没有任何区别。当声明一个模板类型参数时，class和typename意味着相同的事情。一些程序员喜欢使用class，因为容易敲打。其他的（包括我）更加喜欢使用typename，因为用它表明参数不需要是一个class类型。一些程序员在允许使用任何type的时候使用typename，只用对用户自定义的类型使用class。但是从C++ 的观点来看，在声明模板参数的时候class和typename意味着相同的事情。</p>
+<h2 id="2-必须使用typename的例子"><a href="#2-必须使用typename的例子" class="headerlink" title="2. 必须使用typename的例子"></a>2. 必须使用typename的例子</h2><p>然而，C++并不总是将class和typename同等对待。有时你必须使用typename。为了理解在什么时候必须使用，我们必须讨论能够在模板中引用的两种名字。</p>
+<p>假设我们有一个函数模板，用和STL兼容的容器作为模板参数，此容器中包含的对象能够被赋值给int类型。进一步假设这个函数打印容器中的第二个元素值。我在下面以愚蠢的方式实现了一个愚蠢的函数，它甚至不能通过编译，但是请忽略这些事情，看下面的例子: </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">template&lt;typename C&gt; // print 2nd element in</div><div class="line">void print2nd(const C&amp; container) // container;</div><div class="line">&#123; // this is not valid C++!</div><div class="line">if (container.size() &gt;= 2) &#123;</div><div class="line">C::const_iterator iter(container.begin()); // get iterator to 1st element</div><div class="line">++iter; // move iter to 2nd element</div><div class="line">int value = *iter; // copy that element to an int</div><div class="line"></div><div class="line">std::cout &lt;&lt; value;                       // print the int</div><div class="line"></div><div class="line">&#125;                                                 </div><div class="line"></div><div class="line">&#125;     </div></pre></td></tr></table></figure>
+<p> 我对此函数中的两个本地变量做了高亮，iter和value。Iter的类型是C::const_iterator，它依赖于模板参数C。模板中依赖于模板参数的名字被称作依赖名字(dependent names)。当一个依赖名字嵌套在一个类中的时候，我把它叫做内嵌依赖名字（nested dependent name）。C::const_iterator是一个内嵌依赖名字。事实上，它是一个内嵌依赖类型名字（nested dependent type name）,也即是指向一个类型（type）的内嵌依赖名字。</p>
+<p>对于print2nd中的其他本地变量，value，类型为int。int不依赖于任何模板参数。这种名字被称作“非依赖名字”（non-dependent names）。（我不知道为什么不把它们叫做独立名字（independent names）。“non-dependent”是一种不好的命名方式，但毕竟它是术语，所以需要遵守这个约定。）</p>
+<p>内嵌依赖名字会导致解析困难。例如，如果我们让print2nd函数以下面的方式开始，会更加愚蠢：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">template&lt;typename C&gt;</div><div class="line"></div><div class="line">void print2nd(const C&amp; container)</div><div class="line"></div><div class="line">&#123;</div><div class="line"></div><div class="line">C::const_iterator * x;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>看上去像是我们声明了一个本地变量x，这个x指针指向一个C::const_iterator。但是它看上去是这样的仅仅因为我们“知道”C::const_iterator是一个type。但是如果C::const_iterator不是一个type会是怎样呢？如果C有个静态数据成员恰好被命名为const_iterator会发生什么？如果x恰巧是一个全局变量的名字呢？在这种情况下，上面的code就不会声明一个本地变量，它会是C::const_iterator和x的乘积！听起来有些疯狂，但这是可能的，实现C++编译器的人员也必须考虑到所有可能的输入，包括一些看起来很疯狂的例子。</p>
+<p>直到C被确定之前，没有办法知道C::const_iterator是否是一个type，当函数模板print2nd被解析的时候，C不能够被确认。为了处理这种模棱两可的问题，C++有一个准则：<strong>如果解析器在模板中碰到了一个内嵌依赖名字，它不会认为这是一个**</strong>type，除非你告诉它<strong>。默认情况下，</strong>内嵌依赖名字不是<strong>**types。</strong>（对于这个规则有个例外，一会会提到。）</p>
+<p>将上面的规则记在心中，再看一次print2nd的开始部分：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">template&lt;typename C&gt;</div><div class="line">void print2nd(const C&amp; container)</div><div class="line">&#123;</div><div class="line">if (container.size() &gt;= 2) &#123;</div><div class="line">C::const_iterator iter(container.begin()); // this name is assumed to</div><div class="line">... // not be a type</div></pre></td></tr></table></figure>
+<p>现在应该清楚为什么这不是有效的C++了。Iter的声明只有在C::const_iterator是一个type的情况下才有意义，但是我们并没有告知C++它是一个类型，于是C++假设它不是一个类型。为了纠正这种情况，我们必须告诉C++ C::const_iterator是一个类型。我们将typename放在type之前就能达到这个目的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">template&lt;typename C&gt;                                                               // this is valid C++</div><div class="line"></div><div class="line">void print2nd(const C&amp; container)                                            </div><div class="line"></div><div class="line">&#123;                                                                                                </div><div class="line"></div><div class="line">if (container.size() &gt;= 2) &#123;                                                          </div><div class="line"></div><div class="line">typename C::const_iterator iter(container.begin());                  </div><div class="line"></div><div class="line">...                                                                                                </div><div class="line"></div><div class="line">&#125;                                                                                                </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个规则很简单：在一个模板中，任何时候你引用一个内嵌依赖类型名字，你都必须在名字前加上typename。（也有例外，一会会提到。）</p>
+<p><strong>typename应该只被用来确认一个内嵌依赖类型名字</strong>；其他的名字不应该加这个前缀。例如，下面的函数模板使用两个参数，一个容器和一个容器的迭代器：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">template&lt;typename C&gt;                        <span class="comment">// typename allowed (as is “class”)</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span>(<span class="params"><span class="keyword">const</span> C&amp; container, // typename not allowed</span></span></div><div class="line">typename C::iterator iter); <span class="comment">// typename required</span></div></pre></td></tr></table></figure>
+<p>C不是内嵌依赖类型名字（它没有内嵌在任何依赖于模板参数的东西中），所以在声明容器的时候不应该加typename，但是C::iterator是一个内嵌依赖类型名字，所以需要加typename。</p>
+<h2 id="3-一个例外——不能使用typename的地方"><a href="#3-一个例外——不能使用typename的地方" class="headerlink" title="3. 一个例外——不能使用typename的地方"></a>3. 一个例外——不能使用typename的地方</h2><p>”typename”必须加在内嵌依赖类型名字之前“这个规则有一个例外：<strong>基类列表中的内嵌依赖类型名字或者成员初始化列表中的基类标识符不能加typename</strong>。例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">template&lt;typename T&gt;</div><div class="line">class Derived: public Base&lt;T&gt;::Nested &#123; // base class list: typename not</div><div class="line"></div><div class="line">public:                                    // allowed</div><div class="line"></div><div class="line">explicit Derived(int x)           </div><div class="line"></div><div class="line">: Base&lt;T&gt;::Nested(x)          // base class identifier in mem.</div><div class="line"></div><div class="line">&#123;                                         // init. list: typename not allowed</div><div class="line"></div><div class="line">typename Base&lt;T&gt;::Nested temp; // use of nested dependent type</div><div class="line">... // name not in a base class list or</div><div class="line">&#125; // as a base class identifier in a</div><div class="line">... // mem. init. list: typename</div><div class="line">required</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这种不一致性令人感到厌烦，但是一旦你有了一点经验，你就会注意到它。</p>
+<h2 id="4-最后的例子——为typename使用typedef"><a href="#4-最后的例子——为typename使用typedef" class="headerlink" title="4. 最后的例子——为typename使用typedef"></a>4. 最后的例子——为typename使用typedef</h2><p>让我们看最后一个typename的例子，因为它代表了你将会在真实代码中看到的某些东西。假设我们正在实现一个函数模板，带了一个迭代器参数，我们想为迭代器指向的对象做一份本地拷贝，temp。我们可以像下面这样实现：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT&gt;</div><div class="line">void workWithIterator(IterT iter)</div><div class="line">&#123;</div><div class="line">typename std::iterator_traits&lt;IterT&gt;::value_type temp(*iter);</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不要让 std::iterator_traits<itert>::value_type 吓到你。这只是标准特性类（standard traits class）的一种使用方法，这是“类型IterT对象指向的类型“的C++实现方式。这个句子声明了一个本地变量(temp)，它的类型同IterT对象指向的对象的类型一致，它将temp初始化为iter指向的对象。如果IterT是vector<int>::iterator，那么temp就是int类型的。如果IterT是list<string>::iterator，temp就是string类型的。因为std::iterator_traits<itert>::value_type是一个内嵌依赖类型名字（在iterator_traits<itert>内部value_type是内嵌的，IterT是一个模板参数），我们必须为其添加typename。</itert></itert></string></int></itert></p>
+<p>如果你认为读std::iterator_traits<itert>::value_type是一件不让人愉快的事情，想像一下将其打出来会是什么样的。如果你像大部分程序员一样，多次输入这个表达式的想法是可怕的，所以你会想为其创建一个typedef。对于像value_type这样的特性（traits）成员名字来说（对于特性的信息看Item47）,使用惯例是使得typedef名字和特性成员名字相同，所以这样一个本地typedef通常被定义成下面这样：</itert></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">template&lt;typename IterT&gt;</div><div class="line">void workWithIterator(IterT iter)</div><div class="line">&#123;</div><div class="line">typedef typename std::iterator_traits&lt;IterT&gt;::value_type value_type;</div><div class="line">value_type temp(*iter);</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>许多程序员发现将“typedef typename“并列看上去不和谐，但是对于使用内嵌依赖类型名字的规则来说，这是一个合乎逻辑的结果。你会很快习惯这种用法。毕竟，你有着很强的驱动力。你想输入typename std::iterator_traits<itert>::value_type多少次呢？</itert></p>
+<h2 id="5-Typename的执行因编译器而异"><a href="#5-Typename的执行因编译器而异" class="headerlink" title="5. Typename的执行因编译器而异"></a>5. Typename的执行因编译器而异</h2><p>作为结束语，我应该提及的是关于typename规则的强制执行随着编译器的不同而不同，一些编译器接受需要typename但实际上没有输入的情况；一些编译器接受输入了typename但实际上不允许的情况；还有一些（通常是老的编译器）在需要输入typename时拒绝了typename输入。这就意味着typename和内嵌依赖类型名字的交互会产生让你头痛的问题。</p>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><ul>
+<li>当声明模板参数的时候，class和typename是可以互换的。</li>
+<li>使用typename来识别内嵌依赖类型名字，但在基类列表中或者成员初始化列表中的基类标识符除外。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/30/2017-03-30_22_56_读书笔记_effective_c++_Item_41_理解隐式接口和编译期多态/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1466,335 +1794,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/" itemprop="url">读书笔记 effective c++ Item 34 区分接口继承和实现继承</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-20T22:26:00+08:00">
-                2017-03-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective c++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/" class="leancloud_visitors" data-flag-title="读书笔记 effective c++ Item 34 区分接口继承和实现继承">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><p>看上去最为简单的(public)继承的概念由两个单独部分组成：<strong>函数接口的继承和函数模板继承</strong>。这两种继承之间的区别同本书介绍部分讨论的函数声明和函数定义之间的区别完全对应。</p>
-<h2 id="1-类函数的三种实现"><a href="#1-类函数的三种实现" class="headerlink" title="1. 类函数的三种实现"></a>1. 类函数的三种实现</h2><p>作为一个类设计者，有时候你<strong>只想派生类继承成员函数的接口</strong>（声明<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/03/20/2017-03-20_22_26_读书笔记_effective_c++_Item_34_区分接口继承和实现继承/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Harlan Chen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://files.cnblogs.com/files/harlanc/elempent.bmp">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="HarlanC's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/" itemprop="url">读书笔记 effective C++ Item 33 避免隐藏继承而来的名字</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-15T20:56:00+08:00">
-                2017-03-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Effective-c/" itemprop="url" rel="index">
-                    <span itemprop="name">Effective c++</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2017/03/15/2017-03-15_20_56_读书笔记_effective_C++_Item_33_避免隐藏继承而来的名字/" class="leancloud_visitors" data-flag-title="读书笔记 effective C++ Item 33 避免隐藏继承而来的名字">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><h2 id="1-普通作用域中的隐藏"><a href="#1-普通作用域中的隐藏" class="headerlink" title="1. 普通作用域中的隐藏"></a>1. 普通作用域中的隐藏</h2><p>名字实际上和继承没有关系。有关系的是作用域。我们都知道像下面的代码：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"> int x;                 // global variable</div><div class="line"></div><div class="line"> void someFunc</div><div class="line">&lt;!--more--&gt;</div><div class="line">)</div><div class="line"> &#123;</div><div class="line"> double x;          // local variable</div><div class="line"></div><div class="line"> std::cin &gt;&gt; x;     // read a new value for local x</div><div class="line"></div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<p>读入x的声明指向的是本地的x而不是全局的x，因为内部作用域的名字将外部作用域的变量隐藏掉了。我们将作用域的这种情况用以下方式进行可视化：</p>
-<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205232604-2077757503.png" alt=""></p>
-<p>当编译器在someFunc的作用域中时，遇到了名字x,它们先在本地作用域中查询是否有以这个名字命名的一些东西。因为存在，它们就不再检查别的作用域了。在这种情况中，someFunc的x是double类型，而global的x是int类型，这没有关系。C++的名字隐藏规则会对其进行处理：隐藏名字。不管与名字对应的是相同还是不同的类型都没有关系。在这种情况中，被命名为x的double隐藏了命名为x的int。</p>
-<h2 id="2-编译器是如何在继承体系中寻找名字的"><a href="#2-编译器是如何在继承体系中寻找名字的" class="headerlink" title="2. 编译器是如何在继承体系中寻找名字的"></a>2. 编译器是如何在继承体系中寻找名字的</h2><p>现在进入继承。我们知道当我们处在一个派生类成员函数内部时，并且引用了一些基类的东西（例如，一个成员函数，一个typedef或者一个数据成员），编译器能够找到我们所引用的东西，因为派生类继承了声明在基类中的这些东西。实际的工作方式是派生类的作用域被镶嵌在基类作用域内部。举个例子：</p>
-<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205309620-2055878691.png" alt=""></p>
-<p>这个类中既有public的名字也有private的名字，既有数据成员也有成员函数。成员函数包括纯虚函数，普通虚函数（非纯虚函数）以及非虚函数。这是为了强调我们要讨论的是名字而不是别的。例子中也能包含类型名称，例如，枚举，嵌套类和typedefs。在这次的讨论中我们唯一关心的是他们是名字。他们是什么样的类型无关紧要。这个例子使用的是单继承，但是一旦你明白了在单继承下会发生什么，多继承下的C++行为很容易就能够预推测出来。</p>
-<p>假设派生类中的mf4定义如下：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">void Derived::mf4()</div><div class="line">&#123;</div><div class="line">...</div><div class="line">mf2();</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>当编译器看到这里使用了名字mf2，它们必须理解mf2指向的是什么。它们会在作用域中寻找名字为mf2的一个声明。首先他们在local作用域中寻找，但是发现没有任何名字为mf4的声明。接下来寻找包含（containing）作用域，也就是类Derived。它们仍然没有发现mf2，所以它们进入了下一个包含作用域，也就是基类。在这里找到了名字为mf2的声明，搜索结束了。如果在基类中没有mf2,搜索会继续进行，首先在包含Derived的namespace(s)中寻找，最后在全局作用域内寻找。</p>
-<p>我们刚刚描述的流程是准确的，但是对于名字如何在C++中被发现来说是不全面的。我们的目标不是为了了解足够的名字寻找规则然后实现一个编译器，然而，我们应该了解足够的规则来避免碰到一些让人感到意外的事情，对这个工作，我们已经了解了大量的信息了。</p>
-<h2 id="3-继承体系中的名字是如何被隐藏的"><a href="#3-继承体系中的名字是如何被隐藏的" class="headerlink" title="3. 继承体系中的名字是如何被隐藏的"></a>3. 继承体系中的名字是如何被隐藏的</h2><p>考虑前面的例子，这次我们除了要重载mf1和mf3之外，也在Derived中添加一个mf3版本。（正如Item36中解释的，Derived中mf3的声明——一个继承而来的非virtual函数——会让这个设计看起来很可疑，但是为了理解继承下的名字可见性，我们忽略这个问题。）</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">class</span> <span class="title">Base</span> &#123;</div><div class="line"><span class="keyword">private</span>:</div><div class="line"><span class="keyword">int</span> x;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span>(<span class="params"></span>) </span>= <span class="number">0</span>;</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span>(<span class="params"><span class="keyword">int</span></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf2</span>(<span class="params"></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mf3</span>(<span class="params"></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mf3</span>(<span class="params"><span class="keyword">double</span></span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div><div class="line"><span class="keyword">class</span> <span class="title">Derived</span>: <span class="title">public</span> <span class="title">Base</span> &#123;</div><div class="line"><span class="keyword">public</span>:</div><div class="line"><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">mf1</span>(<span class="params"></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mf3</span>(<span class="params"></span>)</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mf4</span>(<span class="params"></span>)</span>;</div><div class="line">...</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205340135-333941176.png" alt=""></p>
-<p>这段代码产生的行为会让每个首次碰到这种情况的C++程序员都感到吃惊。基于作用域的名字隐藏规则并没有变化，所以基类中的名字为mf1和mf3的所有函数被派生类中相同名字的函数隐藏掉了。从名字搜寻的角度来看，Base::mf1和Base::mf3不再被Derived继承了！</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Derived d;</div><div class="line"><span class="keyword">int</span> x;</div><div class="line">...</div><div class="line">d.mf1(); <span class="comment">// fine, calls Derived::mf1</span></div><div class="line">d.mf1(x); <span class="comment">// error! Derived::mf1 hides Base::mf1</span></div><div class="line"></div><div class="line">d.mf2();         <span class="comment">// fine, calls Base::mf2</span></div><div class="line"></div><div class="line">d.mf3();         <span class="comment">// fine, calls Derived::mf3</span></div><div class="line"></div><div class="line">d.mf3(x);                     <span class="comment">// error! Derived::mf3 hides Base::mf3</span></div></pre></td></tr></table></figure>
-<p>正如你所看到的，对于有相同名字的基类和派生类中的函数有，即使参数类型不同，上面的隐藏规则也同样适用，并且它和函数的虚与非虚没有关系。在这个条款开始也是同样的方式，函数someFunc中的double x隐藏了全局作用域的int x，在这里Derived中的函数mf3隐藏了基类中名字为mf3的函数，即使参数类型不一样。</p>
-<h2 id="4-如何将隐藏行为覆盖掉"><a href="#4-如何将隐藏行为覆盖掉" class="headerlink" title="4. 如何将隐藏行为覆盖掉"></a>4. 如何将隐藏行为覆盖掉</h2><p>这种行为背后的基本原理在于当你在一个库或者应用框架中创建一个新的派生类时，它能够阻止你突然从遥远的基类中继承重载函数。不幸的是，你总是想继承重载函数。事实上，如果你正在使用public继承并且没有继承重载函数，你就违反了基类和派生类之间的”is-a”关系，这是<a href="http://www.cnblogs.com/harlanc/p/6551155.html" title="Item 32" target="_blank" rel="external">Item 32</a>中介绍的public继承的基本原则。这就是基本情况，你总是想对继承来的名字的默认隐藏行为进行覆盖。</p>
-<h3 id="4-1-方法一-使用using-声明"><a href="#4-1-方法一-使用using-声明" class="headerlink" title="4.1 方法一 使用using 声明"></a>4.1 方法一 使用using 声明</h3><p>使用using声明来达到这个目的：</p>
-<p> <img src="http://oq8nryefp.bkt.clouddn.com/blog_830862-20170315205353510-1969970357.png" alt=""></p>
-<p>现在的继承就按照你所期望的进行工作了：</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Derived d;</div><div class="line"><span class="keyword">int</span> x;</div><div class="line">...</div><div class="line">d.mf1(); <span class="comment">// still fine, still calls Derived::mf1</span></div><div class="line">d.mf1(x); <span class="comment">// now okay, calls Base::mf1</span></div><div class="line"></div><div class="line">d.mf2();         <span class="comment">// still fine, still calls Base::mf2</span></div><div class="line"></div><div class="line">d.mf3();         <span class="comment">// fine, calls Derived::mf3</span></div><div class="line"></div><div class="line">d.mf3(x);    <span class="comment">// now okay, calls Base::mf3 (The int x is</span></div><div class="line"><span class="comment">// implicitly converted to a double so that</span></div><div class="line"><span class="comment">// the call to Base::mf3 is valid.)</span></div></pre></td></tr></table></figure>
-<p>这意味着如果你的类继承自包含重载函数的基类，你想对其中的一些函数进行重新定义或者覆盖，你需要为每个即将被隐藏掉的名字包含一个using声明，如果你不这样做，你想继承的一些名字就会被隐藏。</p>
-<h3 id="4-2-方法二-使用forwarding函数"><a href="#4-2-方法二-使用forwarding函数" class="headerlink" title="4.2 方法二 使用forwarding函数"></a>4.2 方法二 使用forwarding函数</h3><p>有时候你并不想继承基类的所有函数，这是可能的。在public继承下，你应该永远拒绝这种行为，因为，它违反了基类和派生类之间public继承的”is-a”关系。（这也是为什么上面的using声明放在派生类的public部分：基类中的public名字在public继承的派生类中应该也是public的）。然而在private继承中(见Item 39)，它也是有意义的。举个例子，假设Derived私有继承自基类Base,Derived类想继承基类函数mf1的唯一版本是不带参数的版本。Using声明在这里就不工作了，因为一个using声明会使得所有继承而来的函数的名字在派生类中是可见的。这里可以使用不同的技术，也就是简单的forwarding函数：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Base &#123;</div><div class="line">public:</div><div class="line">virtual void mf1() = 0;</div><div class="line">virtual void mf1(int);</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line">// as before</div><div class="line"></div><div class="line">&#125;;</div><div class="line">class Derived: private Base &#123;</div><div class="line">public:</div><div class="line">virtual void mf1() // forwarding function; implicitly</div><div class="line">&#123; Base::mf1(); &#125; // inline — see [Item 30](http://www.cnblogs.com/harlanc/p/6523201.html "Item 30"). (For info</div><div class="line">... // on calling a pure virtual</div><div class="line">&#125;; // function, see Item 34.)</div><div class="line">...</div><div class="line">Derived d;</div><div class="line">int x;</div><div class="line">d.mf1(); // fine, calls Derived::mf1</div><div class="line">d.mf1(x); // error! Base::mf1() is hidden</div></pre></td></tr></table></figure>
-<p>另外一种使用inline forwarding函数的地方是在使用比较老的编译器的时候，它们不支持通过using 声明来将继承而来的名字导入到派生类作用域中。</p>
-<p>这就是关于继承和名字隐藏的全部故事，但是当继承同模板结合起来的时候，一个完全不同的“继承而来的名字被隐藏”问题就会出现，详情见 Item 43。</p>
-<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><ul>
-<li><ul>
-<li>派生类中的名字会将基类中的名字隐藏掉。在公共继承中，这绝不是令人满意的。</li>
-<li>为了让隐藏起来的名字重见天日，使用using声明或者forwarding函数来达到目的。</li>
-</ul>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1844,7 +1843,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">83</span>
+                <span class="site-state-item-count">85</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1866,7 +1865,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
