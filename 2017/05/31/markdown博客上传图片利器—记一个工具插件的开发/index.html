@@ -92,13 +92,13 @@
 
 
 
-<meta name="description" content="##1. 背景## 写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中">
+<meta name="description" content="1. 背景写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中(Ctrl">
 <meta name="keywords" content="工具开发">
 <meta property="og:type" content="article">
 <meta property="og:title" content="markdown博客上传图片利器——记一个工具插件的开发">
 <meta property="og:url" content="http://yoursite.com/2017/05/31/markdown博客上传图片利器—记一个工具插件的开发/index.html">
 <meta property="og:site_name" content="HarlanC&#39;s Blog">
-<meta property="og:description" content="##1. 背景## 写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中">
+<meta property="og:description" content="1. 背景写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中(Ctrl">
 <meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531193518.gif">
 <meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531193719.gif">
 <meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531194153.gif">
@@ -111,10 +111,10 @@
 <meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531200915.gif">
 <meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531201126.gif">
 <meta property="og:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531201424.gif">
-<meta property="og:updated_time" content="2017-05-31T12:51:01.513Z">
+<meta property="og:updated_time" content="2017-05-31T13:05:09.822Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="markdown博客上传图片利器——记一个工具插件的开发">
-<meta name="twitter:description" content="##1. 背景## 写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中">
+<meta name="twitter:description" content="1. 背景写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：  截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。 上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…) 获取图片链接(为了确保无误，可以在浏览器中打开图片，并复制link) 将链接添加到markdown博客中(Ctrl">
 <meta name="twitter:image" content="http://oq8nryefp.bkt.clouddn.com/blog_20170531193518.gif">
 
 
@@ -364,8 +364,7 @@
       
 
       
-        <p>##1. 背景##</p>
-<p>写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：</p>
+        <h2 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h2><p>写博客有一个自己的图床是不错的选择，如果不借助工具，在markdown博客中添加图片的步骤如下：</p>
 <ul>
 <li>截取图片，保存到本地(得来回点对话框，选择保存路径，选择文件类型，输入文件名)。</li>
 <li>上传到图床服务器(打开网页，跳转到上传页面，点击browse,选择本地文件，upload…)</li>
@@ -373,27 +372,21 @@
 <li>将链接添加到markdown博客中(Ctrl+v 复制到博客中)</li>
 </ul>
 <p>还是很繁琐的，那么可不可以自己实现一个工具来做这些繁琐的事情呢？<br><a id="more"></a></p>
-<p>##2. 分析##</p>
-<p>首先要确定使用哪家的图床服务，网上搜了一下，都说七牛云比较靠谱（这里不是打广告。。），提供的SDK也比较全，我们这里就用七牛云，接下来确定该如何实现一个截图工具来实现截图+图片upload功能，从头实现一个工具不太现实，找一个开源的截图工具比较靠谱，博主目前正在用的是<a href="https://github.com/greenshot/greenshot" target="_blank" rel="external">greenshot</a>,发现这正好是一个开源的工具，好了，就是它了。</p>
-<p>##3. 需求##</p>
-<p>为greenshot添加一个插件，初步实现以下功能：</p>
+<h2 id="2-分析"><a href="#2-分析" class="headerlink" title="2. 分析"></a>2. 分析</h2><p>首先要确定使用哪家的图床服务，网上搜了一下，都说七牛云比较靠谱（这里不是打广告。。），提供的SDK也比较全，我们这里就用七牛云，接下来确定该如何实现一个截图工具来实现截图+图片upload功能，从头实现一个工具不太现实，找一个开源的截图工具比较靠谱，博主目前正在用的是<a href="https://github.com/greenshot/greenshot" target="_blank" rel="external">greenshot</a>,发现这正好是一个开源的工具，好了，就是它了。</p>
+<h2 id="3-需求"><a href="#3-需求" class="headerlink" title="3. 需求"></a>3. 需求</h2><p>为greenshot添加一个插件，初步实现以下功能：</p>
 <ul>
 <li>针对七牛云SDK接口，添加配置对话框，可以配置accesskey,secretkey,scope，default domain来支持上传，并能将这些配置保存到本地(为了简单，将access key和secret key保存成明文)</li>
 <li>可以为图片名字添加前缀</li>
 <li>支持选择文件类型，支持bmp,gif,png,jpg等格式</li>
 <li>上传文件后可以自动将图床中的文件link复制到剪贴板</li>
 </ul>
-<p>##4. 准备##</p>
-<ul>
+<h2 id="4-准备"><a href="#4-准备" class="headerlink" title="4. 准备"></a>4. 准备</h2><ul>
 <li>开发工具 visual Studio 2017</li>
 <li>原材料   七牛云SDK源码+greenshot源码</li>
 <li>其它    申请一个七牛云账号，开通图床服务（可以百度或者google…）</li>
 </ul>
-<p>##5. 实现##</p>
-<p>过程省略，实现比较简单，大部分时间花在熟悉greenshot代码架构和代码调试上，直接上源码：<br><a href="https://github.com/harlanc/greenshot" target="_blank" rel="external">https://github.com/harlanc/greenshot</a></p>
-<p>##6. Demo##</p>
-<p>####6.1 安装####</p>
-<ul>
+<h2 id="5-实现"><a href="#5-实现" class="headerlink" title="5. 实现"></a>5. 实现</h2><p>过程省略，实现比较简单，大部分时间花在熟悉greenshot代码架构和代码调试上，直接上源码：<br><a href="https://github.com/harlanc/greenshot" target="_blank" rel="external">https://github.com/harlanc/greenshot</a></p>
+<h2 id="6-Demo"><a href="#6-Demo" class="headerlink" title="6. Demo"></a>6. Demo</h2><h4 id="6-1-安装"><a href="#6-1-安装" class="headerlink" title="6.1 安装"></a>6.1 安装</h4><ul>
 <li><p>首先安装GreenShot：<br><a href="http://getgreenshot.org/" target="_blank" rel="external">http://getgreenshot.org/</a></p>
 </li>
 <li><p>如果不想重新编译源码，直接到下面的网盘链接下载插件：</p>
@@ -403,7 +396,7 @@
 </ul>
 <p>   <img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531193518.gif" alt=""></p>
 <p>   <img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531193719.gif" alt=""></p>
-<p>####6.2 配置####<br>打开GreenShot,首先我们验证一下插件是否加载成功，邮件单击GreenShot图标，单击<strong>Preference…</strong>：</p>
+<h4 id="6-2-配置"><a href="#6-2-配置" class="headerlink" title="6.2 配置"></a>6.2 配置</h4><p>打开GreenShot,首先我们验证一下插件是否加载成功，邮件单击GreenShot图标，单击<strong>Preference…</strong>：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531194153.gif" alt=""></p>
 <p>  如果看到插件列在了<strong>Plugins</strong>中，说明加在成功：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531194440.gif" alt=""></p>
@@ -418,7 +411,7 @@
 <p>序号4对应着域名，这个域名是用于拼写复制到剪贴板的图片link的，不知道有没有更好的方法。目前楼主用的是测试域名：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531200256.gif" alt=""></p>
 <p>序号5是图片格式，序号6为图片名字前缀，方便管理图片。<br>好了，配置好之后，点击OK，这些配置信息都会保存到本地的配置文件中，注意AK和SK在这里是明文保存，小心不要泄露。。</p>
-<p>####6.3 使用####<br>看一下如何使用，右键单击GreenShot图标，点击<strong>Capture region</strong>,或者其他的截图方式：</p>
+<h4 id="6-3-使用"><a href="#6-3-使用" class="headerlink" title="6.3 使用"></a>6.3 使用</h4><p>看一下如何使用，右键单击GreenShot图标，点击<strong>Capture region</strong>,或者其他的截图方式：</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531200915.gif" alt=""></p>
 <p>如果去边编辑图片，你可以选择<strong>Open in image editor</strong>,如果你想直接上传，单击<strong>Upload to Qiniu</strong>即可。</p>
 <p><img src="http://oq8nryefp.bkt.clouddn.com/blog_20170531201126.gif" alt=""></p>
@@ -467,8 +460,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/26/APUE-文件和目录/" rel="next" title="">
-                <i class="fa fa-chevron-left"></i> 
+              <a href="/2017/05/25/APUE-UNIX文件IO/" rel="next" title="UNIX 文件I/O">
+                <i class="fa fa-chevron-left"></i> UNIX 文件I/O
               </a>
             
           </div>
@@ -524,8 +517,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://files.cnblogs.com/files/harlanc/elempent.bmp"
@@ -540,7 +542,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">85</span>
+                <span class="site-state-item-count">84</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -562,7 +564,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -605,6 +607,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-背景"><span class="nav-text">1. 背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-分析"><span class="nav-text">2. 分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-需求"><span class="nav-text">3. 需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-准备"><span class="nav-text">4. 准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-实现"><span class="nav-text">5. 实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Demo"><span class="nav-text">6. Demo</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-安装"><span class="nav-text">6.1 安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-配置"><span class="nav-text">6.2 配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-3-使用"><span class="nav-text">6.3 使用</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
