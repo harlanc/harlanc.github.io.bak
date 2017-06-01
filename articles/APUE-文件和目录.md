@@ -214,3 +214,60 @@ harlan@DESKTOP-KU8C3K5:~$ ll /usr/bin/passwd
 ```
 任意用户修改口令需要写入/etc/passwd文件中，而此文件只有root用户才有写权限，/usr/bin/passwd用来执行写操作，可以看到这个程序将root用户指定为设置用户组ID，因此任意用户当执行此程序进行写文件的时候将拥有root权限。
 ## 4.5文件访问权限 ##
+
+所有文件类型（目录·字符特别文件等）都有访问权限（access permission）。每个文件有9个访问权限，将它们分为3类，见图4-6。
+
+![](http://oq8nryefp.bkt.clouddn.com/bloglt_20170601081725.jpg)
+
+我们用chmod命令修改这9个权限位。它允许我们**用u表示用户，用g表示组，用o表示其他**。
+图4-6中的3类访问权限（读、写和执行）以各种不同的方式由不同函数使用。
+
+- 规则一，我们用名字打开任一类型的文件时，对该名字中包含的每一个目录，包括它可能隐含的当前工作目录都应具有执行权限。这就是为什么对于目录其执行权限位常被称为搜索位的原因。
+  **读权限允许我们读目录，获得在该目录中所有文件名的列表**，这是原书中的话，看下面的例子：
+```
+drwxr-xr-- root root 0 1496278552 test
+  -rw-r--r-- root root 0 1496278548 1.txt
+  -rw-r--r-- root root 0 1496278552 2.txt
+```
+test文件夹的路径为/,我们现在在普通用户（harlan）下执行**ls**，看是否可以将test下面的文件名列出来。可以看到test文件夹和下面的两个文件对于其他用户有读权限。
+
+先执行一个cd.
+```
+harlan@DESKTOP-KU8C3K5:~$ cd /test
+bash: cd: /test: 权限不够
+```
+可见cd是需要执行权限的。
+```
+harlan@DESKTOP-KU8C3K5:~$ ls /test
+1.txt  2.txt
+harlan@DESKTOP-KU8C3K5:~$ ls -l /test
+ls: 无法访问/test/1.txt: 权限不够
+ls: 无法访问/test/2.txt: 权限不够
+总用量 0
+-????????? ? ? ? ?             ? 1.txt
+-????????? ? ? ? ?             ? 2.txt
+```
+可见普通的ls是可以的，以列表方式列出文件信息就只列出了文件名。
+
+为文件夹加上执行权限：
+```
+drwxr-xr-x root root 0 1496278552 test
+  -rw-r--r-- root root 0 1496278548 1.txt
+  -rw-r--r-- root root 0 1496278552 2.txt
+```
+
+```
+harlan@DESKTOP-KU8C3K5:/$ cd /test
+harlan@DESKTOP-KU8C3K5:/test$
+harlan@DESKTOP-KU8C3K5:/test$cd ..
+harlan@DESKTOP-KU8C3K5:/$ ls -l /test
+总用量 0
+-rw-r--r-- 1 root root 0  6月  1 08:55 1.txt
+-rw-r--r-- 1 root root 0  6月  1 08:55 2.txt
+```
+cd执行成功,ls -l 也执行成功。
+
+
+- 对于一个文件的读权限决定了我们是否能够打开现有文件进行读操作。这与open函数的O_RDONLY和O_RDWR标志相关。
+- 对于一个文件的写权限决定了我们是否能够打开现有文件进行写操作。这与open函数的O_WRONLY和O_RDWR标志相关。
+-  
